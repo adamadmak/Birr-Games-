@@ -2848,3 +2848,271 @@ body {
     white-space: nowrap;
     border: 0;
 }
+
+/* ============================================================================
+   LOBBY LAYOUT IN THE STYLE OF A MODERN CASINO LOBBY
+   Presentation only. Navy ground; a pill navigation bar; a grouped sidebar; a
+   studio pill row under the search; each studio as a framed shelf with a title
+   bar, "View all" and scroll arrows; and tall game cards on horizontal rails.
+   The brand green stays the accent. Every behaviour (search, studio filter,
+   collapse, the game dialog, pagination) is the existing markup and script.
+   To retire the look, delete from here to the end of the file.
+   ========================================================================== */
+
+/* ---------- Navy palette -------------------------------------------------- */
+:root {
+    --bg: #0a0d14;
+    --bg-deep: #070910;
+    --surface-solid: #141722;
+    --surface-lift: #1b1f2d;
+    --glass: rgba(21, 24, 36, .68);
+    --glass-soft: rgba(28, 32, 46, .48);
+    --glass-strong: rgba(10, 13, 20, .86);
+    --glass-line: rgba(140, 160, 215, .12);
+    --glass-line-strong: rgba(140, 160, 215, .20);
+}
+.player-authenticated,
+.player-shell {
+    --bg: #0a0d14;
+    --surface-2: var(--surface-solid);
+    --surface-3: var(--surface-lift);
+    background:
+        radial-gradient(circle at 8% 4%, rgba(60, 90, 200, .10), transparent 28%),
+        radial-gradient(circle at 94% 8%, rgba(110, 156, 6, .06), transparent 26%),
+        linear-gradient(170deg, #0c1018, #0a0d14 58%, #080b11);
+    background-attachment: fixed;
+}
+body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #080b11); background-attachment: fixed; }
+
+/* ---------- Top navigation as a pill bar ---------------------------------- */
+@media (min-width: 921px) {
+    .player-topnav, .main-nav {
+        gap: 2px;
+        padding: 4px;
+        border-radius: 999px;
+        background: var(--glass);
+        -webkit-backdrop-filter: var(--blur-sm);
+        backdrop-filter: var(--blur-sm);
+        border: 1px solid var(--glass-line);
+    }
+    .player-topnav a, .main-nav a {
+        padding: 7px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 750;
+        color: var(--muted);
+        transition: background-color 180ms ease, color 180ms ease;
+    }
+    .player-topnav a:hover, .main-nav a:hover { color: #fff; background: var(--glass-soft); }
+    .player-topnav a.active, .main-nav a.active { color: #0b1403; background: linear-gradient(135deg, var(--main-600), var(--main-400)); }
+    .player-topnav a.active::after, .main-nav a.active::after { display: none; }
+}
+
+/* ---------- Sidebar: grouped, compact rows -------------------------------- */
+.side-heading {
+    margin: 6px 8px 0;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+.player-side-nav, .side-nav {
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(8, 10, 16, .55);
+    border: 1px solid var(--glass-line);
+}
+.player-side-nav a, .side-nav a, .player-side-nav [data-install-app] {
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #c5cbe0;
+}
+.player-side-nav a.active, .side-nav a.active {
+    color: #fff;
+    background: linear-gradient(90deg, rgba(129, 181, 7, .22), rgba(129, 181, 7, .04));
+    border-color: var(--lime-line);
+    box-shadow: inset 3px 0 0 var(--main-400);
+}
+.player-side-nav a.active span, .side-nav a.active span { color: var(--main-400); }
+
+/* ---------- Search bar ---------------------------------------------------- */
+.search-box, .member-search-box, .provider-select, .member-provider-select {
+    min-height: 48px;
+    border-radius: 12px;
+    background: rgba(8, 10, 16, .6);
+    border-color: var(--glass-line-strong);
+}
+
+/* ---------- Studio pills -------------------------------------------------- */
+.lobby-chips {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 2px 0 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.lobby-chips::-webkit-scrollbar { display: none; }
+.lobby-chip {
+    --chip-a: #3a4256;
+    --chip-b: #232838;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 8px 0 14px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--chip-a), var(--chip-b));
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .16);
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+.lobby-chip small {
+    min-width: 24px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .32);
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+.lobby-chip-all { padding-right: 14px; }
+.lobby-chip:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.lobby-chip.active { outline: 2px solid var(--main-400); outline-offset: 2px; }
+.lobby-chip-1 { --chip-a: #e0457b; --chip-b: #8b2fc9; }
+.lobby-chip-2 { --chip-a: #2f8cf0; --chip-b: #2a4fc0; }
+.lobby-chip-3 { --chip-a: #f0a12b; --chip-b: #d4571b; }
+.lobby-chip-4 { --chip-a: #30c48d; --chip-b: #12876a; }
+.lobby-chip-5 { --chip-a: #9b5cf0; --chip-b: #5a34c0; }
+.lobby-chip-6 { --chip-a: #ee5b5b; --chip-b: #b22f4a; }
+.lobby-chip-7 { --chip-a: #25b7d3; --chip-b: #1a6fa8; }
+.lobby-chip-8 { --chip-a: #b6cc2a; --chip-b: #6b9806; }
+
+/* ---------- Shelves: framed, with a title bar ----------------------------- */
+.member-game-section, .game-section {
+    margin-top: 18px;
+    border: 1px solid var(--glass-line);
+    border-radius: 14px;
+    background: var(--glass);
+    overflow: hidden;
+}
+.member-section-heading, .section-heading {
+    margin: 0;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, .035);
+    border-bottom: 1px solid var(--glass-line);
+}
+.member-section-heading h2, .section-heading h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+.member-section-heading h2::before, .section-heading h2::before {
+    content: "";
+    width: 4px;
+    height: 16px;
+    border-radius: 2px;
+    background: var(--main-400);
+    box-shadow: 0 0 10px rgba(159, 203, 46, .55);
+}
+.section-heading p { display: none; }
+
+.rail-tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.rail-viewall {
+    padding: 6px 12px;
+    border: 1px solid var(--lime-line);
+    border-radius: 999px;
+    color: var(--main-300);
+    background: var(--lime-tint);
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+.rail-viewall:hover { color: #0b1403; background: var(--main-400); }
+.member-section-heading button.rail-arrow,
+.section-heading button.rail-arrow,
+.player-guest .section-heading button.rail-arrow {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0 0 2px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--glass-line-strong);
+    border-radius: 8px;
+    color: #fff;
+    background: var(--glass-soft);
+    font-size: 18px;
+    line-height: 1;
+    opacity: 1;
+}
+.member-section-heading button.rail-arrow:hover,
+.section-heading button.rail-arrow:hover { background: var(--lime-tint); border-color: var(--lime-line); }
+/* Fingers swipe a rail; the arrows are for pointers. */
+@media (hover: none) { .rail-arrow { display: none !important; } }
+/* The collapse control is secondary to the shelf now. */
+.member-section-heading [data-collapse], .section-heading [data-collapse] { margin-left: 2px; }
+
+/* ---------- Rails of tall cards ------------------------------------------- */
+.member-game-grid, .game-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    padding: 14px 14px 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.member-game-grid::-webkit-scrollbar, .game-grid::-webkit-scrollbar { display: none; }
+.member-game-grid.collapsed, .game-grid.collapsed { display: none; }
+.member-game-card, .game-card {
+    flex: 0 0 clamp(124px, 12.5vw, 172px);
+    width: auto;
+    min-width: 0;
+    scroll-snap-align: start;
+}
+.member-game-card .game-art, .game-card .game-art {
+    aspect-ratio: 5 / 6;
+    border-radius: 12px;
+}
+.member-game-card .game-info strong, .game-card .game-info strong { font-size: 13px; }
+@media (max-width: 700px) {
+    .member-game-section, .game-section { margin-top: 14px; border-radius: 12px; }
+    .member-section-heading, .section-heading { padding: 9px 12px; }
+    .member-game-grid, .game-grid { padding: 12px 12px 8px; gap: 10px; }
+    .member-game-card, .game-card { flex-basis: 118px; }
+    .player-guest .section-heading { margin: 0; min-height: 0; }
+    .player-guest .game-section { margin-top: 14px; }
+    /* The phone layout above blanked the "Collapse" label to just its sign. */
+    .member-section-heading [data-collapse], .section-heading [data-collapse] { padding: 4px 9px; min-width: 0; min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lobby-chip, .lobby-chip:hover { transition: none; transform: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .member-game-section, .game-section, .player-topnav, .main-nav { background: var(--surface-solid); }
+}

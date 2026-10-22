@@ -48,6 +48,8 @@
         <label class="member-provider-select"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg><select name="provider" data-provider-filter aria-label="Filter by provider"><option value="">{{ __('All providers') }}</option>@foreach ($providers as $provider)<option value="{{ $provider->name }}" @selected($catalogProvider === $provider->name)>{{ $provider->name }} ({{ number_format($provider->games_count) }})</option>@endforeach</select></label>
     </form>
 
+    @include('partials.lobby-chips')
+
     <div class="empty-games member-empty-games" data-searching-games hidden><span>&#9906;</span><h2>{{ __('Searching the catalogue…') }}</h2><p>{{ __('Looking beyond the games on this page.') }}</p></div>
     <div class="empty-games member-empty-games" data-empty-games hidden><span>&#9906;</span><h2>{{ __('No games found') }}</h2><p>{{ __('Try another title or provider.') }}</p></div>
 
@@ -59,6 +61,7 @@
         <section class="member-game-section" id="trending" data-game-section>
             <div class="member-section-heading">
                 <div><h2>{{ __('Top Games') }}</h2></div>
+                @include('partials.rail-tools')
                 <button type="button" data-collapse aria-expanded="true">{{ __('Collapse') }} <span>&minus;</span></button>
             </div>
             <div class="member-game-grid" data-game-grid>
@@ -80,6 +83,7 @@
         <section class="member-game-section" id="provider-{{ \Illuminate\Support\Str::slug($providerName) }}" data-game-section>
             <div class="member-section-heading">
                 <div><h2>{{ $providerName }}</h2></div>
+                @include('partials.rail-tools', ['viewAll' => route('home', ['provider' => $providerName])])
                 <button type="button" data-collapse aria-expanded="true">{{ __('Collapse') }} <span>&minus;</span></button>
             </div>
             <div class="member-game-grid" data-game-grid>
@@ -125,6 +129,7 @@
             <button type="button" disabled>On signup</button>
         </section>
 
+        <p class="side-heading">Menu</p>
         <nav class="side-nav" aria-label="Lobby sections">
             <a class="active" href="#trending"><span>⌂</span>Lobby</a>
             <a href="#playable-agents"><span>⚡</span>Game agents</a>
@@ -173,6 +178,8 @@
             </label>
         </form>
 
+        @include('partials.lobby-chips')
+
         <div class="empty-games" data-searching-games hidden>
             <span>⌕</span><h2>{{ __('Searching the catalogue…') }}</h2><p>{{ __('Looking beyond the games on this page.') }}</p>
         </div>
@@ -185,6 +192,7 @@
             <section class="game-section" id="{{ $category->slug }}" data-game-section>
                 <div class="section-heading">
                     <div><p>{{ $category->description }}</p><h2>{{ $category->name }}</h2></div>
+                    @include('partials.rail-tools', ['viewAll' => str_starts_with($category->slug, 'provider-') ? route('home', ['provider' => $category->name]) : null])
                     <button type="button" data-collapse aria-expanded="true">Collapse <span>−</span></button>
                 </div>
                 <div class="game-grid" data-game-grid>

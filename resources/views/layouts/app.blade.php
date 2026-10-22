@@ -253,6 +253,7 @@
                     </section>
                 @endauth
 
+                <p class="side-heading">{{ __('Menu') }}</p>
                 <nav class="player-side-nav" aria-label="Player navigation">
                     <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 00352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 00-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><circle cx="292" cy="224" r="20"/><path d="M336 288a20 20 0 1120-19.95A20 20 0 01336 288z"/><circle cx="336" cy="180" r="20"/><circle cx="380" cy="224" r="20"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96M208 224h-96"/></svg></span>{{ __('Lobby') }}</a>
                     <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><circle cx="256" cy="256" r="192" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 175.15l-76.09 63.83L200 320h112l20.09-81.02L256 175.15zM332.09 238.98l52.87-22.4 25.78-73.26M447 269.97l-62.04-53.39M179.91 238.98l-52.87-22.4-25.78-73.26M65 269.97l62.04-53.39M256 175.15v-57.57l64-42.64M192 74.93l64 42.65M312 320l28 48-28 71M410.74 368H342M200 320l-28 48 28.37 71.5M101.63 368H172"/></svg></span>{{ __('Sports') }}</a>
@@ -481,6 +482,7 @@
     @endauth
 
     <script src="/js/lucy-play.js?v={{ @filemtime(public_path('js/lucy-play.js')) ?: time() }}" defer></script>
+    <script src="/js/lobby-rails.js?v={{ @filemtime(public_path('js/lobby-rails.js')) ?: time() }}" defer></script>
 
     {{-- Installability: keep the app on the home screen, in a browser or in Telegram. --}}
     <script>
