@@ -142,25 +142,19 @@
         {{-- The artwork is whatever an operator uploaded under Configuration →
              Frontend → Hero banner (App\Support\HeroBanner), with the bundled
              illustration as the fallback. Phones get their own, taller image
-             when one is set; otherwise the wide one is cropped to fit. --}}
+             when one is set; otherwise the wide one is used. --}}
         <section class="hero-banner hero-banner-image">
             @php([$heroW, $heroH] = \App\Support\HeroBanner::size('desktop'))
             @php([$heroMobileW, $heroMobileH] = \App\Support\HeroBanner::size('mobile'))
             {{-- width/height are the uploaded picture's own size: on desktop the
                  hero takes that picture's height, so nothing is cropped. --}}
-            <picture class="hero-media" aria-hidden="true">
+            <picture class="hero-media">
                 <source media="(max-width: 700px)" srcset="{{ \App\Support\HeroBanner::mobileUrl() }}" width="{{ $heroMobileW }}" height="{{ $heroMobileH }}">
                 <img src="{{ \App\Support\HeroBanner::desktopUrl() }}" alt="{{ \App\Support\HeroBanner::alt() }}" width="{{ $heroW }}" height="{{ $heroH }}" fetchpriority="high" decoding="async">
             </picture>
-            <div class="hero-copy glass-panel">
-                <p class="eyebrow">Integrated casino</p>
-                <h1>Explore it.<br><span>Play it.</span> Enjoy it.</h1>
-                <p>Browse the integrated catalog and play with your Birr wallet.</p>
-                <div class="hero-actions">
-                    @if($featuredGame)<a class="button button-primary" href="{{ route('games.show', $featuredGame) }}">Play {{ $featuredGame->title }}</a>@endif
-                    @guest<a class="button button-soft" href="{{ route('register') }}">Get {{ \App\Support\Money::format($welcomeBalance) }}</a>@endguest
-                </div>
-            </div>
+            {{-- The picture is the whole banner. The heading stays for screen readers
+                 and search engines but is not drawn. --}}
+            <h1 class="hero-sr-title">{{ __('Explore it. Play it. Enjoy it.') }}</h1>
         </section>
 
         <form class="lobby-toolbar" method="GET" action="{{ route('home') }}" aria-label="Game filters" data-server-query="{{ $catalogSearch }}" data-server-provider="{{ $catalogProvider }}">
