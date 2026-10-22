@@ -55,11 +55,11 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
     --agent-muted: #8f9c85;
     --agent-faint: #6a7860;
 
-    --agent-teal: #8CC414;            /* legacy alias — now the brand lime */
-    --agent-teal-soft: rgba(140, 196, 20, .14);
-    --agent-accent: #8CC414;
-    --agent-accent-deep: #6E9C06;
-    --agent-accent-line: rgba(140, 196, 20, .30);
+    --agent-teal: #e0aa2b;            /* legacy alias — now the brand lime */
+    --agent-teal-soft: rgba(224, 170, 43, .14);
+    --agent-accent: #e0aa2b;
+    --agent-accent-deep: #c8961e;
+    --agent-accent-line: rgba(224, 170, 43, .30);
     --agent-on-accent: #0c1403;
 
     --agent-blue: #5aa2ff;   --agent-blue-soft: rgba(90, 162, 255, .14);
@@ -82,11 +82,11 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
     --agent-muted: #647059;
     --agent-faint: #97a38c;
 
-    --agent-teal: #6E9C06;
-    --agent-teal-soft: rgba(110, 156, 6, .12);
-    --agent-accent: #6E9C06;
-    --agent-accent-deep: #567b05;
-    --agent-accent-line: rgba(110, 156, 6, .30);
+    --agent-teal: #c8961e;
+    --agent-teal-soft: rgba(200, 150, 30, .12);
+    --agent-accent: #c8961e;
+    --agent-accent-deep: #a67a14;
+    --agent-accent-line: rgba(200, 150, 30, .30);
     --agent-on-accent: #ffffff;
 
     --agent-blue: #2a6ff0;   --agent-blue-soft: rgba(42, 111, 240, .10);
@@ -168,7 +168,7 @@ body { font-family: 'Urbanist', Inter, ui-sans-serif, system-ui, sans-serif; }
     border-color: var(--agent-accent-line);
     background: linear-gradient(135deg, var(--agent-accent-deep), var(--agent-accent));
     color: var(--agent-on-accent);
-    box-shadow: 0 4px 14px rgba(110, 156, 6, .26);
+    box-shadow: 0 4px 14px rgba(200, 150, 30, .26);
 }
 .agent-button.danger, .agent-button.red {
     color: var(--agent-pink); border-color: var(--agent-pink-soft); background: var(--agent-pink-soft);

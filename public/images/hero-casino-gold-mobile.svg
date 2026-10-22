@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" width="900" height="1100" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Casino chips, dice and cards on a dark table">
   <defs>
     <radialGradient id="m-glow" cx="55%" cy="28%" r="60%">
-      <stop offset="0" stop-color="#8ec41a" stop-opacity=".45"/>
-      <stop offset=".5" stop-color="#2d4a05" stop-opacity=".22"/>
+      <stop offset="0" stop-color="#d9a21f" stop-opacity=".45"/>
+      <stop offset=".5" stop-color="#5a430a" stop-opacity=".22"/>
       <stop offset="1" stop-color="#07090a" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="m-glow2" cx="10%" cy="95%" r="55%">
@@ -16,10 +16,10 @@
     <linearGradient id="m-die-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e4e8"/></linearGradient>
     <linearGradient id="m-die-side" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c7cc"/><stop offset="1" stop-color="#7f9096"/></linearGradient>
     <linearGradient id="m-die-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6fbfc"/><stop offset="1" stop-color="#c9d7db"/></linearGradient>
-    <linearGradient id="m-lime-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ef4f"/><stop offset="1" stop-color="#7fb30a"/></linearGradient>
-    <linearGradient id="m-lime-side" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d9a08"/><stop offset="1" stop-color="#3f5a04"/></linearGradient>
-    <linearGradient id="m-lime-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2ff8a"/><stop offset="1" stop-color="#a7d82a"/></linearGradient>
-    <linearGradient id="m-chip-lime" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9d92e"/><stop offset="1" stop-color="#5d8505"/></linearGradient>
+    <linearGradient id="m-lime-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d27a"/><stop offset="1" stop-color="#c8961e"/></linearGradient>
+    <linearGradient id="m-lime-side" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a67a14"/><stop offset="1" stop-color="#6b500a"/></linearGradient>
+    <linearGradient id="m-lime-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe7a0"/><stop offset="1" stop-color="#e8b93b"/></linearGradient>
+    <linearGradient id="m-chip-lime" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ebbd3c"/><stop offset="1" stop-color="#a67a14"/></linearGradient>
     <linearGradient id="m-chip-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c7901a"/></linearGradient>
     <linearGradient id="m-chip-violet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9a4ff"/><stop offset="1" stop-color="#6a4fd6"/></linearGradient>
     <linearGradient id="m-chip-dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2f34"/><stop offset="1" stop-color="#0f1215"/></linearGradient>
@@ -41,19 +41,19 @@
   <rect width="900" height="1100" fill="url(#m-glow)"/>
   <rect width="900" height="1100" fill="url(#m-glow2)"/>
 
-  <ellipse cx="470" cy="560" rx="330" ry="80" fill="#9ed12a" fill-opacity=".16" filter="url(#m-soft)"/>
+  <ellipse cx="470" cy="560" rx="330" ry="80" fill="#e0aa2b" fill-opacity=".16" filter="url(#m-soft)"/>
   <g fill="none" stroke-width="1.5">
-    <circle cx="470" cy="380" r="260" stroke="#9ed12a" stroke-opacity=".22"/>
+    <circle cx="470" cy="380" r="260" stroke="#e0aa2b" stroke-opacity=".22"/>
     <circle cx="470" cy="380" r="190" stroke="#b9a4ff" stroke-opacity=".18" stroke-dasharray="6 14"/>
   </g>
-  <circle cx="210" cy="380" r="6" fill="#c6ef4f" filter="url(#m-glowf)"/>
+  <circle cx="210" cy="380" r="6" fill="#f3d27a" filter="url(#m-glowf)"/>
   <circle cx="690" cy="200" r="5" fill="#ffe08a" filter="url(#m-glowf)"/>
 
   <!-- cards -->
   <g transform="translate(330 340) rotate(-20)" filter="url(#m-shadow)">
     <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#m-card-back)" stroke="#ffffff" stroke-opacity=".16"/>
-    <rect x="-56" y="-84" width="112" height="168" rx="9" fill="none" stroke="#9ed12a" stroke-opacity=".55" stroke-width="2"/>
-    <path d="M0-34 L18-6 L0 30 L-18-6Z" fill="#9ed12a" fill-opacity=".85"/>
+    <rect x="-56" y="-84" width="112" height="168" rx="9" fill="none" stroke="#e0aa2b" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M0-34 L18-6 L0 30 L-18-6Z" fill="#e0aa2b" fill-opacity=".85"/>
   </g>
   <g transform="translate(385 330) rotate(-6)" filter="url(#m-shadow)">
     <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#m-card)"/>
@@ -66,7 +66,7 @@
     <g transform="translate(0 44)"><ellipse rx="74" ry="24" fill="url(#m-chip-dark)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="3" stroke-dasharray="14 10"/></g>
     <g transform="translate(0 30)"><ellipse rx="74" ry="24" fill="url(#m-chip-violet)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="3" stroke-dasharray="14 10"/></g>
     <g transform="translate(0 16)"><ellipse rx="74" ry="24" fill="url(#m-chip-gold)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".6" stroke-width="3" stroke-dasharray="14 10"/></g>
-    <g transform="translate(0 2)"><ellipse rx="74" ry="24" fill="url(#m-chip-lime)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="14 10"/><ellipse rx="32" ry="10" fill="#0d1a02" fill-opacity=".55"/><text y="4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="800" fill="#e8ffb2" letter-spacing="1">ETB</text></g>
+    <g transform="translate(0 2)"><ellipse rx="74" ry="24" fill="url(#m-chip-lime)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="14 10"/><ellipse rx="32" ry="10" fill="#1c1400" fill-opacity=".55"/><text y="4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="800" fill="#fff1c4" letter-spacing="1">ETB</text></g>
   </g>
 
   <!-- big die -->
@@ -87,9 +87,9 @@
       <path d="M-92-36 L0 16 L0 120 L-92 68Z" fill="url(#m-lime-face)"/>
       <path d="M92-36 L0 16 L0 120 L92 68Z" fill="url(#m-lime-side)"/>
       <path d="M-92-36 L0-88 L92-36 L0 16Z M-92-36 L0 16 L0 120 L-92 68Z M92-36 L0 16 L0 120 L92 68Z" fill="none" stroke="#ffffff" stroke-opacity=".4" stroke-width="2" stroke-linejoin="round"/>
-      <g fill="#182000"><ellipse cx="0" cy="-36" rx="10" ry="6"/></g>
-      <g fill="#182000"><ellipse cx="-46" cy="42" rx="7" ry="9" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="7" ry="9" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="7" ry="9" transform="rotate(30 -22 56)"/><ellipse cx="-46" cy="14" rx="7" ry="9" transform="rotate(30 -46 14)"/></g>
-      <g fill="#0e1600"><ellipse cx="46" cy="40" rx="7" ry="9" transform="rotate(-30 46 40)"/><ellipse cx="46" cy="70" rx="7" ry="9" transform="rotate(-30 46 70)"/></g>
+      <g fill="#1c1400"><ellipse cx="0" cy="-36" rx="10" ry="6"/></g>
+      <g fill="#1c1400"><ellipse cx="-46" cy="42" rx="7" ry="9" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="7" ry="9" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="7" ry="9" transform="rotate(30 -22 56)"/><ellipse cx="-46" cy="14" rx="7" ry="9" transform="rotate(30 -46 14)"/></g>
+      <g fill="#1c1400"><ellipse cx="46" cy="40" rx="7" ry="9" transform="rotate(-30 46 40)"/><ellipse cx="46" cy="70" rx="7" ry="9" transform="rotate(-30 46 70)"/></g>
     </g>
   </g>
 
@@ -97,8 +97,8 @@
   <g transform="translate(700 560) rotate(-28)" filter="url(#m-shadow)">
     <circle r="58" fill="url(#m-chip-lime)"/>
     <circle r="43" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="4" stroke-dasharray="16 11"/>
-    <circle r="27" fill="#0d1a02" fill-opacity=".55"/>
-    <text y="7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900" fill="#e8ffb2">5×</text>
+    <circle r="27" fill="#1c1400" fill-opacity=".55"/>
+    <text y="7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900" fill="#fff1c4">5×</text>
   </g>
 
   <g fill="#ffffff">

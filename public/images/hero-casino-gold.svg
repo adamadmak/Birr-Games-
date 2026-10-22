@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 720" width="1600" height="720" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Casino chips, dice and cards on a dark table">
   <defs>
     <radialGradient id="bg-glow" cx="78%" cy="45%" r="55%">
-      <stop offset="0" stop-color="#8ec41a" stop-opacity=".42"/>
-      <stop offset=".45" stop-color="#2d4a05" stop-opacity=".25"/>
+      <stop offset="0" stop-color="#d9a21f" stop-opacity=".42"/>
+      <stop offset=".45" stop-color="#5a430a" stop-opacity=".25"/>
       <stop offset="1" stop-color="#07090a" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="bg-glow2" cx="18%" cy="85%" r="50%">
@@ -26,20 +26,20 @@
       <stop offset="1" stop-color="#c9d7db"/>
     </linearGradient>
     <linearGradient id="die-lime-face" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#c6ef4f"/>
-      <stop offset="1" stop-color="#7fb30a"/>
+      <stop offset="0" stop-color="#f3d27a"/>
+      <stop offset="1" stop-color="#c8961e"/>
     </linearGradient>
     <linearGradient id="die-lime-side" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6d9a08"/>
-      <stop offset="1" stop-color="#3f5a04"/>
+      <stop offset="0" stop-color="#a67a14"/>
+      <stop offset="1" stop-color="#6b500a"/>
     </linearGradient>
     <linearGradient id="die-lime-top" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e2ff8a"/>
-      <stop offset="1" stop-color="#a7d82a"/>
+      <stop offset="0" stop-color="#fbe7a0"/>
+      <stop offset="1" stop-color="#e8b93b"/>
     </linearGradient>
     <linearGradient id="chip-lime" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#a9d92e"/>
-      <stop offset="1" stop-color="#5d8505"/>
+      <stop offset="0" stop-color="#ebbd3c"/>
+      <stop offset="1" stop-color="#a67a14"/>
     </linearGradient>
     <linearGradient id="chip-dark" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#2a2f34"/>
@@ -93,23 +93,23 @@
   <rect width="1600" height="720" fill="url(#bg-glow2)"/>
 
   <!-- floor glow under the composition -->
-  <ellipse cx="1130" cy="560" rx="420" ry="90" fill="#9ed12a" fill-opacity=".16" filter="url(#soft)"/>
+  <ellipse cx="1130" cy="560" rx="420" ry="90" fill="#e0aa2b" fill-opacity=".16" filter="url(#soft)"/>
 
   <!-- orbit rings -->
   <g fill="none" stroke-width="1.5">
-    <circle cx="1130" cy="360" r="300" stroke="#9ed12a" stroke-opacity=".22"/>
+    <circle cx="1130" cy="360" r="300" stroke="#e0aa2b" stroke-opacity=".22"/>
     <circle cx="1130" cy="360" r="222" stroke="#b9a4ff" stroke-opacity=".18" stroke-dasharray="6 14"/>
     <circle cx="1130" cy="360" r="380" stroke="#ffffff" stroke-opacity=".06"/>
   </g>
-  <circle cx="830" cy="360" r="6" fill="#c6ef4f" filter="url(#glow)"/>
+  <circle cx="830" cy="360" r="6" fill="#f3d27a" filter="url(#glow)"/>
   <circle cx="1352" cy="166" r="5" fill="#ffe08a" filter="url(#glow)"/>
   <circle cx="1390" cy="520" r="4" fill="#b9a4ff" filter="url(#glow)"/>
 
   <!-- cards fanned behind -->
   <g transform="translate(1010 330) rotate(-18)" filter="url(#shadow)">
     <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#card-back)" stroke="#ffffff" stroke-opacity=".16"/>
-    <rect x="-56" y="-84" width="112" height="168" rx="9" fill="none" stroke="#9ed12a" stroke-opacity=".55" stroke-width="2"/>
-    <path d="M0-34 L18-6 L0 30 L-18-6Z" fill="#9ed12a" fill-opacity=".85"/>
+    <rect x="-56" y="-84" width="112" height="168" rx="9" fill="none" stroke="#e0aa2b" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M0-34 L18-6 L0 30 L-18-6Z" fill="#e0aa2b" fill-opacity=".85"/>
   </g>
   <g transform="translate(1060 318) rotate(-4)" filter="url(#shadow)">
     <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#card)"/>
@@ -128,15 +128,15 @@
     <g transform="translate(0 44)"><ellipse rx="78" ry="26" fill="#0a0d10"/><ellipse rx="78" ry="26" fill="url(#chip-dark)"/><ellipse rx="56" ry="18" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="3" stroke-dasharray="14 10"/></g>
     <g transform="translate(0 30)"><ellipse rx="78" ry="26" fill="#0a0d10"/><ellipse rx="78" ry="26" fill="url(#chip-violet)"/><ellipse rx="56" ry="18" fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="3" stroke-dasharray="14 10"/></g>
     <g transform="translate(0 16)"><ellipse rx="78" ry="26" fill="#0a0d10"/><ellipse rx="78" ry="26" fill="url(#chip-gold)"/><ellipse rx="56" ry="18" fill="none" stroke="#ffffff" stroke-opacity=".6" stroke-width="3" stroke-dasharray="14 10"/></g>
-    <g transform="translate(0 2)"><ellipse rx="78" ry="26" fill="#0a0d10"/><ellipse rx="78" ry="26" fill="url(#chip-lime)"/><ellipse rx="56" ry="18" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="14 10"/><ellipse rx="34" ry="11" fill="#0d1a02" fill-opacity=".55"/><text y="4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" fill="#e8ffb2" letter-spacing="1">ETB</text></g>
+    <g transform="translate(0 2)"><ellipse rx="78" ry="26" fill="#0a0d10"/><ellipse rx="78" ry="26" fill="url(#chip-lime)"/><ellipse rx="56" ry="18" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="14 10"/><ellipse rx="34" ry="11" fill="#1c1400" fill-opacity=".55"/><text y="4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" fill="#fff1c4" letter-spacing="1">ETB</text></g>
   </g>
 
   <!-- leaning chip -->
   <g transform="translate(1335 505) rotate(-28)" filter="url(#shadow)">
     <circle r="64" fill="url(#chip-lime)"/>
     <circle r="48" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="4" stroke-dasharray="16 11"/>
-    <circle r="30" fill="#0d1a02" fill-opacity=".55"/>
-    <text y="7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#e8ffb2">5×</text>
+    <circle r="30" fill="#1c1400" fill-opacity=".55"/>
+    <text y="7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#fff1c4">5×</text>
   </g>
 
   <!-- big white die (isometric) -->
@@ -172,9 +172,9 @@
       <path d="M-92-36 L0 16 L0 120 L-92 68Z" fill="url(#die-lime-face)"/>
       <path d="M92-36 L0 16 L0 120 L92 68Z" fill="url(#die-lime-side)"/>
       <path d="M-92-36 L0-88 L92-36 L0 16Z M-92-36 L0 16 L0 120 L-92 68Z M92-36 L0 16 L0 120 L92 68Z" fill="none" stroke="#ffffff" stroke-opacity=".4" stroke-width="2" stroke-linejoin="round"/>
-      <g fill="#182000"><ellipse cx="0" cy="-36" rx="10" ry="6"/></g>
-      <g fill="#182000"><ellipse cx="-46" cy="42" rx="7" ry="9" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="7" ry="9" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="7" ry="9" transform="rotate(30 -22 56)"/><ellipse cx="-46" cy="14" rx="7" ry="9" transform="rotate(30 -46 14)"/></g>
-      <g fill="#0e1600"><ellipse cx="46" cy="40" rx="7" ry="9" transform="rotate(-30 46 40)"/><ellipse cx="46" cy="70" rx="7" ry="9" transform="rotate(-30 46 70)"/></g>
+      <g fill="#1c1400"><ellipse cx="0" cy="-36" rx="10" ry="6"/></g>
+      <g fill="#1c1400"><ellipse cx="-46" cy="42" rx="7" ry="9" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="7" ry="9" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="7" ry="9" transform="rotate(30 -22 56)"/><ellipse cx="-46" cy="14" rx="7" ry="9" transform="rotate(30 -46 14)"/></g>
+      <g fill="#1c1400"><ellipse cx="46" cy="40" rx="7" ry="9" transform="rotate(-30 46 40)"/><ellipse cx="46" cy="70" rx="7" ry="9" transform="rotate(-30 46 70)"/></g>
     </g>
   </g>
 

@@ -32,8 +32,8 @@ final class HeroBanner
     public const SETTING_DESKTOP_SIZE = 'hero_image_desktop_size';
     public const SETTING_MOBILE_SIZE = 'hero_image_mobile_size';
 
-    public const DEFAULT_DESKTOP = 'images/hero-casino.svg';
-    public const DEFAULT_MOBILE = 'images/hero-casino-mobile.svg';
+    public const DEFAULT_DESKTOP = 'images/hero-casino-gold.svg';
+    public const DEFAULT_MOBILE = 'images/hero-casino-gold-mobile.svg';
 
     private const DEFAULT_DESKTOP_SIZE = [1600, 720];
     private const DEFAULT_MOBILE_SIZE = [900, 1100];

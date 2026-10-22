@@ -8,7 +8,7 @@
 
     /* --- surfaces -------------------------------------------------------- */
     --bg: #0a0e14;
-    --bg-tint: radial-gradient(1200px 600px at 78% -8%, rgba(110, 156, 6, .10), transparent 62%),
+    --bg-tint: radial-gradient(1200px 600px at 78% -8%, rgba(200, 150, 30, .10), transparent 62%),
                radial-gradient(900px 520px at 8% 4%, rgba(84, 122, 200, .07), transparent 58%);
     --surface: #121821;
     --surface-2: #171e29;
@@ -32,12 +32,12 @@
     --on-solid: #0d1219;
 
     /* --- brand accent ---------------------------------------------------- */
-    --primary: #8CC414;
-    --primary-ink: #A5DE2A;
-    --primary-deep: #6E9C06;
-    --primary-soft: rgba(140, 196, 20, .14);
-    --primary-line: rgba(140, 196, 20, .30);
-    --on-primary: #0c1403;
+    --primary: #e0aa2b;
+    --primary-ink: #f0c457;
+    --primary-deep: #c8961e;
+    --primary-soft: rgba(224, 170, 43, .14);
+    --primary-line: rgba(224, 170, 43, .30);
+    --on-primary: #1c1400;
 
     /* --- semantic -------------------------------------------------------- */
     --success: #35d18b;      --success-soft: rgba(53, 209, 139, .13);
@@ -71,7 +71,7 @@
     color-scheme: light;
 
     --bg: #f7f8fa;
-    --bg-tint: radial-gradient(1100px 560px at 80% -10%, rgba(110, 156, 6, .07), transparent 60%),
+    --bg-tint: radial-gradient(1100px 560px at 80% -10%, rgba(200, 150, 30, .07), transparent 60%),
                radial-gradient(820px 460px at 6% 2%, rgba(84, 122, 200, .05), transparent 58%);
     --surface: #ffffff;
     --surface-2: #f6f7f9;
@@ -91,11 +91,11 @@
     --solid: #14191f;
     --on-solid: #ffffff;
 
-    --primary: #6E9C06;
-    --primary-ink: #5A8005;
-    --primary-deep: #4E6F04;
-    --primary-soft: rgba(110, 156, 6, .11);
-    --primary-line: rgba(110, 156, 6, .28);
+    --primary: #a87612;
+    --primary-ink: #8a600c;
+    --primary-deep: #73510a;
+    --primary-soft: rgba(168, 118, 18, .12);
+    --primary-line: rgba(168, 118, 18, .30);
     --on-primary: #ffffff;
 
     --success: #12945f;      --success-soft: rgba(18, 148, 95, .11);
@@ -149,7 +149,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .admin-sidebar { width: 264px; position: fixed; inset: 0 auto 0 0; z-index: 30; display: flex; flex-direction: column; background: var(--surface); border-right: 1px solid var(--line); transition: width .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1); }
 .admin-brand { min-height: 76px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
 .admin-brand-logo { height: 38px; width: auto; max-width: 120px; object-fit: contain; border-radius: 8px; }
-.admin-brand-mark { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; color: #fff; background: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary) 55%, #b8e04a 100%); border-radius: 12px; font-family: var(--font-display); font-weight: 800; font-size: 18px; box-shadow: 0 4px 12px rgba(106, 92, 255, .35); }
+.admin-brand-mark { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; color: #fff; background: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary) 55%, #f2cc66 100%); border-radius: 12px; font-family: var(--font-display); font-weight: 800; font-size: 18px; box-shadow: 0 4px 12px rgba(106, 92, 255, .35); }
 .admin-brand div { display: grid; line-height: 1.2; }
 .admin-brand strong { font-family: var(--font-display); font-size: 16px; letter-spacing: -.01em; }
 .admin-brand small { color: var(--faint); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
