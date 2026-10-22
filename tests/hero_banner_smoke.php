@@ -124,6 +124,8 @@ try {
     $check('mobile reference is a database media reference', is_string($mobile) && str_starts_with($mobile, 'media:mobile-'), (string) $mobile);
     $check('both rows exist in site_media', SiteMedia::query()->whereIn('slot', ['hero-desktop', 'hero-mobile'])->count() === 2);
     $check('alt text is stored', HeroBanner::alt() === 'Smoke test artwork');
+    $check('desktop picture size is recorded for the hero height', HeroBanner::size('desktop') === [3000, 1350], json_encode(HeroBanner::size('desktop')));
+    $check('phone picture size is recorded separately', HeroBanner::size('mobile') === [900, 1200], json_encode(HeroBanner::size('mobile')));
 
     $row = SiteMedia::query()->where('slot', 'hero-desktop')->first();
     $binary = $row ? base64_decode($row->data, true) : false;

@@ -28,8 +28,45 @@ final class HeroBanner
     public const SETTING_MOBILE = 'hero_image_mobile';
     public const SETTING_ALT = 'hero_image_alt';
 
+    /** "WIDTHxHEIGHT" of what was uploaded, so the lobby can size the hero to the picture. */
+    public const SETTING_DESKTOP_SIZE = 'hero_image_desktop_size';
+    public const SETTING_MOBILE_SIZE = 'hero_image_mobile_size';
+
     public const DEFAULT_DESKTOP = 'images/hero-casino.svg';
     public const DEFAULT_MOBILE = 'images/hero-casino-mobile.svg';
+
+    private const DEFAULT_DESKTOP_SIZE = [1600, 720];
+    private const DEFAULT_MOBILE_SIZE = [900, 1100];
+
+    /**
+     * Pixel size of the image a slot is showing, as [width, height].
+     *
+     * Only the ratio matters: the lobby gives the hero this height so a wide
+     * banner is shown whole instead of being cropped to a fixed-height box.
+     * The phone slot falls back the same way its image does.
+     *
+     * @return array{0: int, 1: int}
+     */
+    public static function size(string $slot): array
+    {
+        $slot = $slot === 'mobile' ? 'mobile' : 'desktop';
+
+        if ($slot === 'mobile' && self::path('mobile') === null) {
+            return self::path('desktop') !== null ? self::size('desktop') : self::DEFAULT_MOBILE_SIZE;
+        }
+
+        if (self::path($slot) === null) {
+            return $slot === 'mobile' ? self::DEFAULT_MOBILE_SIZE : self::DEFAULT_DESKTOP_SIZE;
+        }
+
+        $raw = (string) PlatformSetting::valueFor($slot === 'mobile' ? self::SETTING_MOBILE_SIZE : self::SETTING_DESKTOP_SIZE, '');
+
+        if (preg_match('/^(\d{2,5})x(\d{2,5})$/', $raw, $m) && (int) $m[1] > 0 && (int) $m[2] > 0) {
+            return [(int) $m[1], (int) $m[2]];
+        }
+
+        return $slot === 'mobile' ? self::DEFAULT_MOBILE_SIZE : self::DEFAULT_DESKTOP_SIZE;
+    }
 
     /** The stored reference for a slot, or null when nothing usable is stored. */
     public static function path(string $slot): ?string

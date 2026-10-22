@@ -141,18 +141,23 @@ class SettingController
         try {
             foreach (['desktop' => 'hero_desktop', 'mobile' => 'hero_mobile'] as $slot => $field) {
                 $settingKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE : \App\Support\HeroBanner::SETTING_DESKTOP;
+                $sizeKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE_SIZE : \App\Support\HeroBanner::SETTING_DESKTOP_SIZE;
                 // The reference as saved, even when its image is gone, so a broken
                 // one can still be reset.
                 $current = \App\Support\HeroBanner::storedReference($slot);
 
                 if ($request->hasFile($field)) {
                     $values[$settingKey] = $images->store($request->file($field), $slot);
+                    // The picture's own proportions, so the lobby can give the hero its height.
+                    $dims = @getimagesize($request->file($field)->getRealPath());
+                    $values[$sizeKey] = $dims ? $dims[0].'x'.$dims[1] : '';
                     // The new image replaced the slot's row in place; only a legacy
                     // disk file is left over.
                     $images->deleteLegacyFile($current);
                     $changed[] = $slot;
                 } elseif ($request->boolean('remove_'.$slot) && $current !== null) {
                     $values[$settingKey] = '';
+                    $values[$sizeKey] = '';
                     $clear[$slot] = $current;
                     $changed[] = $slot.' (reset)';
                 }

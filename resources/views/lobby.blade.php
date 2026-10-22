@@ -144,9 +144,13 @@
              illustration as the fallback. Phones get their own, taller image
              when one is set; otherwise the wide one is cropped to fit. --}}
         <section class="hero-banner hero-banner-image">
+            @php([$heroW, $heroH] = \App\Support\HeroBanner::size('desktop'))
+            @php([$heroMobileW, $heroMobileH] = \App\Support\HeroBanner::size('mobile'))
+            {{-- width/height are the uploaded picture's own size: on desktop the
+                 hero takes that picture's height, so nothing is cropped. --}}
             <picture class="hero-media" aria-hidden="true">
-                <source media="(max-width: 680px)" srcset="{{ \App\Support\HeroBanner::mobileUrl() }}">
-                <img src="{{ \App\Support\HeroBanner::desktopUrl() }}" alt="{{ \App\Support\HeroBanner::alt() }}" width="1600" height="720" fetchpriority="high" decoding="async">
+                <source media="(max-width: 700px)" srcset="{{ \App\Support\HeroBanner::mobileUrl() }}" width="{{ $heroMobileW }}" height="{{ $heroMobileH }}">
+                <img src="{{ \App\Support\HeroBanner::desktopUrl() }}" alt="{{ \App\Support\HeroBanner::alt() }}" width="{{ $heroW }}" height="{{ $heroH }}" fetchpriority="high" decoding="async">
             </picture>
             <div class="hero-copy glass-panel">
                 <p class="eyebrow">Integrated casino</p>
