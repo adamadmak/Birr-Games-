@@ -85,8 +85,9 @@ and a message rather than a bare 429. Every refusal lands in `security_events`
 tab keeps seeing them, and keep the per-network quota loose — Ethiopian mobile
 carriers put whole towns behind one address.
 
-`php tests/registration_guard_smoke.php` and `php tests/hero_banner_smoke.php`
-drive these through the HTTP kernel; run them after touching auth or the hero.
+The smoke-test scripts that exercised these were removed from the repository
+(see commit a32bf27 and earlier to recover them); re-check sign-up, sign-in and
+the hero by hand after touching auth or the hero.
 
 ## Both brands move together
 

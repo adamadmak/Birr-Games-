@@ -21,7 +21,6 @@
   - FontAwesome 6 icons replacing unicode glyphs in sidebar + dashboard
   - Larger readable typography (was 8-10px, now 12.5-14px base)
   - data-testid attributes on nav + metric cards
-- [x] Demo data: 20 players + 400 game rounds (/app/database/seeders/demo_data.php)
 - [x] Testing: iteration_1 — 100% frontend pass (all 19 admin routes, CRUD flows, filters, collapse, logout)
 
 ### Iteration 2 (Jun 2026) — Images on frontend + form redesign

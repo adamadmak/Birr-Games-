@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Promotion;
 use App\Models\PlatformSetting;
 use Illuminate\Database\Seeder;
@@ -13,32 +12,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ShamoSeeder::class);
 
-        if (! app()->environment('production')) {
-            // Players are identified by phone number and handle, never by an email address.
-            User::query()->updateOrCreate(
-                ['phone' => '251900000001'],
-                [
-                    'name' => 'Demo Player',
-                    'username' => 'demo_player',
-                    'password' => 'demo1234',
-                    'role' => User::ROLE_PLAYER,
-                    'credits' => 25_000,
-                ]
-            );
-
-            // Administrators keep an email address: it is what they sign in with.
-            User::query()->updateOrCreate(
-                ['email' => 'admin@lucyplay.local'],
-                [
-                    'name' => 'Lucy Administrator',
-                    'username' => 'lucy_admin',
-                    'password' => 'LucyAdmin#2026',
-                    'role' => User::ROLE_ADMIN,
-                    'credits' => 100_000,
-                    'email_verified_at' => now(),
-                ]
-            );
-        }
+        // No demo players or administrators are seeded: the first administrator is
+        // created deliberately on each install, never from a password in the repository.
 
         $promotions = [
             ['title' => 'ETB 5 welcome balance', 'description' => 'Every new local account starts with an ETB 5 play balance.', 'code' => 'WELCOME10K', 'accent' => 'cyan'],
