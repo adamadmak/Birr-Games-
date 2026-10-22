@@ -43,6 +43,8 @@
     @endif
 
 
+    @include('partials.win-ticker')
+
     <form class="member-lobby-toolbar" method="GET" action="{{ route('home') }}" aria-label="Game filters" data-server-query="{{ $catalogSearch }}" data-server-provider="{{ $catalogProvider }}">
         <label class="member-search-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input type="search" name="q" value="{{ $catalogSearch }}" placeholder="{{ __('Search games...') }}" data-game-search></label>
         <label class="member-provider-select"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg><select name="provider" data-provider-filter aria-label="Filter by provider"><option value="">{{ __('All providers') }}</option>@foreach ($providers as $provider)<option value="{{ $provider->name }}" @selected($catalogProvider === $provider->name)>{{ $provider->name }} ({{ number_format($provider->games_count) }})</option>@endforeach</select></label>
@@ -163,6 +165,8 @@
                  and search engines but is not drawn. --}}
             <h1 class="hero-sr-title">{{ __('Explore it. Play it. Enjoy it.') }}</h1>
         </section>
+
+        @include('partials.win-ticker')
 
         <form class="lobby-toolbar" method="GET" action="{{ route('home') }}" aria-label="Game filters" data-server-query="{{ $catalogSearch }}" data-server-provider="{{ $catalogProvider }}">
             <label class="search-box">

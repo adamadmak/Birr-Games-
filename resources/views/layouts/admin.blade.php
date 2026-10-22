@@ -157,6 +157,7 @@
 
     <script src="/js/nav-progress.js?v={{ @filemtime(public_path('js/nav-progress.js')) ?: time() }}" defer></script>
     <script src="/js/lucy-admin.js?v={{ @filemtime(public_path('js/lucy-admin.js')) ?: time() }}" defer></script>
+    <script src="/js/admin-fx.js?v={{ @filemtime(public_path('js/admin-fx.js')) ?: time() }}" defer></script>
     <script src="/js/lucy-admin-palette.js?v={{ @filemtime(public_path('js/lucy-admin-palette.js')) ?: time() }}" data-endpoint="{{ route('admin.quick-search') }}" defer></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {

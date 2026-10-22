@@ -483,6 +483,7 @@
 
     <script src="/js/lucy-play.js?v={{ @filemtime(public_path('js/lucy-play.js')) ?: time() }}" defer></script>
     <script src="/js/lobby-rails.js?v={{ @filemtime(public_path('js/lobby-rails.js')) ?: time() }}" defer></script>
+    <script src="/js/lobby-fx.js?v={{ @filemtime(public_path('js/lobby-fx.js')) ?: time() }}" defer></script>
 
     {{-- Installability: keep the app on the home screen, in a browser or in Telegram. --}}
     <script>

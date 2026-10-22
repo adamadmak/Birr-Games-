@@ -3140,3 +3140,108 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
         max-height: none;
     }
 }
+
+/* ============================================================================
+   LOBBY LIFE: LIVE WINS, HERO SHEEN, SHELF REVEAL, CARD GLOW
+   Decoration only, and all of it steps aside for prefers-reduced-motion.
+   ========================================================================== */
+
+/* ---------- Live wins strip ------------------------------------------------ */
+.win-ticker {
+    margin: 0 0 12px;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    border: 1px solid var(--glass-line);
+    border-radius: 12px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--blur-sm);
+    backdrop-filter: var(--blur-sm);
+}
+.win-ticker-label {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    color: #0b1403;
+    background: linear-gradient(135deg, var(--main-600), var(--main-400));
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.win-ticker-label i { width: 8px; height: 8px; border-radius: 50%; background: #0b1403; animation: winBlink 1.6s infinite; }
+.win-ticker-viewport { position: relative; flex: 1 1 auto; min-width: 0; display: flex; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
+.win-ticker-track {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    list-style: none;
+    animation: winScroll 48s linear infinite;
+}
+.win-ticker-viewport:hover .win-ticker-track { animation-play-state: paused; }
+.win-ticker-track li { padding: 11px 22px; color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.win-ticker-track li b { color: #fff; font-weight: 800; }
+.win-ticker-track li em { color: var(--main-300); font-style: normal; font-weight: 850; }
+.win-ticker-track li span { color: #dfe4f2; font-weight: 650; }
+.win-ticker-track li::after { content: "•"; margin-left: 22px; color: var(--glass-line-strong); }
+@keyframes winScroll { to { transform: translateX(-100%); } }
+@keyframes winBlink { 50% { opacity: .25; } }
+
+/* ---------- Hero sheen: one slow glint across the picture ------------------ */
+.hero-banner-image { isolation: isolate; }
+.hero-banner-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .13) 50%, transparent 58%);
+    transform: translateX(-130%);
+    animation: heroSheen 9s ease-in-out 2s infinite;
+    pointer-events: none;
+}
+@keyframes heroSheen { 0% { transform: translateX(-130%); } 38%, 100% { transform: translateX(130%); } }
+
+/* ---------- Shelf reveal + card stagger ----------------------------------- */
+.fx-reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s cubic-bezier(.2, .7, .3, 1), transform .6s cubic-bezier(.2, .7, .3, 1); }
+.fx-reveal.fx-in { opacity: 1; transform: none; }
+.fx-reveal .game-card, .fx-reveal .member-game-card { opacity: 0; transform: translateY(14px) scale(.97); }
+.fx-reveal.fx-in .game-card, .fx-reveal.fx-in .member-game-card { animation: cardIn .55s cubic-bezier(.2, .7, .3, 1) both; }
+.fx-reveal.fx-in .game-card:nth-child(1), .fx-reveal.fx-in .member-game-card:nth-child(1) { animation-delay: .05s; }
+.fx-reveal.fx-in .game-card:nth-child(2), .fx-reveal.fx-in .member-game-card:nth-child(2) { animation-delay: .11s; }
+.fx-reveal.fx-in .game-card:nth-child(3), .fx-reveal.fx-in .member-game-card:nth-child(3) { animation-delay: .17s; }
+.fx-reveal.fx-in .game-card:nth-child(4), .fx-reveal.fx-in .member-game-card:nth-child(4) { animation-delay: .23s; }
+.fx-reveal.fx-in .game-card:nth-child(5), .fx-reveal.fx-in .member-game-card:nth-child(5) { animation-delay: .29s; }
+.fx-reveal.fx-in .game-card:nth-child(n+6), .fx-reveal.fx-in .member-game-card:nth-child(n+6) { animation-delay: .35s; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* ---------- Card hover: lift, lime halo, brighter art --------------------- */
+@media (hover: hover) {
+    .game-card:hover .game-art, .member-game-card:hover .game-art {
+        border-color: var(--lime-line);
+        box-shadow: 0 0 0 1px var(--lime-line), 0 20px 44px rgba(0, 0, 0, .55), 0 0 30px rgba(129, 181, 7, .26);
+    }
+    .game-card:hover .game-cover, .member-game-card:hover .game-cover { filter: saturate(1.15) brightness(1.06); }
+    .game-card:hover .game-info strong, .member-game-card:hover .game-info strong { color: var(--main-300); }
+}
+.game-card .game-info strong, .member-game-card .game-info strong { transition: color .18s ease; }
+
+/* ---------- A quiet pulse on the sign-up button --------------------------- */
+.site-header .header-actions .button-primary { animation: ctaPulse 3.6s ease-in-out infinite; }
+@keyframes ctaPulse { 0%, 100% { box-shadow: 0 8px 24px rgba(110, 156, 6, .24); } 50% { box-shadow: 0 8px 30px rgba(159, 203, 46, .5); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .win-ticker-track { animation: none; }
+    .win-ticker-viewport { overflow-x: auto; }
+    .win-ticker-track[aria-hidden="true"] { display: none; }
+    .win-ticker-label i { animation: none; }
+    .hero-banner-image::after { animation: none; display: none; }
+    .fx-reveal, .fx-reveal .game-card, .fx-reveal .member-game-card { opacity: 1; transform: none; transition: none; animation: none; }
+    .site-header .header-actions .button-primary { animation: none; }
+}
+@media (max-width: 700px) { .win-ticker-label { padding: 0 10px; font-size: 10px; } .win-ticker-track li { padding: 10px 16px; font-size: 12px; } }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .win-ticker { background: var(--surface-solid); } }

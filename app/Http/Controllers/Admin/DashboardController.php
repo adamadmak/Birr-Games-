@@ -52,6 +52,10 @@ class DashboardController
 
         $stats['onlineUsers'] = \App\Http\Middleware\TrackUserPresence::getOnlineCount();
 
+        // Read-only and cheap: counts over an indexed log, wrapped so a brand
+        // that has not applied the security migration still gets its dashboard.
+        $security = $this->securityWatch();
+
         return view('admin.dashboard', [
             'deltas' => $deltas,
             'range' => $range,
@@ -61,7 +65,37 @@ class DashboardController
             'trend' => $trend,
             'recentRounds' => $recentRounds,
             'topPlayers' => $topPlayers,
+            'security' => $security,
         ]);
+    }
+
+    /**
+     * The last day of sign-up and sign-in pressure, from the security log.
+     *
+     * @return array{ready: bool, registered: int, blocked: int, failed: int, limited: int, level: string}
+     */
+    private function securityWatch(): array
+    {
+        $out = ['ready' => false, 'registered' => 0, 'blocked' => 0, 'failed' => 0, 'limited' => 0, 'level' => 'quiet'];
+
+        try {
+            $since = now()->subDay();
+            $count = fn (string $type, string $outcome) => \App\Models\SecurityEvent::query()
+                ->where('type', $type)->where('outcome', $outcome)->where('created_at', '>=', $since)->count();
+
+            $out['registered'] = $count('registration', 'allowed');
+            $out['blocked'] = $count('registration', 'blocked');
+            $out['failed'] = $count('login', 'failed');
+            $out['limited'] = $count('login', 'blocked');
+            $out['ready'] = true;
+        } catch (\Throwable) {
+            return $out;
+        }
+
+        $pressure = $out['blocked'] + $out['limited'] + intdiv($out['failed'], 4);
+        $out['level'] = $pressure >= 40 ? 'high' : ($pressure >= 10 ? 'watch' : 'quiet');
+
+        return $out;
     }
 
     /** @return array{0: array<string, mixed>, 1: array<string, ?float>, 2: array, 3: mixed, 4: mixed} */

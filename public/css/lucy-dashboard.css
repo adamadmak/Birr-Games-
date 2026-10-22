@@ -364,3 +364,111 @@ a.ops-count:focus-visible { outline: 2px solid var(--primary); outline-offset: 2
 @media (prefers-reduced-motion: reduce) {
     .ops-dash * { transition: none !important; animation: none !important; }
 }
+
+/* ============================================================================
+   DASHBOARD: WELCOME BANNER, SECURITY WATCH, AND A LITTLE LIFE
+   Uses only the admin theme tokens, so it follows light and dark.
+   ========================================================================== */
+
+/* ---------- Welcome banner ------------------------------------------------ */
+.ops-welcome {
+    position: relative;
+    margin-bottom: 18px;
+    padding: 24px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px 28px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background:
+        radial-gradient(520px 220px at 100% 0%, var(--primary-soft), transparent 70%),
+        radial-gradient(420px 200px at 0% 100%, rgba(80, 120, 255, .08), transparent 70%),
+        var(--surface);
+    animation: opsRise .5s cubic-bezier(.2, .7, .3, 1) both;
+}
+.ops-welcome::after {
+    /* A slow light sweep: the one moving thing, and it is barely there. */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .07) 50%, transparent 60%);
+    transform: translateX(-120%);
+    animation: opsSweep 7s ease-in-out 1.2s infinite;
+    pointer-events: none;
+}
+.ops-welcome-copy small { color: var(--primary); font-size: 11px; font-weight: 750; letter-spacing: .16em; text-transform: uppercase; }
+.ops-welcome-copy h2 { margin: 6px 0 6px; font-size: 28px; font-weight: 760; letter-spacing: -.03em; line-height: 1.1; }
+.ops-welcome-copy p { margin: 0; color: var(--muted); font-size: 14px; }
+.ops-welcome-chips { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; }
+.ops-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--surface-2);
+    font-size: 12.5px;
+    font-weight: 650;
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease, background-color .18s ease;
+}
+.ops-chip b { color: var(--ink); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ops-chip:hover { transform: translateY(-2px); border-color: var(--primary); }
+.ops-chip.is-warn { border-color: var(--warn); background: var(--warn-soft); }
+.ops-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 0 var(--success); animation: opsPulse 2s infinite; }
+
+/* ---------- Security watch ------------------------------------------------ */
+.ops-security {
+    --watch: var(--success);
+    margin: 18px 0;
+    padding: 20px 24px;
+    position: relative;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--watch);
+    border-radius: 14px;
+    background: var(--surface);
+    animation: opsRise .5s cubic-bezier(.2, .7, .3, 1) .08s both;
+}
+.ops-security.is-watch { --watch: var(--warn); }
+.ops-security.is-high { --watch: var(--danger); background: linear-gradient(90deg, var(--danger-soft), transparent 55%), var(--surface); }
+.ops-security-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.ops-security-head small { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.ops-security-head h2 { margin: 4px 0 0; font-size: 18px; font-weight: 750; }
+.ops-security-head h2::before {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 9px;
+    border-radius: 50%;
+    background: var(--watch);
+    animation: opsPulse 2.2s infinite;
+}
+.ops-security-head a { color: var(--primary); font-size: 12.5px; font-weight: 700; text-decoration: none; }
+.ops-security-head a:hover { text-decoration: underline; }
+.ops-security-stats { margin-top: 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.ops-security-stats > div { padding: 12px 14px; display: grid; gap: 4px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--surface-2); }
+.ops-security-stats span { color: var(--muted); font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; }
+.ops-security-stats b { font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.ops-security-stats .is-hot { border-color: var(--danger); background: var(--danger-soft); }
+.ops-security-stats .is-hot b { color: var(--danger); }
+.ops-security-note { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 800px) { .ops-security-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ops-welcome { padding: 20px; } .ops-welcome-copy h2 { font-size: 23px; } }
+
+/* ---------- Life in the existing cards ------------------------------------ */
+.ops-position, .ops-ledger, .ops-count { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.ops-count:hover { transform: translateY(-2px); border-color: var(--primary); }
+.ops-position:hover { box-shadow: 0 14px 40px rgba(0, 0, 0, .18); }
+
+@keyframes opsRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes opsSweep { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
+@keyframes opsPulse { 0% { box-shadow: 0 0 0 0 var(--watch, var(--success)); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) {
+    .ops-welcome, .ops-security { animation: none; }
+    .ops-welcome::after, .ops-chip i, .ops-security-head h2::before { animation: none; }
+}

@@ -46,6 +46,30 @@
 
 <div class="ops-dash">
 
+@php
+    $hour = (int) now()->format('G');
+    $greeting = $hour < 12 ? 'Good morning' : ($hour < 18 ? 'Good afternoon' : 'Good evening');
+    $needsAttention = (int) $stats['pendingPayoutCount'];
+@endphp
+<section class="ops-welcome" data-testid="dashboard-welcome">
+    <div class="ops-welcome-copy">
+        <small>{{ now()->format('l, F j') }}</small>
+        <h2>{{ $greeting }}, {{ \Illuminate\Support\Str::before(auth()->user()->name, ' ') }}</h2>
+        <p>
+            @if ($needsAttention > 0)
+                {{ number_format($needsAttention) }} {{ \Illuminate\Support\Str::plural('payout', $needsAttention) }} waiting on an agent. Everything else is running.
+            @else
+                Nothing is waiting on you. The platform is running smoothly.
+            @endif
+        </p>
+    </div>
+    <div class="ops-welcome-chips">
+        <a class="ops-chip is-live" href="{{ route('admin.online-players') }}"><i></i><b data-countup>{{ number_format($stats['onlineUsers']) }}</b> online now</a>
+        <a class="ops-chip {{ $needsAttention > 0 ? 'is-warn' : '' }}" href="{{ route('admin.agents.withdrawals') }}"><b data-countup>{{ number_format($needsAttention) }}</b> payouts waiting</a>
+        <a class="ops-chip" href="{{ route('admin.members.index') }}"><b data-countup>{{ number_format($stats['newMembers']) }}</b> new sign-ups</a>
+    </div>
+</section>
+
 <section class="ops-period">
     <div class="ops-period-dates">{{ $from->format('M j, Y') }} — {{ $to->format('M j, Y') }}</div>
     <nav class="ops-period-tabs">
@@ -184,6 +208,36 @@
     </article>
 </section>
 
+{{-- Sign-up and sign-in pressure over the last day, from the security log. --}}
+<section class="ops-security is-{{ $security['level'] }}" data-testid="dashboard-security">
+    <div class="ops-security-head">
+        <div>
+            <small>Security watch · last 24 hours</small>
+            <h2>
+                @if (! $security['ready'])
+                    Security log not set up yet
+                @elseif ($security['level'] === 'high')
+                    High bot and abuse activity
+                @elseif ($security['level'] === 'watch')
+                    Some suspicious activity
+                @else
+                    All quiet
+                @endif
+            </h2>
+        </div>
+        <a href="{{ route('admin.settings.index', ['tab' => 'security']) }}">Open Security <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    @if ($security['ready'])
+        <div class="ops-security-stats">
+            <div><span>Sign-ups</span><b data-countup>{{ number_format($security['registered']) }}</b></div>
+            <div class="{{ $security['blocked'] > 0 ? 'is-hot' : '' }}"><span>Sign-ups refused</span><b data-countup>{{ number_format($security['blocked']) }}</b></div>
+            <div><span>Failed sign-ins</span><b data-countup>{{ number_format($security['failed']) }}</b></div>
+            <div class="{{ $security['limited'] > 0 ? 'is-hot' : '' }}"><span>Rate-limited</span><b data-countup>{{ number_format($security['limited']) }}</b></div>
+        </div>
+    @else
+        <p class="ops-security-note">Apply the waiting schema update on Configuration → System to start recording sign-up and sign-in attempts.</p>
+    @endif
+</section>
 <section class="admin-dashboard-grid">
     <article class="admin-panel quick-stats-panel">
         <div class="panel-title"><div><p>Snapshot</p><h2>Quick stats</h2></div><span>Live</span></div>

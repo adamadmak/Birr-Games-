@@ -104,6 +104,8 @@ class LobbyController
                 : null,
             'predictionPicks' => $predictionPool ? $predictionPool->entries()->count() : 0,
             'recentGames' => $isFiltered ? collect() : $this->recentlyPlayed($request),
+            // Real, recent, masked wins for the strip under the hero. Empty means no strip.
+            'recentWins' => $isFiltered ? [] : \App\Support\WinsTicker::recent(),
             'trendingGames' => $trendingGames,
             'providerSections' => $providerSections,
             'guestSections' => $guestSections,
