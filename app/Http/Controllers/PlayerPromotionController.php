@@ -1,0 +1,167 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\BonusClaim;
+use App\Models\PlatformSetting;
+use App\Models\ShamoCampaign;
+use App\Models\ShamoParticipation;
+use App\Models\User;
+use App\Models\WalletTransaction;
+use App\Support\Money;
+use App\Services\WageringService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+
+class PlayerPromotionController
+{
+    public function depositBonus(Request $request): View
+    {
+        return view('player.deposit-bonus', [
+            'claim' => $request->user()->bonusClaims()
+                ->where('bonus_type', BonusClaim::FIRST_DEMO_TOP_UP)
+                ->first(),
+            'bonusCredits' => $this->depositBonusAmount(),
+        ]);
+    }
+
+    public function claimDepositBonus(Request $request, WageringService $wagering): RedirectResponse
+    {
+        $bonusAmount = $this->depositBonusAmount();
+
+        $claimed = DB::transaction(function () use ($request, $bonusAmount, $wagering) {
+            /** @var User $user */
+            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+
+            if ($user->bonusClaims()->where('bonus_type', BonusClaim::FIRST_DEMO_TOP_UP)->exists()) {
+                return false;
+            }
+
+            $user->increment('credits', $bonusAmount);
+            $claim = $user->bonusClaims()->create([
+                'bonus_type' => BonusClaim::FIRST_DEMO_TOP_UP,
+                'credits' => $bonusAmount,
+                'claimed_at' => now(),
+            ]);
+            WalletTransaction::create([
+                'user_id' => $user->id, 'type' => 'bonus', 'amount' => $bonusAmount,
+                'status' => 'success', 'method' => 'promotion', 'reason' => 'Deposit bonus',
+                'currency' => 'ETB', 'source_type' => 'bonus_claim', 'source_id' => $claim->id,
+            ]);
+            $wagering->awardForClaim($user, $claim);
+
+            return true;
+        });
+
+        return back()->with('status', $claimed
+            ? Money::format($bonusAmount).' was added to your wallet.'
+            : 'This one-time demo bonus has already been claimed.');
+    }
+
+    public function shamo(Request $request): View
+    {
+        $userId = $request->user()->id;
+
+        return view('player.shamo', [
+            'campaigns' => ShamoCampaign::query()
+                ->where('status', ShamoCampaign::STATUS_ACTIVE)
+                ->where(fn ($query) => $query->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
+                ->where(fn ($query) => $query->whereNull('ends_at')->orWhere('ends_at', '>=', now()))
+                ->with(['participations' => fn ($query) => $query->where('user_id', $userId)])
+                ->withCount('participations')
+                ->orderBy('ends_at')
+                ->get(),
+            'history' => $request->user()->shamoParticipations()->with('campaign')->latest('joined_at')->get(),
+        ]);
+    }
+
+    public function joinShamo(Request $request, ShamoCampaign $campaign): RedirectResponse
+    {
+        $result = DB::transaction(function () use ($request, $campaign) {
+            $lockedCampaign = ShamoCampaign::query()->lockForUpdate()->findOrFail($campaign->id);
+            /** @var User $user */
+            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+
+            if (!$lockedCampaign->isOpen()) {
+                return 'closed';
+            }
+
+            if (ShamoParticipation::query()->where('shamo_campaign_id', $lockedCampaign->id)->where('user_id', $user->id)->exists()) {
+                return 'joined';
+            }
+
+            if ($user->credits < $lockedCampaign->entry_cost) {
+                return 'balance';
+            }
+
+            if ($lockedCampaign->entry_cost > 0) {
+                $lockedCredits = max(0, $user->credits - $user->withdrawable_balance);
+                $withdrawableCost = max(0, $lockedCampaign->entry_cost - $lockedCredits);
+                $user->update([
+                    'credits' => $user->credits - $lockedCampaign->entry_cost,
+                    'withdrawable_balance' => max(0, $user->withdrawable_balance - $withdrawableCost),
+                ]);
+                WalletTransaction::create([
+                    'user_id' => $user->id, 'type' => 'campaign_entry', 'amount' => -$lockedCampaign->entry_cost,
+                    'status' => 'success', 'method' => 'shamo', 'reason' => $lockedCampaign->name.' entry',
+                    'currency' => 'ETB', 'source_type' => 'shamo_campaign', 'source_id' => $lockedCampaign->id,
+                ]);
+            }
+
+            ShamoParticipation::create([
+                'shamo_campaign_id' => $lockedCampaign->id,
+                'user_id' => $user->id,
+                'status' => ShamoParticipation::STATUS_JOINED,
+                'joined_at' => now(),
+            ]);
+
+            return 'success';
+        });
+
+        $message = match ($result) {
+            'success' => 'You joined '.$campaign->name.'. Your participation is now active.',
+            'joined' => 'You already joined this Shamo campaign.',
+            'balance' => 'Your Birr balance is too low for this campaign.',
+            default => 'This campaign is no longer accepting participants.',
+        };
+
+        return back()->with($result === 'success' ? 'status' : 'error', $message);
+    }
+
+    public function claimShamo(Request $request, ShamoParticipation $participation): RedirectResponse
+    {
+        abort_unless($participation->user_id === $request->user()->id, 403);
+
+        $claimed = DB::transaction(function () use ($request, $participation) {
+            $locked = ShamoParticipation::query()->lockForUpdate()->findOrFail($participation->id);
+            /** @var User $user */
+            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+
+            if ($locked->status !== ShamoParticipation::STATUS_AWARDED || $locked->prize_amount < 1) {
+                return false;
+            }
+
+            $user->increment('credits', $locked->prize_amount);
+            $user->increment('withdrawable_balance', $locked->prize_amount);
+            $locked->update(['status' => ShamoParticipation::STATUS_CLAIMED, 'claimed_at' => now()]);
+            WalletTransaction::create([
+                'user_id' => $user->id, 'type' => 'campaign_prize', 'amount' => $locked->prize_amount,
+                'status' => 'success', 'method' => 'shamo', 'reason' => 'Shamo campaign prize',
+                'currency' => 'ETB', 'source_type' => 'shamo_participation', 'source_id' => $locked->id,
+            ]);
+
+            return true;
+        });
+
+        return back()->with($claimed ? 'status' : 'error', $claimed
+            ? 'Your Shamo prize was added to your Birr wallet.'
+            : 'This reward is not available to claim.');
+    }
+
+    private function depositBonusAmount(): int
+    {
+        return max(0, (int) PlatformSetting::valueFor('deposit_bonus_amount', 2_500));
+    }
+}

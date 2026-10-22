@@ -1,0 +1,77 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Remove trailing slashes from non-directory URLs.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ /$1 [L,R=308]
+
+    # Serve the Laravel public directory when the host document root points
+    # at the repository root. There is intentionally no web installer.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+# Compression. The stylesheets are the heaviest thing on a cold visit and they
+# are almost pure text, so this is the single largest transfer saving available.
+# Every block is IfModule-guarded: on a host without the module it is inert.
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript application/javascript application/x-javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json application/xml application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+    AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    # Very old browsers mishandle compressed responses.
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    Header append Vary User-Agent env=!dont-vary
+</IfModule>
+
+# Caching. Every asset URL carries a ?v=<filemtime> string that changes when the
+# file changes, so a long max-age can never serve a stale build. HTML itself is
+# never cached — it is what hands out the new version strings.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault                          "access plus 1 hour"
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+    ExpiresByType text/javascript           "access plus 1 year"
+    ExpiresByType image/png                 "access plus 1 year"
+    ExpiresByType image/jpeg                "access plus 1 year"
+    ExpiresByType image/webp                "access plus 1 year"
+    ExpiresByType image/svg+xml             "access plus 1 year"
+    ExpiresByType image/x-icon              "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType text/html                 "access plus 0 seconds"
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|png|jpe?g|webp|svg|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+    # The service worker and the manifest are the two files that must never be
+    # pinned: the worker is how every future update reaches an already-installed
+    # app, and the manifest is what the install itself is built from. Both would
+    # otherwise be caught by the year-long .js rule above, or by ExpiresDefault.
+    <Files "app-sw.js">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </Files>
+    <Files "manifest.webmanifest">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </Files>
+    <Files "offline.html">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </Files>
+</IfModule>
+
+# Shipped by few default Apache builds, and a manifest served as the wrong type is
+# rejected outright by some browsers.
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>

@@ -1,0 +1,443 @@
+CHANGES HISTORY
+---------------
+v3.2.14 - 10 February 2026
+- Minor bug fixes.
+
+v3.2.13 - 9 February 2026
+- Implemented reCAPTCHA Enterprise support instead of decommissioned reCAPTCHA Classic.
+- Minor bug fixes.
+
+v3.2.12 - 30 January 2026
+- Implemented a separate file upload mechanism for KYC requests to mitigate issues on slow networks.
+- Added user rank display and default sorting to the bonus rules table in the backend.
+- Optimized search performance across backend pages.
+- Allowed users to change their email address after verification.
+
+v3.2.11 - 14 January 2026
+- Enhanced period filters across data tables and admin dashboard.
+- Added configurable bonus rules per user rank for faucet, cashback and deposit bonuses.
+- Added the ability to change the user rank manually in the backend.
+
+v3.2.10 - 26 December 2025
+- Improved featured games management.
+
+v3.2.9 - 22 December 2025
+- Fixed failed jobs table overflow issue.
+
+v3.2.8 - 22 December 2025
+- Maintenance page improvements (added available disk space display and improved log management).
+
+v3.2.7 - 9 December 2025
+- Added new thumbnail images for original games.
+
+v3.2.6 - 21 November 2025
+- Added support for uploading PDF documents for deposit, withdrawal, and KYC submissions.
+
+v3.2.5 - 7 November 2025
+- Added automatic username generation during registration.
+- Added configurable welcome email (sent after registration).
+- Added dashboard widgets for top wagered users, top winners and top losers.
+
+v3.2.4 - 30 October 2025
+- Minor bug fixes and performance improvements.
+
+v3.2.3 - 27 October 2025
+- Minor bug fixes and performance improvements.
+
+v3.2.2 - 8 October 2025
+- Reorganized items on the admin settings page.
+
+v3.2.1 - 6 October 2025
+- Added Level Up bonus cards to the VIP Club page.
+- Added XP transactions page to the backend.
+- Fixed various minor display issues.
+
+v3.2.0 - 3 October 2025
+- Added promo code functionality, enabling users to redeem cash bonuses.
+- Introduced VIP Club, rewarding users with bonuses as they achieve higher VIP levels based on activity.
+- Enabled real-time balance updates (requires broadcaster service).
+- Added bet statistics by game provider to the admin dashboard.
+- Removed profit display from leaderboard and user profile pages to enhance privacy.
+- Configured all user notifications to be queued for asynchronous delivery.
+
+v3.1.0 - 16 September 2025
+- Implemented an audit log feature to record and monitor actions performed by admin users.
+
+v3.0.9 - 8 August 2025
+- Added support for the home page slider in the new template.
+
+v3.0.8 - 5 August 2025
+- Added an option to fully disable public user profile viewing.
+- Implemented registration validation to block disposable email addresses.
+- Introduced device fingerprinting during registration to prevent multiple accounts from the same device.
+- Integrated Google libphonenumber for accurate phone number format validation.
+- Enabled customizable user flags for admin assignment.
+- Started tracking IP addresses used for user logins.
+
+v3.0.7 - 18 July 2025
+- Fixed 2FA form in the new template.
+
+v3.0.6 - 2 July 2025
+- Fixed the game search menu for mobiles.
+- Made custom menu items translatable.
+
+v3.0.5 - 25 June 2025
+- Various fixes and enhancements for the mobile version.
+- Fixed a bug affecting file access for admins with individual permissions.
+- Added an option to disable the affiliate program in the settings.
+
+v3.0.4 - 19 June 2025
+- Minor improvements of the mobile version.
+
+v3.0.3 - 11 June 2025
+- Fixed the footer padding on large screens.
+
+v3.0.2 - 10 June 2025
+- Added the ability to customize the welcome card images on the home page.
+
+v3.0.1 - 9 June 2025
+- Minor improvements.
+
+v3.0.0 - 8 June 2025
+- New UI implemented.
+- Live bet stream support added.
+
+v2.12.0 - 13 May 2025
+- Integration with Crisp and Tawk.to support chat providers.
+
+v2.11.0 - 28 March 2025
+- Login with Telegram integrated.
+
+v2.10.2 - 10 March 2025
+- Minor bug fixes.
+
+v2.10.1 - 17 January 2025
+- Cashback bonus card added to the home page.
+- Minor bug fixes.
+
+v2.10.0 - 16 January 2025
+- Added cashback bonus (ability to return a percentage of the lost amount to the user).
+
+v2.9.2 - 24 December 2024
+- Implemented integration with Post Affiliate Pro to track sign-ups create commissions.
+
+v2.9.1 - 19 December 2024
+- Introduced the ability to inject custom JavaScript code via Settings → Theme → JavaScript.
+- Bug fixes.
+
+v2.9.0 - 17 December 2024
+- Implemented KYC functionality with support for manual verification by the admin and seamless integration with BlueAssure.
+- Added the option to upload favicon files and custom CSS rules directly from the backend.
+- Made the main menu visible for non-authenticated users.
+
+v2.8.0 - 4 December 2024
+- Added the functionality to customize affiliate commission rates at the user level.
+- Added the option to change usernames (can be enabled or disabled in the settings).
+- Added a search button to the app bar (can be enabled or disabled in the settings).
+- Vendor packages updated.
+
+v2.7.0 - 8 November 2024
+- Added multi-currency accounts support to the platform core.
+- Important numeric IDs (such as user ID, account ID, and game ID) made hidden from regular users to enhance platform security.
+ This also prevents users from estimating metrics like the total number of registered users, games played, or deposits made.
+- Moved bonus rules configuration from the settings page to the bonuses page.
+- Updated the user dropdown menu.
+- Moved quick user settings from the dropdown menu to a dedicated page.
+- Added the ability to include links to custom static pages to the main menu.
+- Implemented the ability to upgrade the platform from the admin panel.
+
+v2.6.1 - 19 September 2024
+- Minor technical improvements.
+
+v2.6.0 - 16 September 2024
+- Added ability so show different slides on the home page for authenticated and anonymous users.
+
+v2.5.0 - 23 August 2024
+- Bug fix: verification email is sent more than once.
+- Vendor packages updated.
+
+v2.4.1 - 22 July 2024
+- Small bug fixes.
+
+v2.4.0 - 9 July 2024
+- Ability to expand chat window by default.
+- Logo added to the email template.
+
+v2.3.1 - 20 June 2024
+- Game thumbs updates.
+
+v2.3.0 - 11 June 2024
+- Cookie consent banner added (can be enabled or disabled in the backend).
+- Bug fixes for web3 authentication on mobile devices.
+
+v2.2.0 - 31 May 2024
+- Google reCaptcha v3 integration implemented.
+- OAuth and web3 providers icons improved.
+
+v2.1.0 - 24 May 2024
+- Laravel framework upgraded to version 11.7. Min PHP version: 8.2.
+- Bug fix: email verification link is not working.
+
+v2.0.0 - 10 May 2024
+- Added several built-in color themes and the ability to create a custom color theme.
+- Implemented the ability to preserve filtering, sorting, and paging when switching between admin pages.
+- Added game thumbnails to the main menu.
+- Refactored frontend code and updated 3rd party libraries.
+
+v1.21.0 - 18 August 2023
+- Option to disable email authentication (in favor of web3 or OAuth).
+- Game cards responsiveness improvements.
+- Minor bug fixes.
+
+v1.20.0 - 2 June 2023
+- Laravel framework upgraded to version 10.13. Min PHP version: 8.1.
+
+v1.19.1 - 17 April 2023
+- Minor bug fixes and code refactoring.
+
+v1.19.0 - 8 March 2023
+- Ability to add custom fields on the regular sign-up form.
+- Ability to save notes for a specific user in the backend.
+- Separate page in the backend to view all bonuses.
+- Bug fix: bet reset when autoplay mode is enabled.
+- Bug fix: affiliate users are not labeled on the accounts page.
+
+v1.18.0 - 20 January 2023
+- Authentication with Metamask, Phantom and Tronlink wallets implemented.
+
+v1.17.0 - 22 December 2022
+- Ability for users to send tips (credits) to each other.
+- Ability to specify different bonus conditions for the first deposit (Payments add-on is required).
+- Various fixes (game feed, language selector on the home page and some others).
+
+v1.16.0 - 25 November 2022
+- Autoplay feature in single player games with one round.
+- Ability to customize win and lose sounds in the backend.
+- DiceBear Avatars API integrated to automatically assign random avatars to new users and bots.
+- Ability to customize the app bar, system bar, nav bar, page and footer background colors.
+- Ability to customize website fonts.
+- Reduce the header and footer on game pages for mobiles.
+- Make front page slider responsive.
+- Improve frontend redirects when email verification or 2FA is enabled.
+- Generate affiliate links using random hash rather than user IDs.
+- Twitter OAuth2 support.
+- PHP 8.1 compatibility, Laravel framework 8.83.25.
+
+v1.15.6 - 23 September 2022
+- Core changes required for the Payments add-on.
+
+v1.15.5 - 2 September 2022
+- Ability to disable the game feed globally.
+- Ability to specify coincap.io API key.
+
+v1.15.4 - 7 July 2022
+- Laravel framework is upgraded to version 8.66.0.
+
+v1.15.3 - 27 May 2022
+- Filter by game added to leaderboard.
+
+v1.15.2 - 29 April 2022
+- Changes required to add new deposit methods to the Payments add-on.
+
+v1.15.1 - 4 April 2022
+- Changes required to add the Skrill deposit method to the Payments add-on.
+- Minor bug fixes.
+
+v1.15.0 - 4 March 2022
+- Evoplay, BGaming providers support (this version is a prerequisite for installing the extra integration add-on).
+- GGR and NGR calculation added to the admin dashboard.
+
+v1.14.0 - 20 December 2021
+- Caribbean poker game support (this version is a prerequisite for installing this add-on).
+
+v1.13.2 - 18 November 2021
+- Core changes required for the Payments add-on.
+
+v1.13.1 - 11 November 2021
+- Minor fixes.
+
+v1.13.0 - 9 November 2021
+- Crash game support (this version is a prerequisite for installing this add-on).
+- Laravel framework is upgraded to version 8.61.0.
+- All PHP vendor packages are updated.
+- Ability to view log files in the backend.
+
+v1.12.3 - 10 September 2021
+- Cryptocompare.com API integrated (relevant for Crypto Prediction game).
+- Add simplified and traditional chinese languages.
+
+v1.12.2 - 22 August 2021
+- Bug fix: "This action is unauthorized" error in Crypto Prediction game.
+
+v1.12.1 - 11 August 2021
+- Slots 3D game support (this version is a prerequisite for installing this add-on).
+- Bug fix: social login with Twitter.
+
+v1.12.0 - 16 July 2021
+- Home page improvements:
+  * Social media links block added.
+  * Biggest win block added.
+  * Recent games block improved.
+- Application footer improved.
+- Help page added to backend.
+- Hide sign up and deposit bonus cards on the home page if these bonuses are set to zero.
+- Card deck images preloading added to all card games.
+- Minor improvements of Maintenance and Add-on pages.
+
+v1.11.1 - 30 June 2021
+- Bots support for Crypto price prediction game.
+
+v1.11.0 - 26 June 2021
+- Crypto price prediction game support (this version is a prerequisite for installing this add-on).
+
+v1.10.2 - 27 May 2021
+- Auto play support for Dice.
+- German translation improved.
+
+v1.10.1 - 24 May 2021
+- Chat rain feature added (active users in chat can receive extra credits on a regular basis).
+
+v1.10.0 - 20 May 2021
+- Multiplayer roulette game support (this version is a prerequisite for installing this add-on).
+- Support for custom card decks added (plus 3 new card decks to choose from).
+- Game feed is now disabled on mobiles by default.
+
+v1.9.2 - 13 April 2021
+- Keno game support (this version is a prerequisite for installing this add-on).
+
+v1.9.1 - 6 April 2021
+- Bug fix: shift issue on mobiles when using Stars background animation.
+- Circles background animation added.
+
+v1.9.0 - 26 March 2021
+IMPORTANT: Laravel framework is upgraded to v8.27, so please make sure PHP 7.3 or higher is installed on your website.
+
+- Faucet (ability for users to request free extra credits).
+- User online presense tracking (Pusher is required).
+- Live games feed (Pusher is required).
+- Ability to restrict access to various pages for admin accounts.
+- System bar with extra info (number of online users, number of games, last win).
+- Ability to make the main navigation bar visible permanently (except for mobiles).
+- Bonuses for email verification.
+- Filters added to the administrative pages.
+- "View" and "Details" game information pages combined into one.
+- Bug fixes and code re-factoring.
+
+v1.8.2 - 19 January 2021
+- Plinko game support (this version is a prerequisite for installing this add-on).
+
+v1.8.1 - 24 December 2020
+- Bug fix: affiliates are not assigned during sign up.
+- Bug fix: gravatars stopped working.
+- Bug fix: don't escape unicode characters in the app settings.
+
+v1.8.0 - 19 December 2020
+- Sic Bo game support (this version is a prerequisite for installing this add-on).
+- Laravel framework upgraded to v7.30.0.
+
+v1.7.0 - 30 November 2020
+- Ability to enable admin email notifications when a user signs up, wins or loses more than a specific amount.
+- Ability to disable / hide the leaderboard page for all users.
+- Minor bug fixes for the light theme.
+- Bug fix: "last login at" and "last login from" are not filled after the initial user registration.
+
+v1.6.0 - 29 October 2020
+- Horse racing add-on support (this version is a prerequisite for installing this add-on).
+- Ability to customize home page template in the backend - add custom HTML markup or remove default blocks.
+- Don't display zero commissions on affiliate program page for users. Display deposit commissions.
+- Ability to upload / change user and bots avatars in the backend.
+- A mandatory checkbox added to the sign up form: I accept "Terms of use" and "Privacy policy".
+- Sign up link added to the login form.
+
+v1.5.1 - 26 June 2020
+- Raffle add-on support (this version is a prerequisite for installing this add-on).
+- Games combined into a nested list in the main menu.
+- Minor fixes and improvements.
+
+v1.5.0 - 26 June 2020
+- Ability to filter games by categories on the front page (categories can be assigned in the backend).
+- Ability to filter by period in the leaderboard.
+- Ability for every user to hide their profit from display on leaderboard and profile pages (this setting is available on the user profile page).
+- Ability to filter by period in the backend dashboard.
+
+v1.4.0 - 19 June 2020
+- Casino Hold'em game support (this version is a prerequisite for installing this game add-on).
+- Laravel and other 3rd party libraries updated.
+
+v1.3.9 - 9 June 2020
+- Lucky Wheel game support (this version is a prerequisite for installing this game add-on).
+
+v1.3.8 - 3 June 2020
+- Home page slider implemented.
+- Ability to set custom background image for every game page.
+- Links to deposits / withdrawals pages added to the main menu.
+
+v1.3.7 - 19 May 2020
+- Ability to edit games images displayed on the home page.
+- PWA optimization.
+
+v1.3.6 - 8 May 2020
+- Multiplayer Blackjack game support (this version is a prerequisite for installing this game add-on).
+
+v1.3.5 - 20 April 2020
+- Google reCaptcha v2 integration implemented (login, registration and password reset forms).
+
+v1.3.4 - 15 April 2020
+- Progressive Web Application (PWA) support added, which allows the app to be added to the home screen of an iOS or Android device.
+
+v1.3.3 - 13 April 2020
+- Heads Or Tails game support (this version is a prerequisite for installing this game add-on).
+
+v1.3.2 - 11 April 2020
+- Fixes related to Payments add-on.
+
+v1.3.1 - 2 April 2020
+- Minor fixes.
+
+v1.3.0 - 1 April 2020
+IMPORTANT: Please make sure you have PHP 7.2.5 or higher before installing this update.
+
+- Dice 3D game support (this version is a prerequisite for installing this game add-on).
+- Laravel framework upgrade from version 6.x to 7.2.2.
+- JWT auth replaced with native session based auth using Laravel Sanctum.
+
+v1.2.8 - 23 March 2020
+- Security improvement.
+
+v1.2.7 - 19 March 2020
+- Slots games support (this version is a prerequisite for installing the Slots game add-on).
+- Security patch.
+
+v1.2.6 - 20 February 2020
+- Bug fix: incorrect flags used for Estonia and Slovenia.
+- European roulette game support (this version is a prerequisite for installing the European roulette game add-on).
+- Necessary changes to support deposits via Metamask (Payments add-on is required).
+
+v1.2.5 - 13 February 2020
+- Minor fixes and improvements.
+
+v1.2.4 - 12 February 2020
+- Minor fixes and improvements.
+
+v1.2.3 - 7 February 2020
+- Payments add-on support (this version is a prerequisite for installing the Payments add-on).
+
+v1.2.2 - 28 January 2020
+- Dice game support (this version is a prerequisite for installing the Dice game add-on).
+- Ability to add custom links to footer menu.
+- Bug fix: impossible to save settings.
+
+v1.2.1 - 23 January 2020
+- Video poker game support (this version is a prerequisite for installing the Video Poker add-on).
+
+v1.2.0 - 22 January 2020
+- Multi-room chat implemented.
+- Add-ons management impemented.
+
+v1.1.0 - 17 January 2020
+- Affiliate program implemented.
+- Google Tag Manager integration implemented.
+- Overall interface improvements and bug fixes.
+
+v1.0.0 - 27 December 2019
+- Initial release.

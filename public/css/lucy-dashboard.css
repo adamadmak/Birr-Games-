@@ -1,0 +1,366 @@
+/*
+ * Lucy Chewata — the operations dashboard.
+ *
+ * WHY THIS FILE IS SEPARATE AND SCOPED
+ *
+ * Every rule here lives under .ops-dash. The admin stylesheet is two thousand
+ * lines that every screen shares, and the dashboard's old layout is redefined
+ * in four places down its length — writing over that in place means fighting
+ * specificity and risking the other twenty-nine pages. Scoped, this page can be
+ * judged on its own and reverted by deleting one class.
+ *
+ * THE PROBLEM IT ANSWERS
+ *
+ * The old dashboard was eighteen rounded tiles of near-identical weight, each
+ * in its own colour — blue, mint, purple, orange, green, teal. Nothing was
+ * findable because everything was emphasised, and seven accent colours is what
+ * reads as dated. Two operator complaints, one cause.
+ *
+ * So: a cash desk, not a card wall. One number is the house's position for the
+ * period, with the two flows that produce it drawn as what they are — a split.
+ * Everything below is a ledger whose figures share a right edge and a fixed
+ * digit width, because the operator's job is comparing amounts, and a column
+ * you can run an eye down is the whole point. Colour is spent once, on the
+ * position. Money in and money out get one hue each, and that is the entire
+ * palette — the rainbow is gone.
+ */
+
+.ops-dash {
+    --ops-gap: 18px;
+    --ops-pad: clamp(16px, 2vw, 24px);
+    /*
+     * Money in and money out, and nothing else gets a colour. Green stays
+     * reserved for the house's position, so the pair is blue and amber.
+     *
+     * --warn is not used, deliberately: the shared stylesheet defines it as
+     * #24e435, a green, which is almost certainly a mistake — it makes a
+     * warning indistinguishable from a success, and on this page it drew the
+     * Withdrawals line of the cash-flow chart in the same colour as Deposits.
+     * Overridden here so the chart reads; the global token needs its own fix.
+     */
+    --ops-in: var(--info);
+    --ops-out: var(--m-orange);
+    --warn: #ff8a4c;
+    display: grid;
+    gap: var(--ops-gap);
+}
+
+/* --- the period being read ------------------------------------------------ */
+
+.ops-period {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+}
+
+.ops-period-dates {
+    color: var(--muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.ops-period-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.ops-period-tabs a {
+    padding: 6px 13px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: calc(var(--radius) - 4px);
+    transition: color .15s, background-color .15s;
+}
+
+.ops-period-tabs a:hover { color: var(--ink); }
+
+.ops-period-tabs a[aria-current="page"] {
+    color: var(--ink);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-sm);
+}
+
+.ops-period form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.ops-period form label {
+    display: grid;
+    gap: 4px;
+    color: var(--faint);
+    font-size: 11px;
+}
+
+.ops-period form input {
+    padding: 7px 10px;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+}
+
+.ops-period form button,
+.ops-period form a {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.ops-period form button { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+
+/* --- the position: the one thing worth reading first ---------------------- */
+
+.ops-position {
+    padding: var(--ops-pad);
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+}
+
+.ops-position-figure { display: grid; gap: 4px; min-width: 0; }
+
+.ops-position-label {
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+/* The hero. Sized off the viewport so it stays the largest thing on the page
+   at every width without overflowing a phone. */
+.ops-position-value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 46px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -.025em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.ops-position-note { color: var(--muted); font-size: 13px; }
+.ops-position-note b { color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* The split: staked against paid out. A casino's day in one image, and the
+   only decorative element on the page that carries information. */
+.ops-split { display: grid; gap: 10px; min-width: 0; }
+
+.ops-split-bar {
+    height: 12px;
+    display: flex;
+    overflow: hidden;
+    background: var(--surface-3);
+    border-radius: 999px;
+}
+
+/* The one measurement the markup hands in, as a value rather than as styling
+   written inline — the widths themselves live here. */
+.ops-split-bar span { display: block; }
+.ops-split-bar .is-kept { width: calc(100% - var(--paid-share, 0%)); background: var(--primary); }
+.ops-split-bar .is-paid { width: var(--paid-share, 0%); background: var(--ops-out); opacity: .55; }
+
+.ops-split-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+}
+
+.ops-split-keys div { display: grid; gap: 2px; }
+
+.ops-split-keys dt,
+.ops-split-keys span:first-child {
+    color: var(--faint);
+    font-size: 11.5px;
+}
+
+.ops-split-keys b {
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+/* --- the ledger ----------------------------------------------------------- */
+
+.ops-ledger {
+    padding: var(--ops-pad);
+    display: grid;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+}
+
+.ops-ledger-head {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ops-ledger-head h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+    color: var(--ink);
+}
+
+.ops-ledger-head span { color: var(--faint); font-size: 12px; }
+
+/* One row, one amount, one right edge. Grid rather than flex so every figure
+   in the column starts at the same x whatever the label length. */
+.ops-row {
+    padding: 11px 4px;
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--line-soft);
+    color: var(--ink);
+    transition: background-color .15s;
+}
+
+.ops-row:first-of-type { border-top: 0; }
+.ops-row:hover { background: var(--surface-2); }
+.ops-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; border-radius: var(--radius-sm); }
+
+.ops-row-dot {
+    width: 8px;
+    height: 8px;
+    margin-left: 7px;
+    border-radius: 50%;
+    background: var(--line-strong);
+}
+
+.ops-row.is-in .ops-row-dot { background: var(--ops-in); }
+.ops-row.is-out .ops-row-dot { background: var(--ops-out); }
+
+.ops-row-name { display: grid; gap: 1px; min-width: 0; }
+.ops-row-name strong { font-size: 14px; font-weight: 500; }
+.ops-row-name small { color: var(--faint); font-size: 11.5px; }
+
+.ops-row-amount {
+    text-align: right;
+    font-size: 15.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+
+.ops-row-amount small {
+    display: block;
+    color: var(--faint);
+    font-size: 11.5px;
+    font-weight: 400;
+}
+
+/* Work waiting on a person is separated by position, not shouted in colour. */
+.ops-ledger-break {
+    margin: 14px 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--faint);
+    font-size: 11.5px;
+}
+
+.ops-ledger-break::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+/* --- the counts, deliberately quiet -------------------------------------- */
+
+.ops-counts {
+    padding: 4px var(--ops-pad);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2px 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+}
+
+/* Stacked rather than label-left/value-right: "Player balances" against
+   "ETB 828,350" wrapped mid-row at anything under a wide desktop, and a row
+   that reflows unpredictably is worse than one that is simply two lines. */
+.ops-count {
+    padding: 12px 0;
+    display: grid;
+    gap: 1px;
+    border-top: 1px solid var(--line-soft);
+    color: var(--ink);
+}
+
+.ops-counts .ops-count:first-child,
+.ops-counts .ops-count:nth-child(2),
+.ops-counts .ops-count:nth-child(3),
+.ops-counts .ops-count:nth-child(4) { border-top: 0; }
+
+.ops-count span { color: var(--faint); font-size: 12px; }
+.ops-count b { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+a.ops-count:hover b { color: var(--primary); }
+a.ops-count:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+.ops-count.is-live b { color: var(--primary); }
+
+/* --- charts and the panels below ----------------------------------------- */
+
+.ops-dash .admin-chart-grid,
+.ops-dash .admin-dashboard-grid {
+    margin-top: 0;
+    display: grid;
+    gap: var(--ops-gap);
+}
+
+/* auto-fit, so these fold on a narrow laptop instead of crushing. The old
+   fixed three-column grid is what broke on smaller screens. */
+.ops-dash .admin-chart-grid { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.ops-dash .admin-dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+
+/* --- narrower ------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .ops-position { grid-template-columns: minmax(0, 1fr); }
+    .ops-period { flex-direction: column; align-items: stretch; }
+    .ops-period form { justify-content: flex-start; }
+}
+
+@media (max-width: 560px) {
+    .ops-row { grid-template-columns: 22px minmax(0, 1fr); row-gap: 2px; }
+    .ops-row-amount { grid-column: 2; text-align: left; }
+    .ops-counts { grid-template-columns: minmax(0, 1fr); }
+    .ops-counts .ops-count:nth-child(2),
+    .ops-counts .ops-count:nth-child(3),
+    .ops-counts .ops-count:nth-child(4) { border-top: 1px solid var(--line-soft); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ops-dash * { transition: none !important; animation: none !important; }
+}

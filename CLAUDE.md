@@ -1,0 +1,108 @@
+# Working notes for this codebase
+
+Conventions that are not obvious from the code, and that have each caused a
+production bug here at least once. Follow them in every module.
+
+## Admin forms
+
+**Helper text goes in `<small>`; it renders as a hint below the field.**
+Do not write explanatory sentences any other way, and do not add inline
+styles to position them.
+
+```blade
+<label>API base URL
+    <input type="url" name="qtech_api_base_url">
+    <small>The integration host for now. QTech issue a production host to switch to.</small>
+</label>
+```
+
+**A unit badge needs `class="unit"`.** That is the short marker sitting inside
+the control's right edge — `ETB`, `%`, `Top N`. Only use it for a word or two.
+
+```blade
+<label>Max Payout<input type="number" name="max_payout"><small class="unit">ETB</small></label>
+```
+
+This used to be the other way round: every `<small>` was positioned absolutely
+inside the input, so any real sentence rendered on top of the control and was
+unreadable. The default is now the safe one. If you forget `.unit`, a badge
+renders as a hint — plainer, but never broken.
+
+**Group related fields with `.configuration-form-section`** (add `.divided` for
+a rule above it) rather than reusing `.configuration-panel-title`, which is the
+panel header and carries its own border and spacing.
+
+**A secondary action with its own explanation uses `.configuration-inline-action`**
+— a button plus a `<p>`. The panel's primary save stays in
+`.configuration-form-actions`. Section-level errors go in
+`.configuration-form-feedback`.
+
+**No inline `style` attributes.** If a layout needs something new, add a class
+to the brand's admin stylesheet so both brands can share it.
+
+## A submit button inherits its form's method spoof
+
+The settings form posts with `@method('PUT')`. A button inside it sends PUT no
+matter what its own `formmethod` says, because Laravel reads the hidden
+`_method` field. Pointing such a button at a POST-only route returns 405.
+
+Give the action its own form, declared outside the spoofed one, and reach it by
+id — HTML associates a control with a form anywhere in the document:
+
+```blade
+<form id="thing-test-form" method="POST" action="{{ route('...') }}">@csrf</form>
+...
+<button type="submit" form="thing-test-form">Test</button>
+```
+
+## Secrets live in `platform_settings`, not environment variables
+
+This host builds Laravel's config cache at BUILD time, without the runtime
+environment. A cached config makes Laravel skip loading `.env` entirely, so
+`config()`, `env()`, `$_ENV` and `getenv()` are all empty at runtime — a value
+set in the platform dashboard never reaches the application.
+
+`BigBang` and `WinHouse` work around it with literal defaults committed in
+`config/services.php`. Do not copy that for anything that authorises money: a
+clone of the repo would authenticate as us. Read through a support class that
+falls back to `platform_settings` (see `App\Support\Qtech`) and give operators
+an admin field to set it.
+
+For anything new, resolve the value with `App\Support\RuntimeEnv::get()` —
+config → `platform_settings` → process env → the `.env` file on disk — as
+`App\Support\Turnstile` and `App\Support\Mailer` do. Write-only secrets saved
+from the admin (Turnstile secret, SMTP password) go in `SettingController::SECRETS`
+so a blank box keeps the stored value instead of erasing it.
+
+## Registration is guarded in one place
+
+`App\Services\RegistrationGuard` runs before validation on `POST /register`:
+honeypot, session-bound render token with a minimum fill time, Cloudflare
+Turnstile when keys are set, and a per-network daily quota. The auth routes use
+the named limiters in `App\Support\AuthRateLimits`, which answer with the form
+and a message rather than a bare 429. Every refusal lands in `security_events`
+(Configuration → Security). Keep new checks inside the guard so the Security
+tab keeps seeing them, and keep the per-network quota loose — Ethiopian mobile
+carriers put whole towns behind one address.
+
+`php tests/registration_guard_smoke.php` and `php tests/hero_banner_smoke.php`
+drive these through the HTTP kernel; run them after touching auth or the hero.
+
+## Both brands move together
+
+`casinogame` (Lucy Chewata) and `kulubet` are the same product under two brands.
+A change to one almost always belongs in the other. Port it in the same session
+and run the same checks against both before pushing.
+
+## Deploy one brand at a time
+
+AletCloud's plan allows two concurrent builds, and whenever both brands build
+at once neither finishes — they sit in BUILDING for an hour and need a manual
+cancel in the dashboard (there is no cancel API). A build started during that
+overlap does not recover after the other is cancelled. Builds started alone
+land in two to three minutes.
+
+A push auto-triggers a build, so pushing both repositories back to back IS
+starting two builds. Push one, confirm it is live (probe a new route, or
+`lastDeployedAt` from the API — the CSS cache-buster is unreliable), then push
+the other.

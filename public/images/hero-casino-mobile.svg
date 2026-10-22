@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" width="900" height="1100" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Casino chips, dice and cards on a dark table">
+  <defs>
+    <radialGradient id="m-glow" cx="55%" cy="28%" r="60%">
+      <stop offset="0" stop-color="#8ec41a" stop-opacity=".45"/>
+      <stop offset=".5" stop-color="#2d4a05" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#07090a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="m-glow2" cx="10%" cy="95%" r="55%">
+      <stop offset="0" stop-color="#9d7cff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#07090a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="m-table" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e1114"/>
+      <stop offset="1" stop-color="#050607"/>
+    </linearGradient>
+    <linearGradient id="m-die-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e4e8"/></linearGradient>
+    <linearGradient id="m-die-side" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c7cc"/><stop offset="1" stop-color="#7f9096"/></linearGradient>
+    <linearGradient id="m-die-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6fbfc"/><stop offset="1" stop-color="#c9d7db"/></linearGradient>
+    <linearGradient id="m-lime-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6ef4f"/><stop offset="1" stop-color="#7fb30a"/></linearGradient>
+    <linearGradient id="m-lime-side" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d9a08"/><stop offset="1" stop-color="#3f5a04"/></linearGradient>
+    <linearGradient id="m-lime-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2ff8a"/><stop offset="1" stop-color="#a7d82a"/></linearGradient>
+    <linearGradient id="m-chip-lime" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9d92e"/><stop offset="1" stop-color="#5d8505"/></linearGradient>
+    <linearGradient id="m-chip-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c7901a"/></linearGradient>
+    <linearGradient id="m-chip-violet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9a4ff"/><stop offset="1" stop-color="#6a4fd6"/></linearGradient>
+    <linearGradient id="m-chip-dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2f34"/><stop offset="1" stop-color="#0f1215"/></linearGradient>
+    <linearGradient id="m-card" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3eaee"/></linearGradient>
+    <linearGradient id="m-card-back" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b2026"/><stop offset="1" stop-color="#0a0d10"/></linearGradient>
+    <linearGradient id="m-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#07090a" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#07090a" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#07090a" stop-opacity=".95"/>
+    </linearGradient>
+    <filter id="m-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="24"/></filter>
+    <filter id="m-shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#000" flood-opacity=".55"/></filter>
+    <filter id="m-glowf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="m-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+  </defs>
+
+  <rect width="900" height="1100" fill="url(#m-table)"/>
+  <rect width="900" height="1100" fill="url(#m-grid)"/>
+  <rect width="900" height="1100" fill="url(#m-glow)"/>
+  <rect width="900" height="1100" fill="url(#m-glow2)"/>
+
+  <ellipse cx="470" cy="560" rx="330" ry="80" fill="#9ed12a" fill-opacity=".16" filter="url(#m-soft)"/>
+  <g fill="none" stroke-width="1.5">
+    <circle cx="470" cy="380" r="260" stroke="#9ed12a" stroke-opacity=".22"/>
+    <circle cx="470" cy="380" r="190" stroke="#b9a4ff" stroke-opacity=".18" stroke-dasharray="6 14"/>
+  </g>
+  <circle cx="210" cy="380" r="6" fill="#c6ef4f" filter="url(#m-glowf)"/>
+  <circle cx="690" cy="200" r="5" fill="#ffe08a" filter="url(#m-glowf)"/>
+
+  <!-- cards -->
+  <g transform="translate(330 340) rotate(-20)" filter="url(#m-shadow)">
+    <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#m-card-back)" stroke="#ffffff" stroke-opacity=".16"/>
+    <rect x="-56" y="-84" width="112" height="168" rx="9" fill="none" stroke="#9ed12a" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M0-34 L18-6 L0 30 L-18-6Z" fill="#9ed12a" fill-opacity=".85"/>
+  </g>
+  <g transform="translate(385 330) rotate(-6)" filter="url(#m-shadow)">
+    <rect x="-70" y="-98" width="140" height="196" rx="14" fill="url(#m-card)"/>
+    <text x="-56" y="-62" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" fill="#101417">A</text>
+    <g transform="translate(0 6)"><path d="M0-30 C 14-30 26-18 26-6 C 26 10 10 18 0 34 C -10 18 -26 10 -26-6 C -26-18 -14-30 0-30Z" fill="#111519"/><path d="M-5 14 L5 14 L3 40 L-3 40Z" fill="#111519"/></g>
+  </g>
+
+  <!-- chips -->
+  <g transform="translate(270 500)" filter="url(#m-shadow)">
+    <g transform="translate(0 44)"><ellipse rx="74" ry="24" fill="url(#m-chip-dark)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="3" stroke-dasharray="14 10"/></g>
+    <g transform="translate(0 30)"><ellipse rx="74" ry="24" fill="url(#m-chip-violet)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="3" stroke-dasharray="14 10"/></g>
+    <g transform="translate(0 16)"><ellipse rx="74" ry="24" fill="url(#m-chip-gold)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".6" stroke-width="3" stroke-dasharray="14 10"/></g>
+    <g transform="translate(0 2)"><ellipse rx="74" ry="24" fill="url(#m-chip-lime)"/><ellipse rx="52" ry="17" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="14 10"/><ellipse rx="32" ry="10" fill="#0d1a02" fill-opacity=".55"/><text y="4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="800" fill="#e8ffb2" letter-spacing="1">ETB</text></g>
+  </g>
+
+  <!-- big die -->
+  <g transform="translate(540 430)" filter="url(#m-shadow)">
+    <path d="M-92-36 L0-88 L92-36 L0 16Z" fill="url(#m-die-top)"/>
+    <path d="M-92-36 L0 16 L0 120 L-92 68Z" fill="url(#m-die-face)"/>
+    <path d="M92-36 L0 16 L0 120 L92 68Z" fill="url(#m-die-side)"/>
+    <path d="M-92-36 L0-88 L92-36 L0 16Z M-92-36 L0 16 L0 120 L-92 68Z M92-36 L0 16 L0 120 L92 68Z" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.5" stroke-linejoin="round"/>
+    <g fill="#101417"><ellipse cx="0" cy="-36" rx="9" ry="5.5"/><ellipse cx="-46" cy="-36" rx="9" ry="5.5"/><ellipse cx="46" cy="-36" rx="9" ry="5.5"/><ellipse cx="0" cy="-62" rx="9" ry="5.5"/><ellipse cx="0" cy="-10" rx="9" ry="5.5"/></g>
+    <g fill="#101417"><ellipse cx="-46" cy="42" rx="6" ry="8" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="6" ry="8" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="6" ry="8" transform="rotate(30 -22 56)"/></g>
+    <g fill="#2a343a"><ellipse cx="24" cy="36" rx="6" ry="8" transform="rotate(-30 24 36)"/><ellipse cx="68" cy="10" rx="6" ry="8" transform="rotate(-30 68 10)"/><ellipse cx="24" cy="66" rx="6" ry="8" transform="rotate(-30 24 66)"/><ellipse cx="68" cy="40" rx="6" ry="8" transform="rotate(-30 68 40)"/><ellipse cx="24" cy="96" rx="6" ry="8" transform="rotate(-30 24 96)"/><ellipse cx="68" cy="70" rx="6" ry="8" transform="rotate(-30 68 70)"/></g>
+  </g>
+
+  <!-- lime die -->
+  <g transform="translate(690 290) rotate(14)" filter="url(#m-shadow)">
+    <g transform="scale(.62)">
+      <path d="M-92-36 L0-88 L92-36 L0 16Z" fill="url(#m-lime-top)"/>
+      <path d="M-92-36 L0 16 L0 120 L-92 68Z" fill="url(#m-lime-face)"/>
+      <path d="M92-36 L0 16 L0 120 L92 68Z" fill="url(#m-lime-side)"/>
+      <path d="M-92-36 L0-88 L92-36 L0 16Z M-92-36 L0 16 L0 120 L-92 68Z M92-36 L0 16 L0 120 L92 68Z" fill="none" stroke="#ffffff" stroke-opacity=".4" stroke-width="2" stroke-linejoin="round"/>
+      <g fill="#182000"><ellipse cx="0" cy="-36" rx="10" ry="6"/></g>
+      <g fill="#182000"><ellipse cx="-46" cy="42" rx="7" ry="9" transform="rotate(30 -46 42)"/><ellipse cx="-70" cy="28" rx="7" ry="9" transform="rotate(30 -70 28)"/><ellipse cx="-22" cy="56" rx="7" ry="9" transform="rotate(30 -22 56)"/><ellipse cx="-46" cy="14" rx="7" ry="9" transform="rotate(30 -46 14)"/></g>
+      <g fill="#0e1600"><ellipse cx="46" cy="40" rx="7" ry="9" transform="rotate(-30 46 40)"/><ellipse cx="46" cy="70" rx="7" ry="9" transform="rotate(-30 46 70)"/></g>
+    </g>
+  </g>
+
+  <!-- leaning chip -->
+  <g transform="translate(700 560) rotate(-28)" filter="url(#m-shadow)">
+    <circle r="58" fill="url(#m-chip-lime)"/>
+    <circle r="43" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="4" stroke-dasharray="16 11"/>
+    <circle r="27" fill="#0d1a02" fill-opacity=".55"/>
+    <text y="7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900" fill="#e8ffb2">5×</text>
+  </g>
+
+  <g fill="#ffffff">
+    <path d="M160 200 l3 9 9 3 -9 3 -3 9 -3-9 -9-3 9-3z" opacity=".8"/>
+    <path d="M780 420 l2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5-7 -7-2.5 7-2.5z" opacity=".6"/>
+  </g>
+
+  <!-- bottom fade: copy sits over the lower half on phones -->
+  <rect width="900" height="1100" fill="url(#m-fade)"/>
+</svg>
