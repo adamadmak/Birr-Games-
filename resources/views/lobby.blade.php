@@ -148,9 +148,11 @@
              Frontend → Hero banner (App\Support\HeroBanner), with the bundled
              illustration as the fallback. Phones get their own, taller image
              when one is set; otherwise the wide one is used. --}}
-        <section class="hero-banner hero-banner-image">
-            @php([$heroW, $heroH] = \App\Support\HeroBanner::size('desktop'))
-            @php([$heroMobileW, $heroMobileH] = \App\Support\HeroBanner::size('mobile'))
+        @php([$heroW, $heroH] = \App\Support\HeroBanner::size('desktop'))
+        @php([$heroMobileW, $heroMobileH] = \App\Support\HeroBanner::size('mobile'))
+        {{-- Half the picture's natural height: the ratio is doubled, and the image
+             is cropped evenly top and bottom to fit. --}}
+        <section class="hero-banner hero-banner-image" style="--hero-ratio: {{ round(2 * $heroW / max($heroH, 1), 4) }}; --hero-ratio-m: {{ round(2 * $heroMobileW / max($heroMobileH, 1), 4) }}">
             {{-- width/height are the uploaded picture's own size: on desktop the
                  hero takes that picture's height, so nothing is cropped. --}}
             <picture class="hero-media">

@@ -3116,3 +3116,27 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .member-game-section, .game-section, .player-topnav, .main-nav { background: var(--surface-solid); }
 }
+
+/* ---------------------------------------------------------------------------
+   HERO AT HALF HEIGHT
+   The lobby sets --hero-ratio (and --hero-ratio-m for phones) to twice the
+   picture's own width/height, so the hero is half as tall as the picture would
+   be at full width. The image fills that box and is cropped evenly top and
+   bottom. To change the height, change the 2 in lobby.blade.php (3 = a third).
+   ------------------------------------------------------------------------- */
+.hero-banner-image .hero-media img,
+.hero-banner-image:hover .hero-media img {
+    aspect-ratio: var(--hero-ratio, 4.4);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+}
+@media (max-width: 700px) {
+    .hero-banner-image .hero-media img,
+    .hero-banner-image:hover .hero-media img {
+        aspect-ratio: var(--hero-ratio-m, 1.64);
+        max-height: none;
+    }
+}
