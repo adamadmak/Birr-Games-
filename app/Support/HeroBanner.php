@@ -3,6 +3,9 @@
 namespace App\Support;
 
 use App\Models\PlatformSetting;
+use App\Models\SiteMedia;
+use App\Services\HeroImageProcessor;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -13,9 +16,11 @@ use Illuminate\Support\Facades\Storage;
  * slot falls back to the desktop image before that, so a brand that uploads
  * one picture gets it everywhere.
  *
- * Paths are relative to the `public` disk — the same disk and the same
- * `storage/` symlink the game artwork and promotion images already use — so a
- * host that serves those serves this too.
+ * A stored reference is either `media:<slot>-<version>` (a row in
+ * `site_media`, served by MediaController) or a legacy `hero/…` path on the
+ * public disk. A reference whose image is not actually there — a legacy file
+ * lost to a deploy, a table that was dropped — is treated as unset, so the
+ * lobby shows the bundled artwork rather than a broken image.
  */
 final class HeroBanner
 {
@@ -26,8 +31,20 @@ final class HeroBanner
     public const DEFAULT_DESKTOP = 'images/hero-casino.svg';
     public const DEFAULT_MOBILE = 'images/hero-casino-mobile.svg';
 
-    /** The stored path for a slot, or null when the default artwork is in use. */
+    /** The stored reference for a slot, or null when nothing usable is stored. */
     public static function path(string $slot): ?string
+    {
+        $slot = $slot === 'mobile' ? 'mobile' : 'desktop';
+        $value = trim((string) PlatformSetting::valueFor(
+            $slot === 'mobile' ? self::SETTING_MOBILE : self::SETTING_DESKTOP,
+            ''
+        ));
+
+        return $value !== '' && self::present($slot, $value) ? $value : null;
+    }
+
+    /** The reference as saved, usable or not — the admin uses it to say a file is missing. */
+    public static function storedReference(string $slot): ?string
     {
         $value = trim((string) PlatformSetting::valueFor(
             $slot === 'mobile' ? self::SETTING_MOBILE : self::SETTING_DESKTOP,
@@ -41,7 +58,7 @@ final class HeroBanner
     {
         $path = self::path('desktop');
 
-        return $path ? self::storageUrl($path) : asset(self::DEFAULT_DESKTOP);
+        return $path ? self::urlFor('desktop', $path) : asset(self::DEFAULT_DESKTOP);
     }
 
     public static function mobileUrl(): string
@@ -49,7 +66,7 @@ final class HeroBanner
         $path = self::path('mobile');
 
         if ($path) {
-            return self::storageUrl($path);
+            return self::urlFor('mobile', $path);
         }
 
         // A brand that uploaded only the wide picture should still see it on
@@ -69,28 +86,41 @@ final class HeroBanner
         return self::path($slot) !== null;
     }
 
-    /** Whether a stored file is actually on disk — the admin shows a warning otherwise. */
-    public static function exists(string $slot): bool
+    /** True when something is saved for the slot but its image is gone. */
+    public static function isMissing(string $slot): bool
     {
-        $path = self::path($slot);
+        return self::storedReference($slot) !== null && self::path($slot) === null;
+    }
 
-        if ($path === null) {
-            return false;
+    private static function urlFor(string $slot, string $reference): string
+    {
+        if (HeroImageProcessor::isMedia($reference)) {
+            return route('media.hero', ['slot' => $slot, 'version' => HeroImageProcessor::versionOf($reference)], false);
         }
 
-        try {
-            return Storage::disk('public')->exists($path);
-        } catch (\Throwable) {
-            return false;
-        }
+        return asset('storage/'.ltrim($reference, '/'));
     }
 
     /**
-     * The stored path carries a random suffix (see HeroImageProcessor), so a
-     * replaced image always has a new URL and no browser keeps the old one.
+     * Whether the image behind a reference exists. Cached briefly: the lobby is
+     * the busiest page and this runs for each slot on every render.
      */
-    private static function storageUrl(string $path): string
+    private static function present(string $slot, string $reference): bool
     {
-        return asset('storage/'.ltrim($path, '/'));
+        try {
+            return (bool) Cache::remember('hero_present:'.$slot.':'.md5($reference), 120, function () use ($slot, $reference): bool {
+                if (HeroImageProcessor::isMedia($reference)) {
+                    return SiteMedia::available()
+                        && SiteMedia::query()->where('slot', 'hero-'.$slot)->exists();
+                }
+
+                // A legacy disk upload is only usable if the file survived AND
+                // the host actually exposes the public disk (symlink present).
+                return Storage::disk('public')->exists($reference)
+                    && is_dir(public_path('storage'));
+            });
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

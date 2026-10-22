@@ -135,30 +135,39 @@ class SettingController
         ]);
 
         $values = [\App\Support\HeroBanner::SETTING_ALT => trim((string) ($validated['hero_image_alt'] ?? ''))];
-        $stale = [];
+        $clear = [];
         $changed = [];
 
-        foreach (['desktop' => 'hero_desktop', 'mobile' => 'hero_mobile'] as $slot => $field) {
-            $settingKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE : \App\Support\HeroBanner::SETTING_DESKTOP;
-            $current = \App\Support\HeroBanner::path($slot);
+        try {
+            foreach (['desktop' => 'hero_desktop', 'mobile' => 'hero_mobile'] as $slot => $field) {
+                $settingKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE : \App\Support\HeroBanner::SETTING_DESKTOP;
+                // The reference as saved, even when its image is gone, so a broken
+                // one can still be reset.
+                $current = \App\Support\HeroBanner::storedReference($slot);
 
-            if ($request->hasFile($field)) {
-                $values[$settingKey] = $images->store($request->file($field), $slot);
-                $stale[] = $current;
-                $changed[] = $slot;
-            } elseif ($request->boolean('remove_'.$slot) && $current !== null) {
-                $values[$settingKey] = '';
-                $stale[] = $current;
-                $changed[] = $slot.' (reset)';
+                if ($request->hasFile($field)) {
+                    $values[$settingKey] = $images->store($request->file($field), $slot);
+                    // The new image replaced the slot's row in place; only a legacy
+                    // disk file is left over.
+                    $images->deleteLegacyFile($current);
+                    $changed[] = $slot;
+                } elseif ($request->boolean('remove_'.$slot) && $current !== null) {
+                    $values[$settingKey] = '';
+                    $clear[$slot] = $current;
+                    $changed[] = $slot.' (reset)';
+                }
             }
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors(['hero_desktop' => 'The image could not be saved: '.$exception->getMessage()]);
         }
 
         $this->persist($values);
 
-        foreach ($stale as $path) {
-            $images->delete($path);
+        foreach ($clear as $slot => $reference) {
+            $images->clear($slot, $reference);
         }
-
         return redirect()
             ->route('admin.settings.index', ['tab' => 'frontend'])
             ->with('admin_status', $changed === []
@@ -242,8 +251,8 @@ class SettingController
             'mobile_url' => \App\Support\HeroBanner::mobileUrl(),
             'desktop_custom' => \App\Support\HeroBanner::isCustom('desktop'),
             'mobile_custom' => \App\Support\HeroBanner::isCustom('mobile'),
-            'desktop_missing' => \App\Support\HeroBanner::isCustom('desktop') && ! \App\Support\HeroBanner::exists('desktop'),
-            'mobile_missing' => \App\Support\HeroBanner::isCustom('mobile') && ! \App\Support\HeroBanner::exists('mobile'),
+            'desktop_missing' => \App\Support\HeroBanner::isMissing('desktop'),
+            'mobile_missing' => \App\Support\HeroBanner::isMissing('mobile'),
             'alt' => (string) PlatformSetting::valueFor(\App\Support\HeroBanner::SETTING_ALT, ''),
             'optimised' => extension_loaded('gd'),
         ];

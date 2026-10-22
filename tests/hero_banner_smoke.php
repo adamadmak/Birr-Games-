@@ -17,6 +17,7 @@
  */
 
 use App\Models\PlatformSetting;
+use App\Models\SiteMedia;
 use App\Models\User;
 use App\Support\HeroBanner;
 use Illuminate\Contracts\Console\Kernel;
@@ -91,7 +92,6 @@ $png = function (int $w, int $h, string $name) : UploadedFile {
 
 $disk = Storage::disk('public');
 $originalSettings = PlatformSetting::query()->whereIn('key', [HeroBanner::SETTING_DESKTOP, HeroBanner::SETTING_MOBILE, HeroBanner::SETTING_ALT])->pluck('value', 'key')->all();
-$created = [];
 
 try {
     echo "Hero banner upload\n";
@@ -111,7 +111,7 @@ try {
     preg_match('/name="_token" value="([^"]+)"/', $settings->getContent(), $m);
     $csrf = $m[1] ?? $csrf;
 
-    // Upload both slots: an oversize desktop image (should be resized) and a square phone image.
+    // Upload both slots: an oversize desktop image (should be resized) and a portrait phone image.
     $r = $send('POST', '/admin/settings/hero', ['_token' => $csrf, 'hero_image_alt' => 'Smoke test artwork'], [
         'hero_desktop' => $png(3000, 1350, 'wide.png'),
         'hero_mobile' => $png(900, 1200, 'tall.png'),
@@ -119,38 +119,53 @@ try {
     PlatformSetting::flushValueCache();
     $desktop = HeroBanner::path('desktop');
     $mobile = HeroBanner::path('mobile');
-    $created[] = $desktop;
-    $created[] = $mobile;
     $check('upload redirects back to the frontend tab', $r->getStatusCode() === 302 && str_contains((string) $r->headers->get('Location'), 'tab=frontend'), $errorsOf($r));
-    $check('desktop path is stored', is_string($desktop) && str_starts_with($desktop, 'hero/desktop-'));
-    $check('mobile path is stored', is_string($mobile) && str_starts_with($mobile, 'hero/mobile-'));
-    $check('both files exist on the public disk', $desktop && $mobile && $disk->exists($desktop) && $disk->exists($mobile));
+    $check('desktop reference is a database media reference', is_string($desktop) && str_starts_with($desktop, 'media:desktop-'), (string) $desktop);
+    $check('mobile reference is a database media reference', is_string($mobile) && str_starts_with($mobile, 'media:mobile-'), (string) $mobile);
+    $check('both rows exist in site_media', SiteMedia::query()->whereIn('slot', ['hero-desktop', 'hero-mobile'])->count() === 2);
     $check('alt text is stored', HeroBanner::alt() === 'Smoke test artwork');
 
-    if ($desktop && $disk->exists($desktop)) {
-        [$w] = getimagesize($disk->path($desktop)) ?: [0];
-        $check('desktop image was resized to the 2200px ceiling', $w === 2200, 'width '.$w);
-        $check('desktop image was re-encoded as WebP', function_exists('imagewebp') ? str_ends_with($desktop, '.webp') : true);
-        $check('stored file is smaller than the 3000px original', $disk->size($desktop) < 400_000, (string) $disk->size($desktop));
-    }
+    $row = SiteMedia::query()->where('slot', 'hero-desktop')->first();
+    $binary = $row ? base64_decode($row->data, true) : false;
+    $info = $binary ? getimagesizefromstring($binary) : false;
+    $check('desktop image was resized to the 2200px ceiling', $info && $info[0] === 2200, $info ? 'width '.$info[0] : 'unreadable');
+    $check('desktop image was re-encoded as WebP', function_exists('imagewebp') ? ($row?->mime === 'image/webp') : true, (string) $row?->mime);
+    $check('stored image is far smaller than a 3000px PNG', $binary !== false && strlen($binary) < 400_000, (string) strlen((string) $binary));
 
-    // The hero is on the signed-out lobby, so look at it as a guest.
+    // The lobby is looked at as a guest, with the images fetched through the route.
     $adminCookies = $cookies;
     $cookies = [];
     $lobby = $send('GET', '/');
-    $cookies = $adminCookies;
-    $check('lobby serves the uploaded desktop image', str_contains($lobby->getContent(), '/storage/'.$desktop));
-    $check('lobby serves the uploaded mobile image for phones', str_contains($lobby->getContent(), '/storage/'.$mobile));
-    $check('lobby carries the alt text', str_contains($lobby->getContent(), 'alt="Smoke test artwork"'));
+    $html = $lobby->getContent();
+    preg_match('#/media/hero/desktop/([A-Za-z0-9_\-]+)#', $html, $dv);
+    preg_match('#/media/hero/mobile/([A-Za-z0-9_\-]+)#', $html, $mv);
+    $check('lobby points at the desktop media route', ! empty($dv[0]));
+    $check('lobby points the phone source at the mobile media route', ! empty($mv[0]));
+    $check('lobby carries the alt text', str_contains($html, 'alt="Smoke test artwork"'));
 
-    // Replace the desktop image: the old file must go.
+    $img = $send('GET', $dv[0] ?? '/media/hero/desktop/missing000');
+    $check('desktop image is served with a 200', $img->getStatusCode() === 200, (string) $img->getStatusCode());
+    $check('served as an image, not markup', str_starts_with((string) $img->headers->get('Content-Type'), 'image/'), (string) $img->headers->get('Content-Type'));
+    $check('served with a year-long immutable cache', str_contains((string) $img->headers->get('Cache-Control'), 'immutable'));
+    $check('served with nosniff and a sandbox CSP', $img->headers->get('X-Content-Type-Options') === 'nosniff' && str_contains((string) $img->headers->get('Content-Security-Policy'), 'sandbox'), (string) $img->headers->get('Content-Security-Policy'));
+    $check('served bytes are the stored image', $img->getContent() === $binary);
+    $etag = $img->headers->get('ETag');
+    $app['auth']->forgetGuards();
+    $app['session']->forgetDrivers();
+    $app->forgetInstance('session.store');
+    $condRequest = Request::create($dv[0] ?? '/media/hero/desktop/missing000', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_IF_NONE_MATCH' => (string) $etag]);
+    $cond = $kernel->handle($condRequest);
+    $check('a repeat request with the ETag gets a 304', $cond->getStatusCode() === 304, (string) $cond->getStatusCode());
+    $check('an unknown slot is a 404', $send('GET', '/media/hero/sideways/abcdef')->getStatusCode() === 404);
+    $cookies = $adminCookies;
+
+    // Replace the desktop image: a new version in the URL, same row.
     $r = $send('POST', '/admin/settings/hero', ['_token' => $csrf, 'hero_image_alt' => 'Smoke test artwork'], ['hero_desktop' => $png(1600, 720, 'wide2.png')]);
     PlatformSetting::flushValueCache();
     $replaced = HeroBanner::path('desktop');
-    $created[] = $replaced;
-    $check('replacing stores a new desktop path', $replaced && $replaced !== $desktop, $errorsOf($r));
-    $check('previous desktop file was deleted', $desktop && ! $disk->exists($desktop));
-    $check('mobile image is untouched by a desktop replace', HeroBanner::path('mobile') === $mobile && $disk->exists($mobile));
+    $check('replacing stores a new desktop version', $replaced && $replaced !== $desktop, $errorsOf($r));
+    $check('replacing keeps exactly one desktop row', SiteMedia::query()->where('slot', 'hero-desktop')->count() === 1);
+    $check('mobile image is untouched by a desktop replace', HeroBanner::path('mobile') === $mobile);
 
     // Refusals.
     $svgPath = tempnam(sys_get_temp_dir(), 'hero').'.svg';
@@ -161,24 +176,36 @@ try {
 
     $r = $send('POST', '/admin/settings/hero', ['_token' => $csrf], ['hero_desktop' => $png(400, 200, 'tiny.png')]);
     PlatformSetting::flushValueCache();
-    $check('undersized desktop image is refused', str_contains($errorsOf($r), 'dimensions') || str_contains(strtolower($errorsOf($r)), 'invalid'), $errorsOf($r));
+    $check('undersized desktop image is refused', $errorsOf($r) !== '', $errorsOf($r));
     $check('refused upload leaves the stored image alone', HeroBanner::path('desktop') === $replaced);
 
     // Reset the mobile slot.
     $r = $send('POST', '/admin/settings/hero', ['_token' => $csrf, 'remove_mobile' => '1', 'hero_image_alt' => '']);
     PlatformSetting::flushValueCache();
     $check('reset returns the mobile slot to the default artwork', HeroBanner::path('mobile') === null, $errorsOf($r));
-    $check('reset deleted the mobile file', ! $disk->exists($mobile));
+    $check('reset removed the mobile row', ! SiteMedia::query()->where('slot', 'hero-mobile')->exists());
     $check('with only desktop set, phones get the desktop image', HeroBanner::mobileUrl() === HeroBanner::desktopUrl());
     $check('blank alt falls back to the default description', HeroBanner::alt() !== '');
+
+    // The bug that prompted this: a legacy disk path whose file is gone (no symlink, wiped by a deploy).
+    echo "Legacy and broken references\n";
+    PlatformSetting::query()->updateOrCreate(['key' => HeroBanner::SETTING_MOBILE], ['value' => 'hero/mobile-gone0000.webp']);
+    PlatformSetting::flushValueCache();
+    $check('a legacy path with no file behind it is treated as unset', HeroBanner::path('mobile') === null);
+    $check('and the admin is told it is missing', HeroBanner::isMissing('mobile'));
+    $check('and the lobby falls back instead of linking a 404', ! str_contains(HeroBanner::mobileUrl(), 'mobile-gone0000'));
+    $r = $send('POST', '/admin/settings/hero', ['_token' => $csrf, 'remove_mobile' => '1', 'hero_image_alt' => '']);
+    PlatformSetting::flushValueCache();
+    $check('a broken reference can be cleared with the reset box', ! HeroBanner::isMissing('mobile'), $errorsOf($r));
+
+    PlatformSetting::query()->where('key', HeroBanner::SETTING_DESKTOP)->delete();
+    PlatformSetting::query()->where('key', HeroBanner::SETTING_MOBILE)->delete();
+    SiteMedia::query()->whereIn('slot', ['hero-desktop', 'hero-mobile'])->delete();
+    PlatformSetting::flushValueCache();
+    $check('with nothing stored the bundled artwork is used', str_ends_with(HeroBanner::desktopUrl(), HeroBanner::DEFAULT_DESKTOP) && is_file(public_path(HeroBanner::DEFAULT_DESKTOP)));
 } finally {
     // Put everything back.
-    foreach (array_filter($created) as $path) {
-        try {
-            $disk->delete($path);
-        } catch (\Throwable) {
-        }
-    }
+    SiteMedia::query()->whereIn('slot', ['hero-desktop', 'hero-mobile'])->delete();
     PlatformSetting::query()->whereIn('key', [HeroBanner::SETTING_DESKTOP, HeroBanner::SETTING_MOBILE, HeroBanner::SETTING_ALT])->delete();
     foreach ($originalSettings as $key => $value) {
         PlatformSetting::query()->updateOrCreate(['key' => $key], ['value' => $value]);

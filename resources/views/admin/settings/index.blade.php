@@ -395,7 +395,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                             <span class="hero-banner-badge">{{ $hero['desktop_custom'] ? 'Custom' : 'Default artwork' }}</span>
                         </div>
                         @if ($hero['desktop_missing'])
-                            <div class="form-errors">The stored desktop image is missing from disk. Upload it again or reset to the default.</div>
+                            <div class="form-errors">The saved desktop image is no longer on the server, so visitors see the default artwork. Upload it again, or tick reset to clear it.</div>
                         @endif
                         <label class="game-image-dropzone hero-banner-dropzone" data-image-dropzone>
                             <input type="file" name="hero_desktop" accept="image/png,image/jpeg,image/webp" data-image-input>
@@ -405,7 +405,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                             <small>At least 960×360. 1600×720 or wider recommended.</small>
                         </label>
                         <label class="configuration-checkbox">
-                            <input type="checkbox" name="remove_desktop" value="1" @disabled(! $hero['desktop_custom'])>
+                            <input type="checkbox" name="remove_desktop" value="1" @disabled(! $hero['desktop_custom'] && ! $hero['desktop_missing'])>
                             <span>Reset desktop to the default artwork</span>
                         </label>
                     </div>
@@ -415,7 +415,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                             <span class="hero-banner-badge">{{ $hero['mobile_custom'] ? 'Custom' : ($hero['desktop_custom'] ? 'Uses desktop image' : 'Default artwork') }}</span>
                         </div>
                         @if ($hero['mobile_missing'])
-                            <div class="form-errors">The stored mobile image is missing from disk. Upload it again or reset to the default.</div>
+                            <div class="form-errors">The saved phone image is no longer on the server, so visitors see the default artwork. Upload it again, or tick reset to clear it.</div>
                         @endif
                         <label class="game-image-dropzone hero-banner-dropzone" data-image-dropzone>
                             <input type="file" name="hero_mobile" accept="image/png,image/jpeg,image/webp" data-image-input>
@@ -425,7 +425,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                             <small>Portrait or square, at least 480×480. Falls back to the desktop image.</small>
                         </label>
                         <label class="configuration-checkbox">
-                            <input type="checkbox" name="remove_mobile" value="1" @disabled(! $hero['mobile_custom'])>
+                            <input type="checkbox" name="remove_mobile" value="1" @disabled(! $hero['mobile_custom'] && ! $hero['mobile_missing'])>
                             <span>Reset phone image</span>
                         </label>
                     </div>

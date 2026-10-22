@@ -234,10 +234,12 @@ try {
     PlatformSetting::flushValueCache();
     $check('desktop falls back to the bundled artwork', str_ends_with(HeroBanner::desktopUrl(), HeroBanner::DEFAULT_DESKTOP));
     $check('mobile falls back to the bundled mobile artwork', str_ends_with(HeroBanner::mobileUrl(), HeroBanner::DEFAULT_MOBILE));
-    PlatformSetting::query()->updateOrCreate(['key' => HeroBanner::SETTING_DESKTOP], ['value' => 'hero/desktop-test.webp']);
-    PlatformSetting::flushValueCache();
-    $check('a stored desktop path is served from storage', str_ends_with(HeroBanner::desktopUrl(), '/storage/hero/desktop-test.webp'));
-    $check('mobile uses the desktop image when only that is set', HeroBanner::mobileUrl() === HeroBanner::desktopUrl());
+    $check('a saved path whose image is gone falls back to the bundled artwork', (function () {
+        PlatformSetting::query()->updateOrCreate(['key' => HeroBanner::SETTING_DESKTOP], ['value' => 'hero/desktop-test.webp']);
+        PlatformSetting::flushValueCache();
+
+        return str_ends_with(HeroBanner::desktopUrl(), HeroBanner::DEFAULT_DESKTOP) && HeroBanner::isMissing('desktop');
+    })());
     $check('bundled artwork files exist', is_file(public_path(HeroBanner::DEFAULT_DESKTOP)) && is_file(public_path(HeroBanner::DEFAULT_MOBILE)));
 } finally {
     DB::rollBack();
