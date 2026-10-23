@@ -3545,3 +3545,187 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
     .telegram-connect-actions .button { width: 100%; }
     .telegram-unlink-form label, .telegram-unlink-form input { width: 100%; }
 }
+
+/* ============================================================================
+   DAILY TOURNAMENT
+   A hero with the prize pool and a live clock, a podium (real winners, or the
+   prizes still up for grabs when the board is empty), the chasing pack with a
+   bar against the leader, and where the viewer stands.
+   ========================================================================== */
+.tn-page { width: min(1120px, 100%); margin-inline: auto; display: grid; gap: 22px; }
+
+/* ----- Hero ----- */
+.tn-hero {
+    position: relative; overflow: hidden; isolation: isolate;
+    display: grid; grid-template-columns: minmax(0, 1.2fr) auto; align-items: center; gap: 28px;
+    padding: clamp(24px, 4vw, 42px) clamp(24px, 4vw, 44px);
+    border: 1px solid rgba(255, 255, 255, .12); border-radius: 28px;
+    background: linear-gradient(125deg, #04140d 0%, #07301f 48%, #0b5a3a 100%);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+.tn-hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; opacity: .5;
+    background-image: radial-gradient(rgba(255, 255, 255, .11) 1px, transparent 1.4px); background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 20%, #000 100%); mask-image: linear-gradient(90deg, transparent 20%, #000 100%);
+}
+.tn-hero-glow { position: absolute; z-index: -1; right: -6%; top: -40%; width: 60%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 199, 44, .35), transparent 65%); }
+.tn-hero-trophy { position: absolute; z-index: -1; right: clamp(150px, 24%, 320px); bottom: -22px; width: clamp(120px, 15vw, 200px); opacity: .95; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .45)); animation: tnFloat 6s ease-in-out infinite; }
+@keyframes tnFloat { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+.tn-live {
+    display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 13px; border-radius: 999px;
+    color: #1c1400; background: var(--secondary, #ffc72c); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+    box-shadow: 0 8px 22px rgba(255, 199, 44, .3);
+}
+.tn-live i { width: 8px; height: 8px; border-radius: 50%; background: #d11d2c; box-shadow: 0 0 0 0 rgba(209, 29, 44, .6); animation: tnPing 1.6s ease-out infinite; }
+@keyframes tnPing { 0% { box-shadow: 0 0 0 0 rgba(209, 29, 44, .6); } 100% { box-shadow: 0 0 0 9px rgba(209, 29, 44, 0); } }
+.tn-hero-main h1 { margin: 0 0 10px; font-size: clamp(32px, 4.6vw, 56px); line-height: 1; letter-spacing: -.04em; color: #fff; }
+.tn-hero-main p { margin: 0; max-width: 46ch; color: rgba(255, 255, 255, .78); font-size: 15px; line-height: 1.55; }
+.tn-hero-stats { display: grid; gap: 14px; justify-items: end; }
+.tn-pool { text-align: right; }
+.tn-pool small, .tn-clock small { display: block; color: rgba(255, 255, 255, .7); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.tn-pool strong {
+    display: block; margin: 2px 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #fff2b0, #ffc72c); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.tn-pool span { color: rgba(255, 255, 255, .72); font-size: 13px; font-weight: 600; }
+.tn-clock div { display: flex; gap: 8px; margin-top: 7px; }
+.tn-clock span {
+    min-width: 64px; display: grid; justify-items: center; gap: 1px; padding: 9px 8px; border-radius: 14px;
+    background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.tn-clock b { color: #fff; font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
+.tn-clock i { color: rgba(255, 255, 255, .6); font-size: 10px; font-style: normal; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.tn-clock { justify-self: end; text-align: right; }
+.tn-clock div { justify-content: flex-end; }
+
+/* ----- Day picker ----- */
+.tn-days { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tn-days a {
+    display: grid; justify-items: center; gap: 2px; padding: 12px 8px; border-radius: 16px; text-align: center;
+    border: 1px solid var(--glass-line-strong); background: var(--glass-soft); color: var(--muted);
+    transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.tn-days a strong { font-size: 14px; color: var(--text); }
+.tn-days a small { font-size: 11px; color: var(--muted); }
+.tn-days a:hover { transform: translateY(-2px); border-color: rgba(13, 192, 122, .5); }
+.tn-days a.active { border-color: transparent; background: linear-gradient(135deg, #19d48c, #078a58); box-shadow: 0 12px 28px rgba(13, 192, 122, .3); }
+.tn-days a.active strong, .tn-days a.active small { color: #fff; }
+
+/* ----- Podium ----- */
+.tn-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; padding-top: 18px; }
+.tn-pod {
+    position: relative; display: grid; justify-items: center; gap: 6px; padding: 38px 16px 20px; text-align: center; border-radius: 24px;
+    border: 1px solid var(--glass-line-strong); background: var(--glass); box-shadow: var(--glass-sheen), 0 18px 40px rgba(0, 0, 0, .28);
+}
+.tn-pod.place-1 { padding-block: 52px 28px; transform: translateY(-14px); }
+.tn-pod-gold { border-color: rgba(255, 199, 44, .55); background: radial-gradient(90% 70% at 50% 0%, rgba(255, 199, 44, .22), transparent 70%), var(--glass); box-shadow: 0 0 0 1px rgba(255, 199, 44, .15), 0 22px 50px rgba(255, 199, 44, .14); }
+.tn-pod-silver { border-color: rgba(205, 214, 224, .4); background: radial-gradient(90% 70% at 50% 0%, rgba(205, 214, 224, .16), transparent 70%), var(--glass); }
+.tn-pod-bronze { border-color: rgba(214, 138, 82, .45); background: radial-gradient(90% 70% at 50% 0%, rgba(214, 138, 82, .18), transparent 70%), var(--glass); }
+.tn-pod.is-me { outline: 2px solid #19d48c; outline-offset: 3px; }
+.tn-pod-medal {
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
+    color: #1c1400; font-size: 20px; font-weight: 900; border: 3px solid #0b0b0c; box-shadow: 0 8px 20px rgba(0, 0, 0, .4);
+}
+.tn-pod-gold .tn-pod-medal { background: linear-gradient(135deg, #ffe27a, #ffc72c, #d9a410); }
+.tn-pod-silver .tn-pod-medal { background: linear-gradient(135deg, #f5f8fb, #c4cdd8, #9aa6b4); }
+.tn-pod-bronze .tn-pod-medal { background: linear-gradient(135deg, #f3b98d, #d68a52, #a8602f); }
+.tn-pod.place-1 .tn-pod-medal { width: 54px; height: 54px; top: -27px; font-size: 24px; }
+.tn-pod-avatar {
+    width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-size: 26px; font-weight: 900;
+    background: linear-gradient(135deg, #19d48c, #078a58); box-shadow: 0 10px 26px rgba(13, 192, 122, .3);
+}
+.tn-pod.place-1 .tn-pod-avatar { width: 78px; height: 78px; font-size: 32px; }
+.tn-pod-name { font-size: 17px; }
+.tn-pod-sub { color: var(--muted); font-size: 12px; }
+.tn-pod-prize { margin-top: 8px; padding: 9px 18px; border-radius: 14px; background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .08); }
+.tn-pod-prize small { display: block; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.tn-pod-prize b { font-size: 22px; letter-spacing: -.02em; color: var(--secondary, #ffc72c); font-variant-numeric: tabular-nums; }
+.tn-pod.place-1 .tn-pod-prize b { font-size: 28px; }
+.tn-pod-stake { color: var(--muted); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tn-pod-stake i { font-style: normal; font-weight: 500; }
+/* An empty podium is an invitation, not a gap: dashed, and the avatar is a question mark. */
+.tn-pod.is-empty { border-style: dashed; }
+.tn-pod.is-empty .tn-pod-avatar { color: rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .06); box-shadow: none; border: 2px dashed rgba(255, 255, 255, .22); }
+.tn-pod.is-empty .tn-pod-name { color: var(--muted); }
+
+.tn-empty {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 26px;
+    border: 1px solid var(--glass-line-strong); border-radius: 20px; background: var(--glass-soft);
+}
+.tn-empty h2 { margin: 0 0 4px; font-size: 20px; letter-spacing: -.02em; }
+.tn-empty p { margin: 0; max-width: 60ch; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.tn-empty .button, .tn-you .button { min-height: 46px; padding: 0 26px; font-size: 14px; }
+
+/* ----- The chasing pack ----- */
+.tn-board { border: 1px solid var(--glass-line-strong); border-radius: 24px; background: var(--glass); overflow: hidden; box-shadow: var(--glass-sheen); }
+.tn-board > header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--glass-line); }
+.tn-board > header h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+.tn-board > header span { color: var(--muted); font-size: 12px; }
+.tn-row {
+    display: grid; grid-template-columns: 34px 42px minmax(120px, 1.1fr) minmax(80px, 1.4fr) 96px 90px; align-items: center; gap: 14px;
+    padding: 13px 22px; border-top: 1px solid var(--glass-line); transition: background .15s ease;
+}
+.tn-row:first-of-type { border-top: 0; }
+.tn-row:hover { background: rgba(255, 255, 255, .03); }
+.tn-row.is-me { background: linear-gradient(90deg, rgba(13, 192, 122, .18), transparent); box-shadow: inset 3px 0 0 #19d48c; }
+.tn-row-rank { color: var(--muted); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tn-row-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 800; background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .12); }
+.tn-row-player { min-width: 0; display: grid; }
+.tn-row-player strong { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tn-row-player em { margin-left: 6px; padding: 2px 8px; border-radius: 999px; color: #fff; background: #0aa56a; font-size: 10px; font-style: normal; font-weight: 800; }
+.tn-row-player small { color: var(--muted); font-size: 11px; }
+.tn-row-bar progress, .tn-row-bar progress::-webkit-progress-bar { width: 100%; height: 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .08); appearance: none; -webkit-appearance: none; }
+.tn-row-bar progress::-webkit-progress-value { border-radius: 999px; background: linear-gradient(90deg, #19d48c, #ffc72c); }
+.tn-row-bar progress::-moz-progress-bar { border-radius: 999px; background: linear-gradient(90deg, #19d48c, #ffc72c); }
+.tn-row-stake { text-align: right; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tn-row-stake i { display: block; color: var(--muted); font-size: 10px; font-style: normal; font-weight: 500; }
+.tn-row-prize { text-align: right; color: var(--muted); font-size: 13px; font-weight: 700; }
+.tn-row-prize.is-paid { color: var(--secondary, #ffc72c); }
+
+/* ----- Where you stand ----- */
+.tn-you {
+    display: flex; align-items: center; justify-content: space-between; gap: 22px; flex-wrap: wrap; padding: 20px 26px; border-radius: 22px;
+    border: 1px solid rgba(13, 192, 122, .4); background: linear-gradient(110deg, rgba(13, 192, 122, .2), rgba(13, 192, 122, .04));
+}
+.tn-you > div { display: grid; gap: 2px; }
+.tn-you small { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.tn-you strong { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tn-you-rank strong { font-size: 34px; color: var(--secondary, #ffc72c); }
+.tn-you-empty strong { font-size: 17px; }
+.tn-you-empty span { color: var(--muted); font-size: 13px; }
+
+/* ----- How it works ----- */
+.tn-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tn-how article { display: flex; gap: 14px; padding: 18px; border-radius: 20px; border: 1px solid var(--glass-line); background: var(--glass-soft); }
+.tn-how span { flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; color: #fff; font-weight: 900; background: linear-gradient(135deg, #19d48c, #078a58); }
+.tn-how strong { display: block; margin-bottom: 3px; font-size: 15px; }
+.tn-how p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+@media (max-width: 900px) {
+    .tn-hero { grid-template-columns: 1fr; }
+    .tn-hero-stats, .tn-pool, .tn-clock { justify-items: start; justify-self: start; text-align: left; }
+    .tn-clock div { justify-content: flex-start; }
+    .tn-hero-trophy { right: -10px; bottom: auto; top: 14px; width: 110px; opacity: .55; }
+    .tn-how { grid-template-columns: 1fr; }
+    .tn-row { grid-template-columns: 30px 38px minmax(0, 1fr) 86px 80px; }
+    .tn-row-bar { display: none; }
+}
+@media (max-width: 600px) {
+    .tn-days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tn-podium { gap: 8px; padding-top: 24px; }
+    .tn-pod { padding: 34px 6px 14px; border-radius: 18px; }
+    .tn-pod.place-1 { padding-block: 40px 18px; transform: translateY(-8px); }
+    .tn-pod-avatar { width: 46px; height: 46px; font-size: 19px; }
+    .tn-pod.place-1 .tn-pod-avatar { width: 56px; height: 56px; font-size: 23px; }
+    .tn-pod-name { font-size: 13px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tn-pod-sub { display: none; }
+    .tn-pod-prize { padding: 7px 8px; }
+    .tn-pod-prize b, .tn-pod.place-1 .tn-pod-prize b { font-size: 16px; }
+    .tn-pod-medal { width: 34px; height: 34px; top: -17px; font-size: 16px; }
+    .tn-pod.place-1 .tn-pod-medal { width: 42px; height: 42px; top: -21px; font-size: 19px; }
+    .tn-row { grid-template-columns: 26px minmax(0, 1fr) 70px 64px; padding: 11px 14px; gap: 10px; }
+    .tn-row-avatar { display: none; }
+    .tn-clock span { min-width: 56px; }
+    .tn-you { padding: 16px 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .tn-hero-trophy, .tn-live i { animation: none; } }
