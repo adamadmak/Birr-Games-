@@ -107,3 +107,44 @@ A push auto-triggers a build, so pushing both repositories back to back IS
 starting two builds. Push one, confirm it is live (probe a new route, or
 `lastDeployedAt` from the API — the CSS cache-buster is unreliable), then push
 the other.
+
+## A wallet has two buckets, and bonus must never cross over
+
+`users.credits` is the whole wallet; `users.withdrawable_balance` is the part a
+player can cash out. The difference is play-only credit: deposit bonus, the
+welcome balance, anything an administrator locked. A stake is paid from
+play-only credit first.
+
+**Every new path that takes a stake or pays out must go through
+`App\Services\BonusPlay`.** It remembers how much of a round was bonus, so when
+the round pays, the bonus part goes back to play-only and only the winnings
+become withdrawable. A path that credits a payout straight to
+`withdrawable_balance` lets a 1.01x bet turn any bonus into cash. The four
+existing paths (QTech, BigBang, WinHouse, the built-in games) show the shape:
+`stake()` after taking the stake, `payout()` before crediting the win, and a
+provider rollback calls `unstake()`.
+
+The deposit bonus itself is `App\Services\DepositBonusService`: it adds to
+`credits` only, never to `withdrawable_balance`, and is paid once per approved
+deposit order (a unique key on the order). Its settings live in
+`platform_settings` under `deposit_bonus_*` and are edited on Configuration →
+Deposit Bonus.
+
+**Code on a money path must survive a missing table.** This host does not run
+migrations on deploy (an administrator applies them from Configuration →
+System), so the bonus and sticky-bonus code check that their tables exist and
+fall back to the old behaviour, and a failure inside them is reported but never
+fails the deposit, bet or payout.
+
+## Telegram: connecting a website account
+
+`App\Services\TelegramAccountLinker` connects a signed-in website account to a
+chat. The site shows a one-time code (a hash is stored, it lasts 15 minutes);
+the bot proves the person controls both the account (the code) and the phone
+(Telegram's own contact card must match the number on the account). Keep both
+checks: the code alone must never mark a phone number as confirmed.
+
+Bot messages that carry a password go through `sendSecret()` in the webhook, which
+schedules their deletion from the chat. `/password` is limited to three an hour and
+ends the player's other browser sessions. Run the scratch checks by hand after
+touching either (the earlier smoke scripts were removed; see git history).

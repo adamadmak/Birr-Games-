@@ -198,6 +198,12 @@ class AuthController
             $status .= ' We sent a confirmation link to '.$email.'.';
         }
 
+        // Offer to connect the Telegram bot right away, while they are paying attention. It is
+        // optional: the page has a Skip button and the account works without it.
+        if (app(\App\Services\TelegramAccountLinker::class)->available()) {
+            return redirect()->route('player.telegram.show', ['welcome' => 1])->with('status', $status);
+        }
+
         return redirect()->route('home')->with('status', $status);
     }
 

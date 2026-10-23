@@ -562,6 +562,9 @@ class AgentPortalController
                         'approved_by_agent_id' => $lockedAgent->id,
                     ],
                 ]);
+
+                // Play-only bonus on top of the cash; never withdrawable, never throws.
+                app(\App\Services\DepositBonusService::class)->grantForDeposit($user, $lockedOrder, $amount);
             }
 
             $lockedOrder->update([

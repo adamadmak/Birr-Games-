@@ -59,6 +59,18 @@ class PlayerWithdrawalController
             }
             $rules->assertWithdrawalAllowed($user, (float) $validated['amount']);
 
+            // A withdrawal cancels any deposit bonus the player has not used. Without
+            // this a player could take their own deposit out and keep playing on the
+            // house's bonus. They are told first and must confirm.
+            $bonuses = app(\App\Services\DepositBonusService::class);
+            if ($bonuses->settings()['forfeit_on_withdrawal'] && ($unusedBonus = $bonuses->outstanding($user)) > 0) {
+                if (! $request->boolean('acknowledge_bonus_forfeit')) {
+                    throw ValidationException::withMessages(['amount' => 'Withdrawing cancels your remaining bonus of '
+                        .number_format($unusedBonus, 2).' ETB. Tick the box to confirm, or keep playing to use it first.']);
+                }
+                $bonuses->forfeit($user, $unusedBonus, 'withdrawal');
+            }
+
             $agent = Agent::query()
                 ->where('active', true)
                 ->whereHas('bankAccounts', fn ($query) => $query

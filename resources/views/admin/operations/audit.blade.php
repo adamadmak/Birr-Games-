@@ -7,7 +7,7 @@
     <select name="status"><option value="">All response statuses</option>@foreach([200,201,302,400,403,404,422,500] as $status)<option value="{{ $status }}" @selected((string)request('status')===(string)$status)>{{ $status }}</option>@endforeach</select>
     <button type="submit">Filter</button><a href="{{ route('admin.operations.audit') }}">Reset</a>
 </form>
-<section class="admin-panel">
+<section class="admin-panel report-panel">
     <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Date</th><th>Administrator</th><th>Action</th><th>Route</th><th>Target</th><th>Status</th><th>IP</th></tr></thead><tbody>
     @forelse($logs as $log)<tr>
         <td>{{ $log->created_at->format('M j, Y H:i:s') }}</td>

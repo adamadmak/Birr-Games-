@@ -515,7 +515,7 @@ button, select { cursor: pointer; }
 .sidebar-deposit-btn svg { stroke:#d25b12; }
 .sidebar-deposit-btn:hover { background:#f5f5f5; }
 .player-daily-strip { min-height:45px; padding:9px 11px; display:flex; align-items:center; justify-content:space-between; border-radius:11px; background:#0dc07a; font-size:9px; }
-.player-daily-strip strong { padding:6px 8px; border-radius:7px; color:#0dc07a; background:white; font-size:8px; }
+.player-daily-strip strong { padding:6px 8px; border-radius:7px; color:#0dc07a; background:white; font-size:12px;font-weight:800; }
 .player-side-nav { margin-top:1px; padding:7px; display:grid; gap:3px; border-radius:14px; background:#0a0c0e; border:1px solid rgba(255,255,255,.05); }
 .player-side-nav a { min-height:44px; padding:0 12px; display:flex; align-items:center; gap:11px; border-radius:10px; color:#c4cbd0; font-size:12px; font-weight:700; }
 .player-side-nav a span { width:22px; color:#8f9aa1; text-align:center; font-size:13px; }
@@ -3258,7 +3258,7 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
 .player-daily-strip, .player-daily-strip span { color: #ffffff; }
 .member-deposit-strip-copy, .member-deposit-strip-copy span { color: #ffffff; }
 .member-deposit-strip-copy svg { stroke: #ffffff; }
-.player-daily-strip strong { color: #ffffff; }
+.player-daily-strip strong { color: #067049; }
 .player-vip-card small { opacity: .8; }
 /* The gold "Deposit" capsules were orange-on-white: keep them, they read on gold. */
 .sidebar-deposit-btn, .member-deposit-strip .member-deposit-strip-cta { color: #0a8f5b; }
@@ -3475,4 +3475,73 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
     .promo-copy h2 { font-size: clamp(22px, 6.6vw, 28px); }
     .promo-copy p, .promo-actions .button-soft { display: none; }
     .promo-eyebrow { font-size: 10px; padding: 4px 10px; }
+}
+
+/* ============================================================================
+   DEPOSIT BONUS (wallet)
+   The offer above the payment methods, the live "you will also get" line in
+   the deposit dialog, and the play-only note on the bonus card.
+   ========================================================================== */
+.deposit-bonus-offer {
+    display: flex; align-items: center; gap: 16px; margin: 0 0 18px; padding: 16px 18px;
+    border: 1px solid rgba(255, 199, 44, .35); border-radius: 16px;
+    background: radial-gradient(80% 160% at 0% 50%, rgba(255, 199, 44, .16), transparent 70%), rgba(255, 255, 255, .03);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+.deposit-bonus-badge {
+    flex: 0 0 auto; min-width: 68px; padding: 12px 10px; border-radius: 14px; text-align: center;
+    color: #1c1400; background: linear-gradient(135deg, #ffe27a, #ffc72c); font-size: 20px; font-weight: 900; letter-spacing: -.02em;
+    box-shadow: 0 8px 22px rgba(255, 199, 44, .3);
+}
+.deposit-bonus-offer strong { display: block; font-size: 15px; }
+.deposit-bonus-offer p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.deposit-bonus-preview {
+    margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; line-height: 1.4;
+    color: #ffe9a6; background: rgba(255, 199, 44, .12); border: 1px solid rgba(255, 199, 44, .3);
+}
+.deposit-bonus-preview.is-short { color: var(--muted); background: rgba(255, 255, 255, .04); border-color: var(--line); font-weight: 500; }
+.deposit-bonus-preview[hidden] { display: none; }
+.wallet-stat-note { display: block; margin-top: 6px; font-size: 11px; line-height: 1.4; font-weight: 500; opacity: .85; }
+.wallet-confirm { display: flex; align-items: center; gap: 9px; margin-top: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.wallet-confirm input { width: 18px; height: 18px; accent-color: var(--main-600); }
+@media (max-width: 560px) {
+    .deposit-bonus-offer { align-items: flex-start; padding: 14px; }
+    .deposit-bonus-badge { min-width: 58px; font-size: 17px; }
+}
+
+/* ============================================================================
+   CONNECT TELEGRAM
+   ========================================================================== */
+.telegram-connect-card {
+    display: flex; gap: 20px; align-items: flex-start; margin: 0 0 18px; padding: clamp(20px, 3vw, 30px);
+    border: 1px solid var(--glass-line-strong); border-radius: 22px;
+    background: radial-gradient(70% 140% at 0% 0%, rgba(13, 192, 122, .14), transparent 65%), var(--glass);
+    box-shadow: var(--glass-shadow, 0 18px 50px rgba(0, 0, 0, .3)), var(--glass-sheen);
+}
+.telegram-connect-card.is-connected { border-color: rgba(13, 192, 122, .45); }
+.telegram-connect-danger { background: var(--glass-soft); }
+.telegram-connect-icon {
+    flex: 0 0 auto; width: 60px; height: 60px; display: grid; place-items: center; border-radius: 18px;
+    color: #fff; font-size: 28px; background: linear-gradient(135deg, #14c98a, #078a58); box-shadow: 0 10px 26px rgba(13, 192, 122, .3);
+}
+.telegram-connect-card h2 { margin: 0 0 8px; font-size: clamp(20px, 2.4vw, 26px); letter-spacing: -.02em; }
+.telegram-connect-card p { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.telegram-connect-card code { padding: 2px 7px; border-radius: 6px; background: rgba(255, 255, 255, .08); color: var(--text); font-size: 13px; }
+.telegram-steps { margin: 0 0 18px; padding-left: 20px; display: grid; gap: 8px; color: var(--text); font-size: 14px; line-height: 1.5; }
+.telegram-steps li::marker { color: var(--main-500); font-weight: 800; }
+.telegram-connect-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.telegram-connect-actions .button { min-height: 46px; padding: 0 24px; font-size: 14px; }
+.telegram-connect-note { font-size: 12px !important; }
+.telegram-connect-waiting { color: var(--main-400) !important; font-weight: 700; animation: telegramPulse 1.6s ease-in-out infinite; }
+.telegram-connect-waiting[hidden] { display: none; }
+@keyframes telegramPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.telegram-unlink-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.telegram-unlink-form label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+.telegram-unlink-form input { min-height: 44px; min-width: 220px; padding: 0 14px; border: 1px solid var(--glass-line-strong); border-radius: 12px; color: var(--text); background: rgba(8, 10, 16, .6); }
+.profile-telegram-link { color: var(--main-400); font-weight: 700; }
+.profile-telegram-link.is-on { color: #7dffd0; }
+@media (max-width: 560px) {
+    .telegram-connect-card { flex-direction: column; gap: 14px; }
+    .telegram-connect-actions .button { width: 100%; }
+    .telegram-unlink-form label, .telegram-unlink-form input { width: 100%; }
 }

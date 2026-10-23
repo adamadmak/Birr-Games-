@@ -22,13 +22,13 @@
     </button>
 </section>
 
-<section class="admin-panel">
+<section class="admin-panel report-panel">
     <div class="panel-title">
         <div>
             <p>Clients</p>
             <h2>All administrators</h2>
         </div>
-        <span>{{ number_format($administrators->total()) }} records</span>
+        <span>{{ number_format($administrators->total()) }} {{ \Illuminate\Support\Str::plural('record', $administrators->total()) }}</span>
     </div>
     <div class="admin-table-wrap">
         <table class="admin-table">

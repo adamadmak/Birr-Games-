@@ -1966,3 +1966,25 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
 .security-pill-allowed{color:#15803d;background:rgba(22,163,74,.12)}
 @media(max-width:900px){.security-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.security-stats{padding:18px 17px 0}.security-events-wrap{margin:0 17px 8px}}
+
+/* ---------- Toolbar search button -------------------------------------------
+   A bare <button> in a toolbar form fell back to the browser's grey default
+   next to the styled input. It now matches the input's height and radius. */
+.operations-toolbar > form > button {
+    min-height: 40px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface-2); color: var(--ink); font-size: 13px; font-weight: 650; cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.operations-toolbar > form > button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+.operations-toolbar > form input { min-height: 40px; }
+/* A row action that is a bare button (Enable / Disable) reads as a small outlined button. */
+.admin-table td > form > button:not([class]) {
+    padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink);
+    font-size: 12px; font-weight: 650; cursor: pointer; transition: border-color .15s ease, color .15s ease;
+}
+.admin-table td > form > button:not([class]):hover { border-color: var(--primary); color: var(--primary); }
+.report-panel > .panel-title > span { white-space: nowrap; }
+/* A toolbar that leads with a title and a line of explanation stacks them, instead of
+   running "Available banks" straight into "Configuration only…" on one line. */
+.operations-toolbar > div:not([class]) { display: grid; gap: 3px; }
+.operations-toolbar > div:not([class]) small { color: var(--faint); font-size: 12px; font-weight: 500; }

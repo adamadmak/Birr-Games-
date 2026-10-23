@@ -710,6 +710,9 @@ class AgentController
                 'source_id' => $order->id,
                 'metadata' => ['reference' => $order->reference, 'approved_by_user_id' => $request->user()->id],
             ]);
+
+            // Play-only bonus on top of the cash; never withdrawable, never throws.
+            app(\App\Services\DepositBonusService::class)->grantForDeposit($user, $order, $amount);
         }
 
         $order->update([

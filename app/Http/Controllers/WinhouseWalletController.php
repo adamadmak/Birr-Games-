@@ -188,6 +188,10 @@ class WinhouseWalletController
 
         $amount = abs($delta);
         $withdrawableDebit = 0.0;
+        $bonusKept = 0.0;
+        // A sportsbook ticket is the round: its bet, win and void all name it.
+        $ticketRef = trim((string) ($payload['ticket_id'] ?? ''));
+        $roundRef = $ticketRef !== '' ? 'ticket:'.$ticketRef : '';
         if ($delta < 0) {
             // Mirror the casino split: spend locked (bonus) credit first so a
             // stake does not quietly convert bonus funds into withdrawable ones.
@@ -195,9 +199,13 @@ class WinhouseWalletController
             $withdrawableDebit = max(0, $amount - $lockedCredits);
             $user->credits = (float) $user->credits - $amount;
             $user->withdrawable_balance = max(0, (float) $user->withdrawable_balance - $withdrawableDebit);
+            \App\Services\BonusPlay::stake($user, 'winhouse', $roundRef, $amount, $withdrawableDebit);
         } else {
+            // A win and a void both come back here. A void refunds the stake, so it is
+            // measured the same way: the bonus part of the stake returns as bonus.
+            $bonusKept = \App\Services\BonusPlay::payout($user, 'winhouse', $roundRef, $amount);
             $user->credits = (float) $user->credits + $amount;
-            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount;
+            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount - $bonusKept;
         }
         $user->save();
 
@@ -216,6 +224,7 @@ class WinhouseWalletController
             'metadata' => [
                 'callback' => $payload,
                 'withdrawable_debit' => $withdrawableDebit,
+                'bonus_kept' => $bonusKept,
             ],
         ]);
 

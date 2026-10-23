@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 class SettingController
 {
-    private const TABS = ['promotion', 'company', 'contact', 'system', 'frontend', 'agent', 'security'];
+    private const TABS = ['promotion', 'company', 'contact', 'system', 'frontend', 'agent', 'bonus', 'security'];
 
     /** Write-only fields: a blank box means "keep what is stored", never "erase". */
     private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password'];
@@ -39,6 +39,7 @@ class SettingController
             'qtechIntegrationMode' => \App\Support\Qtech::integrationMode(),
             'hero' => $tab === 'frontend' ? $this->heroState() : null,
             'security' => $tab === 'security' ? $this->securityState() : null,
+            'bonus' => $tab === 'bonus' ? $this->bonusState() : null,
             'qtechApi' => [
                 'base_url' => \App\Support\Qtech::apiBaseUrl(),
                 'username' => \App\Support\Qtech::apiUsername(),
@@ -219,6 +220,34 @@ class SettingController
         ];
     }
 
+    /**
+     * What the Deposit Bonus tab shows: whether the tables exist, what is owed to
+     * players as unused bonus, what was paid today and this month, and the latest
+     * grants. Wrapped, like the other panels, so a brand that has not applied the
+     * migration still gets the form.
+     */
+    private function bonusState(): array
+    {
+        $ready = \App\Services\DepositBonusService::tablesReady();
+        $state = ['ready' => $ready, 'outstanding' => 0.0, 'today' => 0.0, 'month' => 0.0, 'month_count' => 0, 'grants' => collect()];
+        if (! $ready) {
+            return $state;
+        }
+
+        try {
+            $grants = \App\Models\DepositBonusGrant::query();
+            $state['outstanding'] = (float) (clone $grants)->active()->selectRaw('COALESCE(SUM(amount - forfeited), 0) AS total')->value('total');
+            $state['today'] = (float) (clone $grants)->where('created_at', '>=', now()->startOfDay())->sum('amount');
+            $state['month'] = (float) (clone $grants)->where('created_at', '>=', now()->startOfMonth())->sum('amount');
+            $state['month_count'] = (clone $grants)->where('created_at', '>=', now()->startOfMonth())->count();
+            $state['grants'] = \App\Models\DepositBonusGrant::query()->with('user:id,name,username,phone')->latest('id')->limit(25)->get();
+        } catch (\Throwable) {
+            $state['ready'] = false;
+        }
+
+        return $state;
+    }
+
     /** Send a message to the signed-in administrator with the SMTP account from the Security tab. */
     public function testMail(Request $request): RedirectResponse
     {
@@ -332,6 +361,12 @@ class SettingController
             // Retired unless the box is ticked, which is the opposite default
             // from the switch above — an absent key must not resurrect BigBang.
             $validated['bigbang_retired'] = ! $request->boolean('bigbang_live');
+        }
+
+        if ($section === 'bonus') {
+            // Unticked boxes are absent from the request and must be saved as off.
+            $validated['deposit_bonus_enabled'] = $request->boolean('deposit_bonus_enabled');
+            $validated['deposit_bonus_forfeit_on_withdrawal'] = $request->boolean('deposit_bonus_forfeit_on_withdrawal');
         }
 
         if ($section === 'security') {
@@ -465,6 +500,19 @@ class SettingController
                 'mail_encryption' => ['required', Rule::in(['tls', 'ssl', 'none'])],
                 'mail_from_address' => ['nullable', 'email', 'max:160'],
                 'mail_from_name' => ['nullable', 'string', 'max:120'],
+            ],
+            'bonus' => [
+                'deposit_bonus_enabled' => ['nullable', 'boolean'],
+                // 100 matches the deposit, 50 pays half of it. Never above 100: a bonus
+                // larger than the deposit is a gift, not a match.
+                'deposit_bonus_percent' => ['required', 'integer', 'min:1', 'max:100'],
+                'deposit_bonus_max_amount' => ['required', 'numeric', 'min:0', 'max:10000000'],
+                'deposit_bonus_min_deposit' => ['required', 'numeric', 'min:0', 'max:10000000'],
+                'deposit_bonus_scope' => ['required', Rule::in(['first', 'every'])],
+                'deposit_bonus_lifetime_cap' => ['required', 'numeric', 'min:0', 'max:100000000'],
+                'deposit_bonus_valid_days' => ['required', 'integer', 'min:0', 'max:365'],
+                'deposit_bonus_daily_budget' => ['required', 'numeric', 'min:0', 'max:1000000000'],
+                'deposit_bonus_forfeit_on_withdrawal' => ['nullable', 'boolean'],
             ],
             'agent' => [
                 'agent_commission_amount' => ['required', 'numeric', 'min:0', 'max:1000000'],

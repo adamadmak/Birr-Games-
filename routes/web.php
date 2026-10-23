@@ -164,6 +164,11 @@ Route::middleware('auth')->prefix('player')->name('player.')->group(function () 
         ->middleware('throttle:20,1')
         ->name('orders.rate');
     Route::get('/profile', [PlayerController::class, 'profile'])->name('profile');
+    // Connect the account to the Telegram bot. Status is polled while the player is in Telegram;
+    // disconnecting asks for the password again.
+    Route::get('/telegram', [\App\Http\Controllers\TelegramConnectController::class, 'show'])->middleware('throttle:30,1')->name('telegram.show');
+    Route::get('/telegram/status', [\App\Http\Controllers\TelegramConnectController::class, 'status'])->middleware('throttle:90,1')->name('telegram.status');
+    Route::post('/telegram/unlink', [\App\Http\Controllers\TelegramConnectController::class, 'unlink'])->middleware('throttle:5,1')->name('telegram.unlink');
 });
 
 // Public, and deliberately outside the auth group: a signed-out visitor sees the

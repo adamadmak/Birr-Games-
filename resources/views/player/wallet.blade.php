@@ -32,7 +32,7 @@
         {{-- A balance is never rounded up: 23,000.75 shown as 23,001 is a figure the
              player cannot withdraw, and they have no way to tell it apart from a real one. --}}
         <div class="wallet-stat wallet-stat-green"><small>Withdrawable</small><strong>{{ \App\Support\Money::exact(auth()->user()->withdrawable_balance) }}</strong></div>
-        <div class="wallet-stat wallet-stat-gold"><small>Bonus / Locked</small><strong>{{ \App\Support\Money::exact($lockedBalance) }}</strong></div>
+        <div class="wallet-stat wallet-stat-gold"><small>Bonus / Play-only</small><strong>{{ \App\Support\Money::exact($lockedBalance) }}</strong>@if($lockedBalance > 0)<span class="wallet-stat-note">Play it, keep what it wins. It cannot be withdrawn.@if($bonusInfo['outstanding'] > 0 && $bonusInfo['expires']) Bonus ends {{ $bonusInfo['expires']->format('M j') }}.@endif</span>@endif</div>
     </section>
 
     <nav class="wallet-mode-tabs" aria-label="Wallet transaction type">
@@ -79,6 +79,14 @@
                             @if(auth()->user()->withdrawal_cap !== null)<span>Cap: {{ \App\Support\Money::format(auth()->user()->withdrawal_cap) }}</span>@endif
                         </div>
                     </div>
+
+                    @if($bonusInfo['forfeits'] && $bonusInfo['outstanding'] > 0)
+                        <div class="wallet-alert">
+                            <strong>You still have a bonus</strong>
+                            <span>Withdrawing cancels the {{ \App\Support\Money::exact($bonusInfo['outstanding']) }} bonus you have not used yet. Your winnings and deposit are not affected.</span>
+                            <label class="wallet-confirm"><input type="checkbox" name="acknowledge_bonus_forfeit" value="1" @checked(old('acknowledge_bonus_forfeit'))> <span>I understand and want to withdraw</span></label>
+                        </div>
+                    @endif
 
                     <div class="wd-form-section">
                         <label class="wd-section-label">Select Bank</label>
@@ -171,6 +179,16 @@
             @if($withdrawalOrders->hasPages())<div class="wallet-pagination">@if($withdrawalOrders->onFirstPage())<span>Previous</span>@else<a href="{{ $withdrawalOrders->previousPageUrl() }}">Previous</a>@endif<strong>Page {{ $withdrawalOrders->currentPage() }} of {{ $withdrawalOrders->lastPage() }}</strong>@if($withdrawalOrders->hasMorePages())<a href="{{ $withdrawalOrders->nextPageUrl() }}">Next</a>@else<span>Next</span>@endif</div>@endif
         </section>
     @else
+        @if($bonusInfo['offer'])
+            @php($offer = $bonusInfo['offer'])
+            <aside class="deposit-bonus-offer" data-deposit-bonus-offer data-percent="{{ $offer['percent'] }}" data-max="{{ $offer['max_amount'] }}" data-min="{{ $offer['min_deposit'] }}">
+                <span class="deposit-bonus-badge">+{{ rtrim(rtrim(number_format($offer['percent'], 2), '0'), '.') }}%</span>
+                <div>
+                    <strong>{{ $offer['scope'] === 'first' ? 'First deposit bonus' : 'Deposit bonus' }}</strong>
+                    <p>Deposit {{ \App\Support\Money::format($offer['min_deposit']) }} or more and get {{ rtrim(rtrim(number_format($offer['percent'], 2), '0'), '.') }}% extra to play with @if($offer['max_amount'] > 0), up to {{ \App\Support\Money::format($offer['max_amount']) }}@endif. The bonus is play-only: whatever it wins is yours to withdraw, but the bonus itself cannot be withdrawn.@if($offer['valid_days'] > 0) It lasts {{ $offer['valid_days'] }} days.@endif</p>
+                </div>
+            </aside>
+        @endif
         <section class="deposit-payment-section">
             <div class="wallet-section-title">
                 <div><p>Fund your Birr wallet</p><h2>Select Payment Method</h2></div>
@@ -235,6 +253,7 @@
                     {{-- Zero is "no maximum" to FinancialRuleService, so it must not be written
                          into the field, where it would instead block every deposit. --}}
                     <label>Amount<input type="number" name="amount" min="{{ $minimumDeposit }}" @if($maximumDeposit > 0) max="{{ $maximumDeposit }}" @endif step="0.01" placeholder="Enter your amount" required data-deposit-amount></label>
+                    @if($bonusInfo['offer'])<p class="deposit-bonus-preview" data-deposit-bonus-preview hidden></p>@endif
                     <button class="deposit-flow-primary" type="button" data-deposit-next-agent>Continue</button>
                     <p class="deposit-flow-hint">Minimum {{ \App\Support\Money::format($minimumDeposit) }} · {{ $maximumDeposit > 0 ? 'Maximum '.\App\Support\Money::format($maximumDeposit) : 'No maximum' }}</p>
                 </section>
@@ -293,4 +312,7 @@
         </dialog>
     @endif
 </div>
+@if($bonusInfo['offer'])
+    <script src="/js/wallet-bonus.js?v={{ @filemtime(public_path('js/wallet-bonus.js')) ?: time() }}" defer></script>
+@endif
 @endsection

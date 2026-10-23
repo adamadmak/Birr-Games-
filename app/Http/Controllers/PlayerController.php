@@ -74,8 +74,18 @@ class PlayerController
             ))
             ->values();
 
+        $bonuses = app(\App\Services\DepositBonusService::class);
+
         return view('player.wallet', [
             'tab' => $tab,
+            // The deposit bonus: what a deposit would earn, what the player still holds,
+            // and whether a withdrawal will cancel it. Each is empty when the bonus is off.
+            'bonusInfo' => [
+                'offer' => $bonuses->offerFor($request->user()),
+                'outstanding' => $bonuses->outstanding($request->user()),
+                'expires' => $bonuses->nextExpiry($request->user()),
+                'forfeits' => $bonuses->settings()['forfeit_on_withdrawal'],
+            ],
             'onlineAgentIds' => $onlineAgentIds,
             'gateways' => PaymentGateway::query()->where('active', true)->where('supports_withdrawal', true)->orderBy('name')->get(),
             'depositAccounts' => $depositAccounts,

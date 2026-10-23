@@ -41,11 +41,31 @@ class TelegramPlayerService
     public function reissuePassword(User $user): string
     {
         $password = $this->generatePassword();
-        $user->forceFill(['password' => $password])->save();
+        // A new remember token signs out every "remember me" browser too.
+        $user->forceFill(['password' => $password, 'remember_token' => Str::random(60)])->save();
+        $this->endOtherSessions($user);
 
+        \App\Models\SecurityEvent::record('telegram', \App\Models\SecurityEvent::OUTCOME_ALLOWED, 'password_reissued', null, null, (string) $user->id, $user->id);
         Log::info('A player password was reissued through the Telegram bot.', ['user_id' => $user->id]);
 
         return $password;
+    }
+
+    /**
+     * A password someone else may have seen is reason to end every browser that
+     * was signed in with the old one. Only the database session driver can be
+     * searched by user; with the file driver the rotated remember token and the
+     * changed password hash are what end the other sessions at their next check.
+     */
+    private function endOtherSessions(User $user): void
+    {
+        try {
+            if (config('session.driver') === 'database' && \Illuminate\Support\Facades\Schema::hasTable(config('session.table', 'sessions'))) {
+                DB::table(config('session.table', 'sessions'))->where('user_id', $user->id)->delete();
+            }
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 
     /**

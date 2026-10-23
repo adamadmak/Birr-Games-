@@ -32,6 +32,16 @@
                         @endif
                     @endif
                 </dd></div>
+                <div><dt>Telegram</dt><dd>
+                    @php($telegramLinker = app(\App\Services\TelegramAccountLinker::class))
+                    @if($telegramLinker->isLinked(auth()->user()))
+                        <a class="profile-telegram-link is-on" href="{{ route('player.telegram.show') }}">&#10003; Connected</a>
+                    @elseif($telegramLinker->available())
+                        <a class="profile-telegram-link" href="{{ route('player.telegram.show') }}">Connect Telegram &#8594;</a>
+                    @else
+                        Not available
+                    @endif
+                </dd></div>
                 <div><dt>Role</dt><dd>{{ str(auth()->user()->role)->title() }}</dd></div>
                 <div><dt>Member since</dt><dd>{{ auth()->user()->created_at->format('M Y') }}</dd></div>
             </dl>

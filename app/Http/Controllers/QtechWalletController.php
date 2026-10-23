@@ -200,6 +200,9 @@ class QtechWalletController
                 // debit is QT's free-round marker: it opens a round without
                 // charging, and qtech_transactions already records that.
                 if ($amount > 0) {
+                    // Remember how much of this stake was bonus, so the round's payout
+                    // returns that part to the bonus wallet instead of making it cash.
+                    \App\Services\BonusPlay::stake($locked, 'qtech', (string) $row->round_id, $amount, $withdrawableDebit);
                     $this->ledger($locked, $row, 'bet', -$amount, 'QTech bet');
                     $this->wagering->recordStake($locked, $amount);
                 }
@@ -245,15 +248,18 @@ class QtechWalletController
             return DB::transaction(function () use ($user, $amount, $txnId, $payload) {
                 $locked = User::query()->lockForUpdate()->findOrFail($user->id);
 
+                $bonusKept = 0.0;
                 if ($amount > 0) {
-                    // A win is real money the moment it lands, so it raises the
-                    // withdrawable balance too — unlike bonus credit.
+                    // Winnings are real money the moment they land, so they raise the
+                    // withdrawable balance. The part of the payout that is only the
+                    // bonus stake coming back stays play-only: bonus is never cash.
+                    $bonusKept = \App\Services\BonusPlay::payout($locked, 'qtech', trim((string) ($payload['roundId'] ?? '')), $amount);
                     $locked->credits = round((float) $locked->credits + $amount, 2);
-                    $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $amount, 2);
+                    $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $amount - $bonusKept, 2);
                     $locked->save();
                 }
 
-                $row = $this->record(QtechTransaction::TYPE_CREDIT, $txnId, $locked, $amount, $payload);
+                $row = $this->record(QtechTransaction::TYPE_CREDIT, $txnId, $locked, $amount, $payload, $bonusKept > 0 ? ['bonus_kept' => $bonusKept] : []);
 
                 if ($amount > 0) {
                     $this->ledger($locked, $row, 'payout', $amount, 'QTech win');
@@ -330,6 +336,7 @@ class QtechWalletController
                     $locked->credits = round((float) $locked->credits + $amount, 2);
                     $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $withdrawable, 2);
                     $locked->save();
+                    \App\Services\BonusPlay::unstake($locked, 'qtech', (string) $bet->round_id, $amount, $withdrawable);
                 }
 
                 $bet->forceFill(['rolled_back' => true])->save();

@@ -144,22 +144,29 @@ class BigBangWalletController
             return response()->json(['status' => 'error', 'error' => 'Insufficient balance.'], 422);
         }
 
+        // Every provider stake and settlement is written to game_rounds as well, so a
+        // deduction can always be traced to a round in the member profile, the casino
+        // report and the player accountability report. Written before the balance moves
+        // because the round is also what ties a payout back to the stake it settles.
+        $round = $this->recordRound($user, $game, $session, $action, $amount, $transactionId);
+        $roundRef = $round ? 'r'.$round->id : '';
+
         $withdrawableDebit = 0.0;
+        $bonusKept = 0.0;
         if ($action === 'bet') {
             $lockedCredits = max(0, (float) $user->credits - (float) $user->withdrawable_balance);
             $withdrawableDebit = max(0, $amount - $lockedCredits);
             $user->credits = (float) $user->credits - $amount;
             $user->withdrawable_balance = max(0, (float) $user->withdrawable_balance - $withdrawableDebit);
+            // Remember how much of the stake was bonus; its payout returns that part to
+            // the bonus wallet instead of making it cash.
+            \App\Services\BonusPlay::stake($user, 'bigbang', $roundRef, $amount, $withdrawableDebit);
         } else {
+            $bonusKept = \App\Services\BonusPlay::payout($user, 'bigbang', $roundRef, $amount);
             $user->credits = (float) $user->credits + $amount;
-            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount;
+            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount - $bonusKept;
         }
         $user->save();
-
-        // Every provider stake and settlement is written to game_rounds as well, so a
-        // deduction can always be traced to a round in the member profile, the casino
-        // report and the player accountability report.
-        $round = $this->recordRound($user, $game, $session, $action, $amount, $transactionId);
 
         BigBangTransaction::create([
             'provider_transaction_id' => $transactionId,
@@ -175,6 +182,7 @@ class BigBangWalletController
             'metadata' => [
                 'callback' => $payload,
                 'withdrawable_debit' => $withdrawableDebit,
+                'bonus_kept' => $bonusKept,
                 'game_category' => $payload['game_category'] ?? null,
             ],
         ]);

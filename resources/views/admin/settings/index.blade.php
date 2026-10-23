@@ -16,6 +16,7 @@
         'system' => ['System Configuration', 'fa-gear'],
         'frontend' => ['Frontend Configuration', 'fa-display'],
         'agent' => ['Agent Payment Config', 'fa-hand-holding-dollar'],
+        'bonus' => ['Deposit Bonus', 'fa-gift'],
         'security' => ['Security', 'fa-shield-halved'],
     ];
     $value = fn (string $key, mixed $default = '') => old($key, $settings[$key] ?? $default);
@@ -452,6 +453,119 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                 </div>
                 <div class="configuration-form-actions"><button type="submit"><i class="fa-solid fa-check"></i> Save Agent Config</button></div>
             </form>
+        @elseif ($activeTab === 'bonus')
+            @php
+                $bonusOn = (bool) (int) $value('deposit_bonus_enabled', 0);
+                $bonusPercent = (int) $value('deposit_bonus_percent', 100);
+                $bonusMax = (float) $value('deposit_bonus_max_amount', 5000);
+                $bonusMin = (float) $value('deposit_bonus_min_deposit', 100);
+                $example = 500.0;
+                $exampleBonus = round($example * $bonusPercent / 100, 2);
+                if ($bonusMax > 0) { $exampleBonus = min($exampleBonus, $bonusMax); }
+            @endphp
+            <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="bonus">
+                <div class="configuration-panel-title"><div><h2>Deposit Bonus</h2><p>Extra play credit on approved deposits. It can be played but never withdrawn: players keep what it wins, not the bonus itself.</p></div>
+                    <span>{{ $bonus['ready'] ? ($bonusOn ? 'Bonus on' : 'Bonus off') : 'Not set up' }}</span></div>
+
+                <div class="security-stats">
+                    <div><small>Unused bonus held by players</small><strong>{{ number_format($bonus['outstanding'], 2) }}</strong></div>
+                    <div><small>Paid today</small><strong>{{ number_format($bonus['today'], 2) }}</strong></div>
+                    <div><small>Paid this month</small><strong>{{ number_format($bonus['month'], 2) }}</strong></div>
+                    <div><small>Bonuses this month</small><strong>{{ number_format($bonus['month_count']) }}</strong></div>
+                </div>
+                @unless ($bonus['ready'])
+                    <div class="configuration-form-feedback"><div class="form-errors">The deposit bonus tables are not there yet. Apply the waiting schema update on the System tab. Until then the bonus cannot be paid, and deposits are not affected.</div></div>
+                @endunless
+
+                <div class="configuration-form-section">
+                    <h3>Switch and size</h3>
+                    <p>Turn the bonus on or off at any time. Bonuses already paid stay with the players who hold them.</p>
+                </div>
+                <div class="configuration-form-grid three">
+                    <label class="configuration-checkbox">
+                        <input type="checkbox" name="deposit_bonus_enabled" value="1" @checked($bonusOn)>
+                        <span>Give a bonus on approved deposits</span>
+                        <small>Off by default. Applies to deposits approved from now on.</small>
+                    </label>
+                    <label>Bonus percentage
+                        <input type="number" name="deposit_bonus_percent" min="1" max="100" step="1" list="bonus-percent-presets" value="{{ $bonusPercent }}" required>
+                        <small>Percent of the deposit. At {{ $bonusPercent }}%, a {{ number_format($example, 0) }} ETB deposit earns {{ number_format($exampleBonus, 2) }} ETB of play-only bonus. 100 matches the deposit, 50 pays half.</small>
+                    </label>
+                    <label>Largest single bonus
+                        <input type="number" name="deposit_bonus_max_amount" min="0" step="0.01" value="{{ $bonusMax }}" required>
+                        <small>ETB. 0 means no limit.</small>
+                    </label>
+                </div>
+                <datalist id="bonus-percent-presets"><option value="10"><option value="25"><option value="50"><option value="75"><option value="100"></datalist>
+
+                <div class="configuration-form-section divided">
+                    <h3>Who qualifies</h3>
+                    <p>Keeps the bonus for the players it is meant for and caps what it can cost.</p>
+                </div>
+                <div class="configuration-form-grid three">
+                    <label>Which deposits
+                        <select name="deposit_bonus_scope" required>
+                            <option value="first" @selected($value('deposit_bonus_scope', 'first') !== 'every')>First deposit only</option>
+                            <option value="every" @selected($value('deposit_bonus_scope', 'first') === 'every')>Every deposit</option>
+                        </select>
+                        <small>First deposit only is the safest setting.</small>
+                    </label>
+                    <label>Smallest deposit that earns it
+                        <input type="number" name="deposit_bonus_min_deposit" min="0" step="0.01" value="{{ $bonusMin }}" required>
+                        <small>ETB. Smaller deposits earn no bonus.</small>
+                    </label>
+                    <label>Most bonus one player can ever receive
+                        <input type="number" name="deposit_bonus_lifetime_cap" min="0" step="0.01" value="{{ $value('deposit_bonus_lifetime_cap', 0) }}" required>
+                        <small>ETB. 0 means no limit.</small>
+                    </label>
+                    <label>Total bonus paid per day
+                        <input type="number" name="deposit_bonus_daily_budget" min="0" step="0.01" value="{{ $value('deposit_bonus_daily_budget', 0) }}" required>
+                        <small>ETB across all players. Once reached, no more bonuses are paid until tomorrow. 0 means no limit.</small>
+                    </label>
+                    <label>Bonus lasts
+                        <input type="number" name="deposit_bonus_valid_days" min="0" max="365" step="1" value="{{ $value('deposit_bonus_valid_days', 30) }}" required>
+                        <small>Days. 0 means it never expires.</small>
+                    </label>
+                    <label class="configuration-checkbox">
+                        <input type="checkbox" name="deposit_bonus_forfeit_on_withdrawal" value="1" @checked((bool) (int) $value('deposit_bonus_forfeit_on_withdrawal', 1))>
+                        <span>A withdrawal cancels unused bonus</span>
+                        <small>Stops a player taking their own deposit out and playing on the bonus alone. They are asked to confirm first.</small>
+                    </label>
+                </div>
+
+                <div class="configuration-form-section divided">
+                    <h3>How the bonus behaves</h3>
+                    <p>The bonus is added to the player's balance but not to what they can withdraw. A bet is paid from the bonus first. If it wins, the bonus part of the bet goes back to the bonus and the winnings become withdrawable. If it loses, the bonus is gone. A player can therefore never turn the bonus itself into cash, whichever game they play.</p>
+                </div>
+
+                <div class="configuration-form-actions"><button type="submit"><i class="fa-solid fa-check"></i> Save Deposit Bonus</button></div>
+            </form>
+
+            <section class="configuration-panel">
+                <div class="configuration-panel-title"><div><h2>Recent bonuses</h2><p>The latest 25, newest first.</p></div></div>
+                @if ($bonus['grants']->isEmpty())
+                    <p class="admin-empty">No deposit bonus has been paid yet.</p>
+                @else
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>Player</th><th>Deposit</th><th>Bonus</th><th>Unused</th><th>Status</th><th>Paid</th><th>Expires</th></tr></thead>
+                            <tbody>
+                                @foreach ($bonus['grants'] as $grant)
+                                    <tr>
+                                        <td><a href="{{ route('admin.members.show', $grant->user_id) }}">{{ $grant->user?->name ?: ('#'.$grant->user_id) }}</a></td>
+                                        <td>{{ number_format((float) $grant->deposit_amount, 2) }}</td>
+                                        <td>{{ number_format((float) $grant->amount, 2) }} <small>({{ rtrim(rtrim(number_format((float) $grant->percent, 2), '0'), '.') }}%)</small></td>
+                                        <td>{{ number_format($grant->remaining(), 2) }}</td>
+                                        <td><span class="status-badge {{ $grant->status === 'active' ? 'won' : '' }}">{{ ucfirst($grant->status) }}{{ $grant->forfeit_reason ? ' · '.$grant->forfeit_reason : '' }}</span></td>
+                                        <td>{{ $grant->created_at->format('M j, H:i') }}</td>
+                                        <td>{{ $grant->expires_at ? $grant->expires_at->format('M j, Y') : 'Never' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
         @elseif ($activeTab === 'security')
             {{-- Its own form, reached by id from inside the settings form, for the
                  same reason as the QTech test button: no inherited PUT spoof. --}}

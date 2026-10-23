@@ -16,7 +16,7 @@
     'commission_anomalies' => ['Commissions missing ledger entries',['Order','Type','Commission / status']],
     'payout_control_anomalies' => ['Settled withdrawals missing controls',['Order','Type','Amount / status']],
 ] as $key => [$title,$headers])
-<section class="admin-panel ops-reconcile-panel"><div class="panel-title"><div><p>Exception report</p><h2>{{ $title }}</h2></div><span>{{ $report[$key]->count() }}</span></div>
+<section class="admin-panel report-panel ops-reconcile-panel"><div class="panel-title"><div><p>Exception report</p><h2>{{ $title }}</h2></div><span>{{ $report[$key]->count() }}</span></div>
 <div class="admin-table-wrap"><table class="admin-table"><thead><tr>@foreach($headers as $header)<th>{{ $header }}</th>@endforeach</tr></thead><tbody>
 @forelse($report[$key] as $row)<tr>
     @if($key === 'balance_mismatches')

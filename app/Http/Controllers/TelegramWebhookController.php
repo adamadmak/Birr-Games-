@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\TelegramPhoneRequiredException;
 use App\Models\PlatformSetting;
 use App\Models\TelegramSubscriber;
+use App\Services\TelegramAccountLinker;
 use App\Services\TelegramBotService;
 use App\Services\TelegramDepositService;
 use App\Services\TelegramPlayerService;
@@ -22,6 +23,7 @@ class TelegramWebhookController
         TelegramBotService $telegram,
         TelegramPlayerService $players,
         TelegramDepositService $deposits,
+        TelegramAccountLinker $linker,
     ): JsonResponse {
         $provided = (string) $request->header('X-Telegram-Bot-Api-Secret-Token');
 
@@ -68,7 +70,10 @@ class TelegramWebhookController
 
         try {
             if (is_array($contact)) {
-                $this->handleSharedContact($contact, $from, $subscriber, $telegram, $players);
+                $this->handleSharedContact($contact, $from, $subscriber, $telegram, $players, $linker);
+            } elseif (str_starts_with($command, '/start') && ($linkCode = $linker->codeFromStart($text)) !== null) {
+                // Opened from the website's Connect Telegram button: connect that account.
+                $this->startLink($linkCode, $subscriber, $telegram, $players, $linker);
             } elseif (str_starts_with($command, '/stop')) {
                 $subscriber->update(['active' => false, 'stopped_at' => now()]);
                 $telegram->sendText($subscriber->chat_id, 'You have been unsubscribed. Send /start to join again.', [], $telegram->removeKeyboard());
@@ -206,13 +211,17 @@ class TelegramWebhookController
                     $telegram->sendText($subscriber->chat_id, $startCaption, [], $telegram->mainMenuKeyboard());
                 }
             } elseif (str_starts_with($command, '/link')) {
-                // Agents can link their Telegram account for deposit/withdrawal push notifications.
-                $code = strtoupper(trim(substr($command, 5)));
+                // Agents link their Telegram for deposit and withdrawal alerts; players connect their
+                // website account with the code from Connect Telegram. The code follows the command
+                // ($command is only its first word).
+                $code = strtoupper(trim(substr($text, 5)));
                 $agent = strlen($code) >= 6
                     ? \App\Models\Agent::query()->where('telegram_link_code', $code)->first()
                     : null;
 
-                if (strlen($code) < 6) {
+                if (strlen($code) >= 6 && ! $agent && preg_match('/^[A-Z0-9]{6,16}$/', $code)) {
+                    $this->startLink($code, $subscriber, $telegram, $players, $linker);
+                } elseif (strlen($code) < 6) {
                     $telegram->sendText($subscriber->chat_id, '<b>Missing link code</b>'."\n\n".'Send /link followed by the code shown in your agent portal.', [], $telegram->mainMenuKeyboard());
                 } elseif (! $agent) {
                     $telegram->sendText($subscriber->chat_id, '<b>Code not recognized</b>'."\n\n".'That link code does not exist or has already been used. Generate a new one in your agent portal.', [], $telegram->mainMenuKeyboard());
@@ -234,14 +243,25 @@ class TelegramWebhookController
             } elseif (str_starts_with($command, '/password')) {
                 $user = $players->ensurePlayer($subscriber);
                 $subscriber->refresh();
+
+                // A password is the key to a wallet. Three an hour is plenty for a player who
+                // lost one, and too few for anyone using the bot to lock a player out.
+                $limitKey = 'tg-password:'.$subscriber->id;
+                if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($limitKey, 3)) {
+                    $telegram->sendText($subscriber->chat_id, 'You asked for a new password a few times already. Please wait an hour and try again.', [], $telegram->mainMenuKeyboard());
+
+                    return response()->json(['ok' => true]);
+                }
+                \Illuminate\Support\Facades\RateLimiter::hit($limitKey, 3600);
+
                 $password = $players->reissuePassword($user);
-                $telegram->sendText(
+                $this->sendSecret(
+                    $telegram,
                     $subscriber->chat_id,
                     "<b>🔑 New website password</b>\n\n"
                         .'📱 Phone: <code>'.e(PhoneNumber::format($user->phone ?: $subscriber->phone)).'</code>'."\n"
                         .'🔑 Password: <code>'.e($password).'</code>'."\n\n"
-                        .'Use these to sign in on the website. Your old password no longer works.',
-                    [],
+                        .'Use these to sign in on the website. Your old password no longer works, and any other browser you were signed in on has been signed out.',
                     $telegram->mainMenuKeyboard()
                 );
             } elseif (str_starts_with($command, '/status')) {
@@ -274,10 +294,10 @@ class TelegramWebhookController
                 if (! $subscriber->user_id) {
                     $user = $players->ensurePlayer($subscriber);
                     $subscriber->refresh();
-                    $telegram->sendText($subscriber->chat_id, '💰 <b>Balance: '.$this->birr($user->credits).'</b>', [], $telegram->mainMenuKeyboard());
+                    $telegram->sendText($subscriber->chat_id, '💰 <b>Balance: '.$this->birr($user->credits).'</b>'.$this->balanceBreakdown($user), [], $telegram->mainMenuKeyboard());
                 } else {
                     $user = $subscriber->user()->firstOrFail();
-                    $telegram->sendText($subscriber->chat_id, '💰 <b>Balance: '.$this->birr($user->credits).'</b>', [], $telegram->mainMenuKeyboard());
+                    $telegram->sendText($subscriber->chat_id, '💰 <b>Balance: '.$this->birr($user->credits).'</b>'.$this->balanceBreakdown($user), [], $telegram->mainMenuKeyboard());
                 }
             } else {
                 $telegram->sendText($subscriber->chat_id, 'Choose Play Games, Deposit, or Check Balance below.', [], $telegram->mainMenuKeyboard());
@@ -320,10 +340,13 @@ class TelegramWebhookController
             $deposits->cancel($subscriber);
         }
 
+        // A chat that is part-way through connecting a website account keeps that state:
+        // overwriting it would drop the link the moment the player sends another message.
+        $connecting = $subscriber->pending_action === 'link_phone';
         $subscriber->update([
             'active' => true,
-            'pending_action' => 'await_phone',
-            'pending_payload' => null,
+            'pending_action' => $connecting ? 'link_phone' : 'await_phone',
+            'pending_payload' => $connecting ? $subscriber->pending_payload : null,
             'started_at' => $subscriber->started_at ?? now(),
             'stopped_at' => null,
         ]);
@@ -353,6 +376,7 @@ class TelegramWebhookController
         TelegramSubscriber $subscriber,
         TelegramBotService $telegram,
         TelegramPlayerService $players,
+        TelegramAccountLinker $linker,
     ): void {
         if ((int) data_get($contact, 'user_id') !== (int) data_get($from, 'id')) {
             $telegram->sendText(
@@ -367,6 +391,12 @@ class TelegramWebhookController
 
         $players->recordSharedPhone($subscriber, (string) data_get($contact, 'phone_number'));
         $subscriber->refresh();
+
+        if ($subscriber->pending_action === 'link_phone') {
+            $this->finishLink($subscriber, $telegram, $players, $linker);
+
+            return;
+        }
 
         $reconnected = $subscriber->user_id !== null
             || $players->findMemberByPhone((string) $subscriber->phone) !== null;
@@ -406,7 +436,108 @@ class TelegramWebhookController
             $message .= "\n".'Your player account is ready. Choose an action below.';
         }
 
+        if ($password !== null) {
+            // The one message that carries a password is removed from the chat shortly after.
+            $this->sendSecret($telegram, $subscriber->chat_id, $message, $telegram->mainMenuKeyboard());
+
+            return;
+        }
+
         $telegram->sendText($subscriber->chat_id, $message, [], $telegram->mainMenuKeyboard());
+    }
+
+    /**
+     * Opened from the website with a one-time code. Check it, then ask for the
+     * contact card (or finish at once if this chat has already shared its number).
+     */
+    private function startLink(
+        string $code,
+        TelegramSubscriber $subscriber,
+        TelegramBotService $telegram,
+        TelegramPlayerService $players,
+        TelegramAccountLinker $linker,
+    ): void {
+        $result = $linker->begin($subscriber, $code);
+
+        if ($result['error'] !== null) {
+            $telegram->sendText($subscriber->chat_id, '<b>Could not connect</b>'."\n\n".e($result['error']), [], $telegram->mainMenuKeyboard());
+
+            return;
+        }
+
+        if ($result['needs_contact']) {
+            $telegram->sendText(
+                $subscriber->chat_id,
+                '<b>🔗 Connect your account</b>'."\n\n"
+                    .'One last step. Tap <b>📱 Share My Phone Number</b> below so Telegram can confirm the number on your account is yours.',
+                [],
+                $telegram->contactKeyboard()
+            );
+
+            return;
+        }
+
+        $this->finishLink($subscriber->fresh(), $telegram, $players, $linker);
+    }
+
+    /** The contact card is known: confirm it matches the account, link, and welcome the player. */
+    private function finishLink(
+        TelegramSubscriber $subscriber,
+        TelegramBotService $telegram,
+        TelegramPlayerService $players,
+        TelegramAccountLinker $linker,
+    ): void {
+        $result = $linker->complete($subscriber);
+
+        if ($result['error'] !== null) {
+            $subscriber->refresh();
+            // Still waiting on a better contact card? Keep the share button in front of them.
+            $keyboard = $subscriber->pending_action === 'link_phone' ? $telegram->contactKeyboard() : $telegram->mainMenuKeyboard();
+            $telegram->sendText($subscriber->chat_id, '<b>Could not connect</b>'."\n\n".e($result['error']), [], $keyboard);
+
+            return;
+        }
+
+        $subscriber->refresh();
+        $user = $result['user'];
+        $url = $players->createLoginLink($subscriber, 'lobby');
+        try {
+            $telegram->setChatMenuButton($subscriber->chat_id, $url, '🎮 Play Games');
+        } catch (\Throwable) {
+        }
+
+        $telegram->sendText(
+            $subscriber->chat_id,
+            '<b>✅ Connected!</b>'."\n\n"
+                .'Your Telegram is now linked to <b>'.e($user->name).'</b>'."\n"
+                .'📱 '.e(PhoneNumber::format($user->phone))."\n"
+                .'💰 Balance: '.$this->birr($user->credits)."\n\n"
+                .'You can play, deposit and check your balance here, and sign in on the website with your own password.',
+            [['text' => '🎮 Open Game', 'type' => 'web_app', 'value' => $url]],
+            null
+        );
+        $telegram->sendText($subscriber->chat_id, 'Choose an action below.', [], $telegram->mainMenuKeyboard());
+    }
+
+    /**
+     * Send a message that carries a password and schedule its removal from the
+     * chat, so a sign-in password does not stay in the conversation history.
+     */
+    private function sendSecret(TelegramBotService $telegram, int|string $chatId, string $text, ?array $markup = null): void
+    {
+        $minutes = 10;
+        $sent = $telegram->sendText($chatId, $text."\n\n".'🕒 <i>For your safety this message is deleted in '.$minutes.' minutes. Save the password first.</i>', [], $markup);
+
+        $messageId = (int) ($sent['message_id'] ?? 0);
+        if ($messageId > 0 && \Illuminate\Support\Facades\Schema::hasTable('telegram_secret_messages')) {
+            \Illuminate\Support\Facades\DB::table('telegram_secret_messages')->insert([
+                'chat_id' => (int) $chatId,
+                'message_id' => $messageId,
+                'delete_after' => now()->addMinutes($minutes),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     private function isAction(string $text, array $actions): bool
@@ -417,6 +548,22 @@ class TelegramWebhookController
     private function isDepositAmount(string $text): bool
     {
         return preg_match('/^\d{1,9}(?:\.\d{1,2})?$/', str_replace(',', '', trim($text))) === 1;
+    }
+
+    /**
+     * Withdrawable cash and play-only bonus, when there is any bonus. A single total
+     * hides that part of it cannot be withdrawn.
+     */
+    private function balanceBreakdown(\App\Models\User $user): string
+    {
+        $locked = max(0, round((float) $user->credits - (float) $user->withdrawable_balance, 2));
+        if ($locked <= 0) {
+            return '';
+        }
+
+        return "
+✅ Withdrawable: ".$this->birr($user->withdrawable_balance)."
+🎁 Bonus (play only): ".$this->birr($locked);
     }
 
     private function birr(int|float|string $amount): string

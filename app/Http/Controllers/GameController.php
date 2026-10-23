@@ -78,9 +78,12 @@ class GameController
 
             $lockedCredits = max(0, $user->credits - $user->withdrawable_balance);
             $withdrawableStake = max(0, $stake - $lockedCredits);
+            // The bonus part of the stake returns to the bonus wallet; only the rest of
+            // the payout becomes withdrawable (see App\Services\BonusPlay).
+            $bonusKept = \App\Services\BonusPlay::immediate((float) $stake, (float) $withdrawableStake, (float) $result['payout']);
             $user->update([
                 'credits' => $user->credits - $stake + $result['payout'],
-                'withdrawable_balance' => max(0, $user->withdrawable_balance - $withdrawableStake + (int) $result['payout']),
+                'withdrawable_balance' => max(0, $user->withdrawable_balance - $withdrawableStake + (int) $result['payout'] - $bonusKept),
             ]);
             WalletTransaction::create([
                 'user_id' => $user->id, 'type' => 'bet', 'amount' => -$stake,
