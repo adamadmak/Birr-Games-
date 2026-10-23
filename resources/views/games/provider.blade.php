@@ -84,17 +84,17 @@
             padding:7px 16px;
             border:0;
             border-radius:9px;
-            background:linear-gradient(135deg, #e0aa2b, #b8860b);
+            background:linear-gradient(135deg, #17e495, #02b571);
             color:#fff;
             font:inherit;
             font-size:12px;
             font-weight:800;
             text-decoration:none;
             cursor:pointer;
-            box-shadow:0 3px 12px rgba(224,170,43,.35);
+            box-shadow:0 3px 12px rgba(23,228,149,.35);
             transition:transform .15s, box-shadow .15s;
         }
-        .bar-deposit:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(224,170,43,.45); }
+        .bar-deposit:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(23,228,149,.45); }
 
         /* ── Main Game Stage ── */
         .game-stage {

@@ -12,14 +12,14 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#15171a;border:1px solid #2a2d31;border-radius:18px;">
                     <tr>
                         <td style="padding:32px 32px 8px;">
-                            <p style="margin:0 0 6px;color:#efc45a;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">{{ $site }}</p>
+                            <p style="margin:0 0 6px;color:#40f6b0;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">{{ $site }}</p>
                             <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;color:#ffffff;">Confirm your email address</h1>
                             <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#c7ccd1;">Hi {{ $user->first_name }}, thanks for joining {{ $site }}. Press the button below to confirm that this address belongs to you.</p>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:0 32px 24px;" align="left">
-                            <a href="{{ $url }}" style="display:inline-block;padding:14px 26px;border-radius:12px;background:#e0aa2b;color:#0b1403;font-size:15px;font-weight:bold;text-decoration:none;">Confirm email</a>
+                            <a href="{{ $url }}" style="display:inline-block;padding:14px 26px;border-radius:12px;background:#17e495;color:#03140d;font-size:15px;font-weight:bold;text-decoration:none;">Confirm email</a>
                         </td>
                     </tr>
                     <tr>

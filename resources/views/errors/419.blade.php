@@ -34,8 +34,8 @@
             margin-top: 18px;
             padding: 11px 20px;
             border-radius: 9px;
-            background: #e0aa2b;
-            color: #1c1400;
+            background: #17e495;
+            color: #041810;
             font-size: 13.5px;
             font-weight: 700;
             text-decoration: none;

@@ -46,21 +46,21 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
 :root,
 [data-agent-theme="dark"] {
     color-scheme: dark;
-    --agent-bg: #0b1207;
-    --agent-panel: #131c0e;
-    --agent-panel-2: #18220f;
-    --agent-line: #26331b;
-    --agent-line-strong: #35462a;
-    --agent-text: #eef4e6;
+    --agent-bg: #07120e;
+    --agent-panel: #0e1c17;
+    --agent-panel-2: #0f221b;
+    --agent-line: #1b332a;
+    --agent-line-strong: #2a463b;
+    --agent-text: #e6f4ef;
     --agent-muted: #8f9c85;
     --agent-faint: #6a7860;
 
-    --agent-teal: #e0aa2b;            /* legacy alias — now the brand lime */
-    --agent-teal-soft: rgba(224, 170, 43, .14);
-    --agent-accent: #e0aa2b;
-    --agent-accent-deep: #c8961e;
-    --agent-accent-line: rgba(224, 170, 43, .30);
-    --agent-on-accent: #0c1403;
+    --agent-teal: #17e495;            /* legacy alias — now the brand lime */
+    --agent-teal-soft: rgba(23,228,149, .14);
+    --agent-accent: #17e495;
+    --agent-accent-deep: #0dc07a;
+    --agent-accent-line: rgba(23,228,149, .30);
+    --agent-on-accent: #03140d;
 
     --agent-blue: #5aa2ff;   --agent-blue-soft: rgba(90, 162, 255, .14);
     --agent-green: #35d18b;  --agent-green-soft: rgba(53, 209, 139, .14);
@@ -68,25 +68,25 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
     --agent-pink: #ff6470;   --agent-pink-soft: rgba(255, 100, 112, .14);
 
     --agent-shadow: 0 18px 40px rgba(0, 0, 0, .45);
-    --agent-glass: rgba(24, 34, 15, .72);
+    --agent-glass: rgba(15,34,27, .72);
 }
 
 [data-agent-theme="light"] {
     color-scheme: light;
-    --agent-bg: #f7f9f4;
+    --agent-bg: #f4f9f7;
     --agent-panel: #ffffff;
-    --agent-panel-2: #f4f7ef;
-    --agent-line: #e3e8dc;
-    --agent-line-strong: #cbd4c0;
-    --agent-text: #121a0c;
+    --agent-panel-2: #eff7f4;
+    --agent-line: #dce8e3;
+    --agent-line-strong: #c0d4cc;
+    --agent-text: #0c1a15;
     --agent-muted: #647059;
     --agent-faint: #97a38c;
 
-    --agent-teal: #c8961e;
-    --agent-teal-soft: rgba(200, 150, 30, .12);
-    --agent-accent: #c8961e;
-    --agent-accent-deep: #a67a14;
-    --agent-accent-line: rgba(200, 150, 30, .30);
+    --agent-teal: #0dc07a;
+    --agent-teal-soft: rgba(13,192,122, .12);
+    --agent-accent: #0dc07a;
+    --agent-accent-deep: #0ca369;
+    --agent-accent-line: rgba(13,192,122, .30);
     --agent-on-accent: #ffffff;
 
     --agent-blue: #2a6ff0;   --agent-blue-soft: rgba(42, 111, 240, .10);
@@ -168,7 +168,7 @@ body { font-family: 'Urbanist', Inter, ui-sans-serif, system-ui, sans-serif; }
     border-color: var(--agent-accent-line);
     background: linear-gradient(135deg, var(--agent-accent-deep), var(--agent-accent));
     color: var(--agent-on-accent);
-    box-shadow: 0 4px 14px rgba(200, 150, 30, .26);
+    box-shadow: 0 4px 14px rgba(13,192,122, .26);
 }
 .agent-button.danger, .agent-button.red {
     color: var(--agent-pink); border-color: var(--agent-pink-soft); background: var(--agent-pink-soft);
@@ -260,7 +260,7 @@ body { font-family: 'Urbanist', Inter, ui-sans-serif, system-ui, sans-serif; }
 .agent-profile-columns .agent-profile-value { color: var(--agent-accent); }
 .agent-detail-list dt, .agent-detail-list dd { border-bottom-color: var(--agent-line); }
 .agent-detail-list dt { color: var(--agent-muted); }
-.agent-modal { background: rgba(4, 8, 2, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.agent-modal { background: rgba(2,8,6, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .agent-modal-head p { color: var(--agent-muted); }
 .agent-modal-head > button { color: var(--agent-muted); }
 .agent-report-card { background: var(--agent-panel); border-color: var(--agent-line); border-left-color: var(--agent-green); }
