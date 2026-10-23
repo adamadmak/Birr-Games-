@@ -19,7 +19,7 @@
                     </tr>
                     <tr>
                         <td style="padding:0 32px 24px;" align="left">
-                            <a href="{{ $url }}" style="display:inline-block;padding:14px 26px;border-radius:12px;background:#17e495;color:#03140d;font-size:15px;font-weight:bold;text-decoration:none;">Confirm email</a>
+                            <a href="{{ $url }}" style="display:inline-block;padding:14px 26px;border-radius:12px;background:#17e495;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;">Confirm email</a>
                         </td>
                     </tr>
                     <tr>

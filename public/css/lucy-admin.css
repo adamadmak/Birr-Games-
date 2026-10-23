@@ -37,7 +37,7 @@
     --primary-deep: #0dc07a;
     --primary-soft: rgba(23,228,149, .14);
     --primary-line: rgba(23,228,149, .30);
-    --on-primary: #041810;
+    --on-primary: #ffffff;
 
     /* --- semantic -------------------------------------------------------- */
     --success: #35d18b;      --success-soft: rgba(53, 209, 139, .13);

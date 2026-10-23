@@ -35,7 +35,7 @@
             padding: 11px 20px;
             border-radius: 9px;
             background: #17e495;
-            color: #041810;
+            color: #ffffff;
             font-size: 13.5px;
             font-weight: 700;
             text-decoration: none;

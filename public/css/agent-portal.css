@@ -60,7 +60,7 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
     --agent-accent: #17e495;
     --agent-accent-deep: #0dc07a;
     --agent-accent-line: rgba(23,228,149, .30);
-    --agent-on-accent: #03140d;
+    --agent-on-accent: #ffffff;
 
     --agent-blue: #5aa2ff;   --agent-blue-soft: rgba(90, 162, 255, .14);
     --agent-green: #35d18b;  --agent-green-soft: rgba(53, 209, 139, .14);
