@@ -22,7 +22,10 @@ class TelegramConnectController
     public function show(Request $request, TelegramAccountLinker $linker): View|RedirectResponse
     {
         $user = $request->user();
-        abort_if($user->isAdmin(), 404);
+        // Administrators have no player wallet to connect; say so instead of showing a bare 404.
+        if ($user->isAdmin()) {
+            return redirect()->route('home')->with('status', 'Administrator accounts do not connect Telegram. Sign in with a player account to try it.');
+        }
 
         $subscriber = $linker->subscriberFor($user);
         $link = null;
