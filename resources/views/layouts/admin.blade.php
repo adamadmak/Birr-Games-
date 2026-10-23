@@ -40,7 +40,6 @@
     <aside class="admin-sidebar" data-admin-sidebar>
         <div class="admin-brand">
             <img class="admin-brand-logo" src="/logo.png" alt="Birr Games logo">
-            <div><small>Operations</small></div>
             <button type="button" data-sidebar-toggle aria-label="Toggle navigation"><i class="admin-collapse-icon fa-solid fa-table-columns"></i><i class="admin-close-icon fa-solid fa-xmark"></i></button>
         </div>
 
