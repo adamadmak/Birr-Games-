@@ -3270,3 +3270,209 @@ body.player-guest { background: linear-gradient(170deg, #0c1018, #0a0d14 58%, #0
 :root { --secondary: #ffc72c; --secondary-dark: #d9a410; }
 .button-primary:hover { background: var(--secondary); box-shadow: 0 8px 24px rgba(255,199,44,.28), var(--glass-sheen); color: #1c1400; }
 .player-topnav a.active::after { background: linear-gradient(90deg, var(--main-600), var(--secondary)); box-shadow: 0 0 14px rgba(255,199,44,.55); }
+
+/* ============================================================================
+   HERO SLIDER
+   Slide 1 is the operator's artwork; the promo slides are live text over
+   bundled art. Promo slides sit on top of the artwork and fade in; without
+   the script they stay hidden and the artwork shows as before.
+   ========================================================================== */
+.hero-banner-image .hero-media { transition: opacity .7s ease, visibility .7s ease; }
+.hero-banner-image.is-slider:not([data-slide="0"]) .hero-media { opacity: 0; visibility: hidden; }
+
+.hero-slide {
+    position: absolute; inset: 0; z-index: 2;
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: center;
+    gap: clamp(8px, 2vw, 32px);
+    padding: clamp(22px, 3.6vw, 52px) clamp(24px, 4.6vw, 72px);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .7s ease, visibility .7s ease;
+    overflow: hidden;
+}
+.hero-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
+.promo-welcome { background: radial-gradient(60% 90% at 78% 50%, rgba(13,192,122,.34), transparent 70%), linear-gradient(120deg, #050d0a 0%, #082a1d 58%, #0a3d2a 100%); }
+.promo-games   { background: radial-gradient(60% 90% at 78% 50%, rgba(255,199,44,.26), transparent 70%), linear-gradient(120deg, #0a0b0d 0%, #14150f 55%, #2a2208 100%); }
+/* A fine dotted lattice so the flat gradient reads as a surface. */
+.hero-slide::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .55;
+    background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 10%, #000 60%);
+    mask-image: linear-gradient(90deg, transparent 10%, #000 60%);
+}
+.promo-copy { position: relative; z-index: 1; display: grid; justify-items: start; gap: 12px; max-width: 560px; }
+.promo-eyebrow {
+    padding: 5px 13px; border-radius: 999px;
+    color: #1c1400; background: var(--secondary, #ffc72c);
+    font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+    box-shadow: 0 6px 18px rgba(255,199,44,.28);
+}
+.promo-copy h2 { margin: 0; color: #fff; font-size: clamp(26px, 3.5vw, 52px); line-height: 1.04; letter-spacing: -.035em; text-shadow: 0 2px 18px rgba(0,0,0,.4); }
+.promo-copy h2 em {
+    font-style: normal;
+    background: linear-gradient(90deg, #3be9a4 0%, #ffc72c 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.promo-copy p {
+    margin: 0; color: #cfd8dc; font-size: clamp(13px, 1.25vw, 16px); line-height: 1.5; max-width: 46ch;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.promo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.promo-actions .button { min-height: 44px; padding: 10px 22px; font-size: 14px; }
+.promo-art { position: relative; z-index: 1; height: 100%; min-height: 0; background: center / contain no-repeat; animation: promoFloat 7s ease-in-out infinite; filter: drop-shadow(0 24px 34px rgba(0,0,0,.45)); }
+.promo-welcome .promo-art { background-image: url('/images/hero-promo-welcome.svg'); }
+.promo-games .promo-art { background-image: url('/images/hero-promo-games.svg'); }
+@keyframes promoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+/* Copy rises in whenever its slide becomes the active one. */
+.hero-slide.is-active .promo-copy > * { animation: promoIn .7s cubic-bezier(.2,.7,.2,1) both; }
+.hero-slide.is-active .promo-copy > :nth-child(2) { animation-delay: .08s; }
+.hero-slide.is-active .promo-copy > :nth-child(3) { animation-delay: .16s; }
+.hero-slide.is-active .promo-copy > :nth-child(4) { animation-delay: .24s; }
+@keyframes promoIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.hero-controls[hidden] { display: none; }
+.hero-controls { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.hero-arrow {
+    position: absolute; top: 50%; width: 42px; height: 42px; margin-top: -21px; display: grid; place-items: center;
+    border: 1px solid rgba(255,255,255,.2); border-radius: 50%; color: #fff; font-size: 26px; line-height: 1; padding: 0 0 3px;
+    background: rgba(8,10,12,.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    cursor: pointer; pointer-events: auto; opacity: 0; transition: opacity .2s ease, background-color .2s ease, transform .2s ease;
+}
+.hero-arrow[data-hero-prev] { left: 14px; }
+.hero-arrow[data-hero-next] { right: 14px; }
+.hero-banner-image:hover .hero-arrow, .hero-arrow:focus-visible { opacity: 1; }
+.hero-arrow:hover { background: var(--main-600); transform: scale(1.06); }
+.hero-dots {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 7px; padding: 7px 11px;
+    border-radius: 999px; background: rgba(8,10,12,.55); border: 1px solid rgba(255,255,255,.12);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); pointer-events: auto;
+}
+.hero-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,.38); cursor: pointer; transition: width .3s ease, background .3s ease; }
+.hero-dot:hover { background: rgba(255,255,255,.7); }
+.hero-dot.is-active { width: 28px; background: linear-gradient(90deg, var(--main-500), var(--secondary, #ffc72c)); }
+@media (max-width: 700px) {
+    .hero-arrow { display: none; }
+    .hero-slide { grid-template-columns: 1fr; grid-template-rows: minmax(0, 42%) auto; align-content: end; gap: 0; padding: 16px 20px 46px; }
+    .hero-slide .promo-art { order: -1; }
+    .promo-copy { gap: 9px; }
+    .promo-copy h2 { font-size: clamp(26px, 8vw, 34px); }
+    .promo-copy p { font-size: 13px; -webkit-line-clamp: 2; }
+    .promo-actions .button { min-height: 42px; padding: 9px 18px; font-size: 13px; }
+    .hero-dots { bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-slide, .hero-banner-image .hero-media { transition: none; }
+    .promo-art, .hero-slide.is-active .promo-copy > * { animation: none; }
+}
+
+/* ============================================================================
+   STUDIO PILLS
+   The row used to clip the active pill's outline and sat hard against the left
+   edge, so "All" looked cut off. It now has room on every side, "All" is the
+   brand green, and the active pill is ringed in yellow instead of outlined.
+   ========================================================================== */
+.lobby-chips {
+    gap: 10px;
+    margin: 4px -2px 8px;
+    padding: 10px 18px 18px;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 18px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 44px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 44px), transparent 100%);
+}
+.lobby-chip {
+    position: relative;
+    min-height: 46px;
+    padding: 0 9px 0 18px;
+    gap: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.2);
+    font-size: 13.5px;
+    letter-spacing: .01em;
+    scroll-snap-align: start;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -10px 18px rgba(0,0,0,.14);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+/* A soft sheen across the top half, so the pills read as glossy. */
+.lobby-chip::before {
+    content: ""; position: absolute; inset: 0 0 52% 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0));
+}
+.lobby-chip > * { position: relative; }
+.lobby-chip small {
+    min-width: 26px; padding: 3px 8px; font-size: 11px;
+    background: rgba(0,0,0,.34); box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+.lobby-chip:hover { transform: translateY(-3px); filter: brightness(1.08); box-shadow: 0 12px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.32); }
+.lobby-chip.active {
+    outline: none;
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,.55);
+    box-shadow: 0 0 0 2px #0b0b0c, 0 0 0 4px var(--secondary, #ffc72c), 0 12px 28px rgba(255,199,44,.28);
+}
+.lobby-chip-all {
+    --chip-a: #19d48c; --chip-b: #078a58;
+    padding: 0 20px 0 16px; gap: 9px; font-weight: 900; letter-spacing: .03em;
+}
+/* A four-dot "everything" mark in front of the label. */
+.lobby-chip-all::after {
+    content: ""; order: -1; width: 14px; height: 14px; flex: 0 0 auto;
+    background: radial-gradient(circle, #fff 52%, transparent 58%) 0 0 / 7px 7px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.3));
+}
+@media (max-width: 680px) {
+    .lobby-chips { margin-inline: -8px; padding-inline: 16px; }
+    .lobby-chip { min-height: 44px; font-size: 13px; }
+}
+
+/* ============================================================================
+   PHONE HEADER AND BOTTOM BAR
+   The wide logo ran under the language switch, and the bottom bar was glass
+   that took on the colour of whatever game art scrolled behind it.
+   ========================================================================== */
+@media (max-width: 680px) {
+    .site-header { gap: 8px; }
+    .site-header .brand, .player-guest .site-header .brand { flex: 0 1 auto; min-width: 0; }
+    .brand-logo { height: 26px; max-width: 32vw; }
+    .site-header .header-actions { flex: 0 1 auto; min-width: 0; margin-left: auto; gap: 6px; }
+    .header-lang { padding: 3px; gap: 3px; border-radius: 10px; }
+    .header-lang a { padding: 6px 8px; font-size: 11px; }
+}
+@media (max-width: 390px) {
+    .brand-logo { height: 22px; max-width: 28vw; }
+    .header-lang a { padding: 6px 6px; font-size: 10px; }
+}
+.player-mobile-nav {
+    background: linear-gradient(180deg, rgba(17,19,21,.98), rgba(8,9,10,.99));
+    border-top: 1px solid rgba(13,192,122,.28);
+    box-shadow: 0 -12px 30px rgba(0,0,0,.55), 0 -1px 0 rgba(13,192,122,.12);
+}
+.player-mobile-nav a.active, .player-mobile-nav button.active { color: var(--main-400); }
+/* Promo slides need a little height to breathe, whatever shape the artwork is. */
+@media (min-width: 701px) {
+    .hero-banner-image.is-slider .hero-media img { min-height: clamp(300px, 25vw, 380px); object-fit: cover; }
+}
+
+/* The operator's banner is shown whole, never cropped: it sits centred over a
+   blurred copy of itself, so a wide picture in a taller box reads as ambient
+   light rather than empty bars. */
+.hero-banner-image.is-slider .hero-media::before {
+    content: ""; position: absolute; inset: -24px; z-index: 0;
+    background: var(--hero-src) center / cover no-repeat;
+    filter: blur(22px) saturate(1.35) brightness(.62);
+}
+.hero-banner-image.is-slider .hero-media img { position: relative; z-index: 1; object-fit: contain; }
+.hero-banner-image.is-slider .hero-media::after { z-index: 2; }
+
+@media (max-width: 700px) {
+    .hero-banner-image.is-slider { min-height: 224px; }
+    .hero-banner-image.is-slider .hero-media { position: absolute; inset: 0; }
+    .hero-banner-image.is-slider .hero-media img { height: 100%; min-height: 0; }
+    .hero-slide { grid-template-columns: 1fr; grid-template-rows: none; align-content: center; padding: 18px 18px 44px; }
+    .hero-slide .promo-art { position: absolute; order: 0; right: -4%; top: 4%; width: 54%; height: 78%; opacity: .95; }
+    .promo-copy { max-width: 62%; }
+    .promo-copy h2 { font-size: clamp(22px, 6.6vw, 28px); }
+    .promo-copy p, .promo-actions .button-soft { display: none; }
+    .promo-eyebrow { font-size: 10px; padding: 4px 10px; }
+}

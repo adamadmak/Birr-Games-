@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" fill="none">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffc72c" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#ffc72c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset=".55" stop-color="#ffc72c"/>
+      <stop offset="1" stop-color="#d9a410"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3be9a4"/>
+      <stop offset="1" stop-color="#0a8f5b"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dfe9e4"/>
+    </linearGradient>
+    <g id="spark"><path d="M0-22 5-5 22 0 5 5 0 22-5 5-22 0-5-5Z"/></g>
+  </defs>
+
+  <circle cx="450" cy="350" r="330" fill="url(#glow)"/>
+  <circle cx="450" cy="350" r="260" stroke="#ffffff" stroke-opacity=".07" stroke-width="2"/>
+  <circle cx="450" cy="350" r="322" stroke="#ffc72c" stroke-opacity=".2" stroke-width="2" stroke-dasharray="4 14"/>
+
+  <!-- trophy -->
+  <g transform="translate(450 330)">
+    <path d="M-150-120H150C150-10 100 70 0 90-100 70-150-10-150-120Z" fill="url(#gold)"/>
+    <path d="M-150-100C-215-100-215-10-125 10M150-100C215-100 215-10 125 10" stroke="#d9a410" stroke-width="22" stroke-linecap="round"/>
+    <path d="M-110-120H-60C-60-30-30 40 20 80-80 60-110-10-110-120Z" fill="#ffffff" fill-opacity=".28"/>
+    <rect x="-24" y="86" width="48" height="70" fill="#d9a410"/>
+    <rect x="-96" y="150" width="192" height="46" rx="12" fill="url(#green)"/>
+    <rect x="-70" y="196" width="140" height="22" rx="8" fill="#0a8f5b"/>
+    <path d="M0-85 14-52 50-48 23-24 30 12 0-6-30 12-23-24-50-48-14-52Z" fill="#ffffff" fill-opacity=".92"/>
+  </g>
+
+  <!-- dice -->
+  <g transform="translate(180 470) rotate(-16)">
+    <rect x="-62" y="-62" width="124" height="124" rx="26" fill="url(#card)"/>
+    <g fill="#0a8f5b"><circle cx="-26" cy="-26" r="10"/><circle cx="26" cy="-26" r="10"/><circle cx="0" cy="0" r="10"/><circle cx="-26" cy="26" r="10"/><circle cx="26" cy="26" r="10"/></g>
+  </g>
+
+  <!-- card -->
+  <g transform="translate(745 470) rotate(14)">
+    <rect x="-62" y="-88" width="124" height="176" rx="20" fill="url(#card)"/>
+    <text x="-38" y="-38" font-family="Georgia,serif" font-weight="700" font-size="46" fill="#0a8f5b">A</text>
+    <path d="M0-20C18-2 36 16 0 46-36 16-18-2 0-20Z" fill="#0dc07a"/>
+  </g>
+
+  <!-- chip -->
+  <g transform="translate(160 190)">
+    <circle r="58" fill="url(#gold)"/>
+    <circle r="58" stroke="#ffffff" stroke-width="12" stroke-dasharray="22 22" stroke-opacity=".9"/>
+    <circle r="36" fill="#d9a410"/>
+    <text y="10" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="28" fill="#ffffff">B</text>
+  </g>
+
+  <g fill="#ffc72c">
+    <use href="#spark" x="740" y="170"/>
+    <use href="#spark" x="300" y="90" transform="translate(300 90) scale(.6) translate(-300 -90)"/>
+  </g>
+  <g fill="#ffffff" fill-opacity=".85">
+    <use href="#spark" x="820" y="320" transform="translate(820 320) scale(.55) translate(-820 -320)"/>
+    <use href="#spark" x="90" y="330" transform="translate(90 330) scale(.5) translate(-90 -330)"/>
+  </g>
+  <g fill="#0dc07a">
+    <use href="#spark" x="640" y="80" transform="translate(640 80) scale(.8) translate(-640 -80)"/>
+  </g>
+</svg>

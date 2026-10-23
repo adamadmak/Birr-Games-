@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" fill="none">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#0dc07a" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#0dc07a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset=".55" stop-color="#ffc72c"/>
+      <stop offset="1" stop-color="#d9a410"/>
+    </linearGradient>
+    <linearGradient id="goldSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9a410"/>
+      <stop offset="1" stop-color="#9a6f06"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3be9a4"/>
+      <stop offset="1" stop-color="#0a8f5b"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dffd0"/>
+      <stop offset=".5" stop-color="#0dc07a"/>
+      <stop offset="1" stop-color="#067049"/>
+    </linearGradient>
+    <g id="coin">
+      <ellipse cx="0" cy="14" rx="92" ry="30" fill="url(#goldSide)"/>
+      <ellipse cx="0" cy="0" rx="92" ry="30" fill="url(#gold)"/>
+      <ellipse cx="0" cy="0" rx="70" ry="21" fill="none" stroke="#b98508" stroke-opacity=".55" stroke-width="3"/>
+      <text x="0" y="8" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="26" fill="#b98508" fill-opacity=".75">B</text>
+    </g>
+    <g id="spark">
+      <path d="M0-22 5-5 22 0 5 5 0 22-5 5-22 0-5-5Z"/>
+    </g>
+  </defs>
+
+  <circle cx="470" cy="360" r="330" fill="url(#glow)"/>
+  <circle cx="470" cy="360" r="250" stroke="#ffffff" stroke-opacity=".07" stroke-width="2"/>
+  <circle cx="470" cy="360" r="320" stroke="#0dc07a" stroke-opacity=".18" stroke-width="2" stroke-dasharray="4 14"/>
+
+  <!-- coin stack -->
+  <use href="#coin" x="470" y="540"/>
+  <use href="#coin" x="470" y="505"/>
+  <use href="#coin" x="470" y="470"/>
+  <use href="#coin" x="470" y="435"/>
+  <use href="#coin" x="470" y="400"/>
+  <use href="#coin" x="470" y="365"/>
+
+  <!-- gem on top -->
+  <g transform="translate(470 250)">
+    <path d="M-70-10 -38-62H38L70-10 0 82Z" fill="url(#gem)"/>
+    <path d="M-70-10H70M-38-62 -16-10 0 82 16-10 38-62M-16-10H16" stroke="#ffffff" stroke-opacity=".5" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-38-62 -16-10H16L38-62Z" fill="#ffffff" fill-opacity=".28"/>
+  </g>
+
+  <!-- loose coins -->
+  <g transform="rotate(-14 700 520)"><use href="#coin" x="700" y="520" transform="translate(0 0) scale(.78)"/></g>
+  <g transform="rotate(10 250 560)"><use href="#coin" x="250" y="560" transform="scale(.62) translate(155 340)"/></g>
+
+  <!-- poker chip -->
+  <g transform="translate(715 250)">
+    <circle r="68" fill="url(#green)"/>
+    <circle r="68" stroke="#ffffff" stroke-width="14" stroke-dasharray="26 26" stroke-opacity=".92"/>
+    <circle r="44" fill="#067049"/>
+    <circle r="44" stroke="#ffffff" stroke-opacity=".6" stroke-width="3"/>
+    <text y="12" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="34" fill="#ffffff">+</text>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#ffc72c">
+    <use href="#spark" x="250" y="170"/>
+    <use href="#spark" x="800" y="430" transform="translate(800 430) scale(.6) translate(-800 -430)"/>
+  </g>
+  <g fill="#ffffff" fill-opacity=".85">
+    <use href="#spark" x="610" y="90" transform="translate(610 90) scale(.55) translate(-610 -90)"/>
+    <use href="#spark" x="140" y="430" transform="translate(140 430) scale(.5) translate(-140 -430)"/>
+  </g>
+  <g fill="#0dc07a">
+    <use href="#spark" x="840" y="140" transform="translate(840 140) scale(.8) translate(-840 -140)"/>
+  </g>
+</svg>
