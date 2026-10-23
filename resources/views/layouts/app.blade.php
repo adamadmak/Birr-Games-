@@ -184,7 +184,7 @@
 @endphp
 <body class="@auth player-authenticated @else player-guest @endauth{{ $playerShell ? ' player-shell' : '' }}" data-telegram-user-id="{{ auth()->user()?->telegramSubscriber?->telegram_user_id }}">
     <div class="splash-screen" id="splashScreen">
-        <img class="splash-logo" src="{{ asset('logo.png') }}" alt="Lucy Chewata" width="700" height="609" fetchpriority="high" decoding="async">
+        <img class="splash-logo" src="{{ asset('logo.png') }}" alt="Lucy Chewata" width="900" height="216" fetchpriority="high" decoding="async">
         <div class="splash-loading-track">
             <div class="splash-loading-bar"></div>
         </div>
@@ -198,7 +198,7 @@
                 <button class="player-menu-toggle" type="button" data-player-menu-toggle aria-label="Open player navigation">&#9776;</button>
 
                 <a class="brand player-brand" href="{{ route('home') }}" aria-label="Lucy Play home">
-                    <img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="700" height="609" fetchpriority="high" decoding="async">
+                    <img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="900" height="216" fetchpriority="high" decoding="async">
                 </a>
 
                 <nav class="player-topnav" aria-label="Primary navigation">
@@ -322,7 +322,7 @@
                 @endauth
                 <main class="player-stage">@yield('content')</main>
                 <footer class="site-footer player-footer">
-                    <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="700" height="609" fetchpriority="high" decoding="async"></a><p>Original local games with an Ethiopian Birr-denominated wallet.</p></div>
+                    <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="900" height="216" fetchpriority="high" decoding="async"></a><p>Original local games with an Ethiopian Birr-denominated wallet.</p></div>
                     <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ auth()->check() ? route('player.wallet') : route('login') }}">{{ __('Birr wallet') }}</a></div>
                     <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a href="{{ route('about') }}">{{ __('About Lucy Play') }}</a><span>18+ interface concept</span></div>
                     <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Lucy Play</small></div>
@@ -358,7 +358,7 @@
         </div>
     @else
         <header class="site-header">
-            <a class="brand" href="{{ route('home') }}" aria-label="Lucy Play home"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="700" height="609" fetchpriority="high" decoding="async"></a>
+            <a class="brand" href="{{ route('home') }}" aria-label="Lucy Play home"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="900" height="216" fetchpriority="high" decoding="async"></a>
             <button class="menu-toggle" type="button" data-menu-toggle aria-label="Toggle navigation">&#9776;</button>
             <nav class="main-nav" data-menu>
                 <a class="{{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Lobby') }}</a>
@@ -385,7 +385,7 @@
         @if ($errors->any())<div class="flash flash-error">{{ $errors->first() }}</div>@endif
         <main>@yield('content')</main>
         <footer class="site-footer">
-            <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="700" height="609" fetchpriority="high" decoding="async"></a><p>Original entertainment built for Ethiopia with Birr-denominated play.</p></div>
+            <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Lucy Play logo" width="900" height="216" fetchpriority="high" decoding="async"></a><p>Original entertainment built for Ethiopia with Birr-denominated play.</p></div>
             <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ route('about') }}">{{ __('About Lucy Play') }}</a></div>
             <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a class="footer-telegram" href="{{ \App\Models\PlatformSetting::telegramSupportUrl() }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 240 240" width="18" height="18" aria-hidden="true"><circle cx="120" cy="120" r="120" fill="#29a9eb"></circle><path fill="#fff" d="m53 122 130-50c6-2 11 1 9 10l-22 104c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 4-8 4l3-40 73-66c3-3-1-4-4-2l-90 57-39-12c-8-3-8-9 2-12z"></path></svg><span>{{ __('Chat with support') }}</span></a><span>Play-money experience</span><span>18+ interface concept</span></div>
             <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Lucy Play</small></div>

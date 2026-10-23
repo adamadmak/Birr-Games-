@@ -57,7 +57,7 @@ button, select { cursor: pointer; }
 }
 
 .brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; }
-.brand-logo { height: 52px; width: auto; max-width: 140px; object-fit: contain; border-radius: 8px; }
+.brand-logo { height: 30px; width: auto; max-width: 190px; object-fit: contain; border-radius: 8px; }
 .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px 14px 14px 5px; color: #ffffff; background: #c8961e; box-shadow: 0 0 28px rgba(200, 150, 30, .25); transform: rotate(-6deg); }
 .brand-mark span { font-size: 22px; transform: rotate(6deg); }
 .brand-copy { display: none !important; }
@@ -468,7 +468,7 @@ button, select { cursor: pointer; }
     transition:height .15s ease,padding-top .15s ease;
 }
 .player-brand { width:auto; flex-shrink:0; }
-.player-brand .brand-logo { height:46px; }
+.player-brand .brand-logo { height:28px; }
 .player-brand .brand-copy { display:none; }
 .player-topnav { display:flex; align-items:center; gap:24px; }
 .player-topnav a { position:relative; color:#9ca5ad; font-size:13px; font-weight:700; transition:.2s ease; }
@@ -1541,7 +1541,7 @@ html[data-theme="dark"] .status-joined { color:#e6cb55; }.status-awarded { color
     pointer-events: none;
 }
 .splash-logo {
-    height: 120px;
+    height: 72px;
     width: auto;
     object-fit: contain;
     animation: splashPulse 2s ease-in-out infinite;
