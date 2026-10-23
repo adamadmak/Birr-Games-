@@ -50,7 +50,7 @@
             <button class="agent-button red" type="submit"><svg class="ag-ico" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 4.9 6"/><line x1="2" y1="2" x2="22" y2="22"/></svg> Unlink Telegram</button>
         </form>
     @elseif($agent->telegram_link_code)
-        <p class="agent-telegram-status is-pending"><svg class="ag-ico" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Your link code is ready. Open the Lucy Play bot on Telegram and send this code:</p>
+        <p class="agent-telegram-status is-pending"><svg class="ag-ico" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Your link code is ready. Open the Birr Games bot on Telegram and send this code:</p>
         <div class="agent-telegram-code">/link {{ $agent->telegram_link_code }}</div>
         <p class="agent-telegram-help">The code expires after you link it or generate a new one.</p>
     @else

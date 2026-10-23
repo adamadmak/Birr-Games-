@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daily Tournament - Lucy Play')
+@section('title', 'Daily Tournament - Birr Games')
 
 @section('content')
 @php
@@ -92,7 +92,7 @@
             @else
                 <div class="tournament-you-empty">
                     <strong>You are not on {{ $isToday ? "today's" : 'this' }} board yet</strong>
-                    <span>Top {{ number_format($paidPlaces) }} players by daily stake share the prize pool. Prizes are paid by the Lucy Play team after the board closes.</span>
+                    <span>Top {{ number_format($paidPlaces) }} players by daily stake share the prize pool. Prizes are paid by the Birr Games team after the board closes.</span>
                 </div>
             @endif
         </section>

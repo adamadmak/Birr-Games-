@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Connect Telegram - Lucy Play')
+@section('title', 'Connect Telegram - Birr Games')
 
 @section('content')
 <div class="player-account-page telegram-connect-page">

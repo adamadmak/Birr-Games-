@@ -122,7 +122,7 @@
             <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="company">
                 <div class="configuration-panel-title"><div><h2>Company Information</h2><p>Public identity and market information.</p></div><span>ETB market</span></div>
                 <div class="configuration-form-grid two">
-                    <label>Name<input name="company_name" value="{{ $value('company_name', 'Lucy Play') }}" required></label>
+                    <label>Name<input name="company_name" value="{{ $value('company_name', 'Birr Games') }}" required></label>
                     <label>Domain<input name="company_domain" value="{{ $value('company_domain', config('app.url')) }}" placeholder="https://example.com"></label>
                     <label>Country<input name="company_country" value="{{ $value('company_country', 'Ethiopia') }}" required></label>
                     <label>Country Code<input name="company_country_code" value="{{ $value('company_country_code', 'ET') }}" maxlength="2" required></label>
@@ -359,14 +359,14 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
             <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="frontend">
                 <div class="configuration-panel-title"><div><h2>Frontend Configuration</h2><p>Player-facing identity, starting balance, theme, and daily tournament prizes.</p></div></div>
                 <div class="configuration-form-grid two">
-                    <label>Site Title<input name="site_title" value="{{ $value('site_title', 'Lucy Play') }}" required></label>
+                    <label>Site Title<input name="site_title" value="{{ $value('site_title', 'Birr Games') }}" required></label>
                     <label>Default Theme<select name="default_theme" required><option value="light" @selected($value('default_theme', 'system') === 'light')>Light</option><option value="dark" @selected($value('default_theme', 'system') === 'dark')>Dark</option><option value="system" @selected($value('default_theme', 'system') === 'system')>System preference</option></select></label>
                     <label>Welcome Credits<input type="number" name="welcome_credits" min="0" max="1000000" value="{{ $value('welcome_credits', 5) }}" required><small class="unit">ETB</small></label>
                     <label>Deposit Bonus<input type="number" name="deposit_bonus_amount" min="0" max="1000000" value="{{ $value('deposit_bonus_amount', 2500) }}" required><small class="unit">ETB</small></label>
                     <label class="full">Frontend Tagline<input name="frontend_tagline" value="{{ $value('frontend_tagline', 'Play bright. Play local.') }}"></label>
                     <label class="full">Maintenance Message<textarea name="maintenance_message" rows="4">{{ $value('maintenance_message') }}</textarea></label>
                 </div>
-                <div class="configuration-form-section divided"><h3>Daily Tournament Prizes</h3><p>Prize pool paid by the Lucy Play team after the board closes. Prizes are NOT auto-credited.</p></div>
+                <div class="configuration-form-section divided"><h3>Daily Tournament Prizes</h3><p>Prize pool paid by the Birr Games team after the board closes. Prizes are NOT auto-credited.</p></div>
                 <div class="configuration-form-grid three">
                     <label>1st Place<input type="number" step="0.01" min="0" name="tournament_prize_first" value="{{ $value('tournament_prize_first', 500) }}" required><small class="unit">ETB</small></label>
                     <label>2nd Place<input type="number" step="0.01" min="0" name="tournament_prize_second" value="{{ $value('tournament_prize_second', 250) }}" required><small class="unit">ETB</small></label>
@@ -668,7 +668,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                         <small>Leave blank to keep the saved password.</small>
                     </label>
                     <label>From address<input type="email" name="mail_from_address" value="{{ $value('mail_from_address') }}" placeholder="no-reply@yourdomain.com"></label>
-                    <label>From name<input name="mail_from_name" value="{{ $value('mail_from_name') }}" placeholder="{{ $value('site_title', 'Lucy Play') }}"></label>
+                    <label>From name<input name="mail_from_name" value="{{ $value('mail_from_name') }}" placeholder="{{ $value('site_title', 'Birr Games') }}"></label>
                 </div>
                 @if ($errors->has('mail'))
                     <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first('mail') }}</div></div>

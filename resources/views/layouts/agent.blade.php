@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Agent Dashboard') · Lucy Play</title>
+    <title>@yield('title', 'Agent Dashboard') · Birr Games</title>
     <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/icons/icon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
@@ -24,7 +24,7 @@
 @php($currentAgent = auth('agent')->user())
 <div class="agent-shell" data-agent-shell>
     <aside class="agent-sidebar">
-        <div class="agent-brand"><img class="agent-brand-logo" src="/logo.png" alt="Lucy Play logo"><div><strong>Lucy Play</strong><small>Agent Dashboard</small></div></div>
+        <div class="agent-brand"><img class="agent-brand-logo" src="/logo.png" alt="Birr Games logo"><div><small>Agent Dashboard</small></div></div>
         <nav class="agent-nav">
             <p>Agent dashboard</p>
             <a class="{{ request()->routeIs('agent.dashboard') ? 'active' : '' }}" href="{{ route('agent.dashboard') }}"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Stats</a>
@@ -50,7 +50,7 @@
     <div class="agent-main-wrap">
         <header class="agent-mobile-header">
             <button type="button" data-agent-menu aria-label="Toggle navigation"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-            <strong>Lucy Play Agent</strong>
+            <strong>Agent Dashboard</strong>
             <button type="button" data-theme-toggle aria-label="Toggle colour theme" title="Toggle colour theme"><span class="ag-ico-sun"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span class="ag-ico-moon"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span></button>
         </header>
         <main class="agent-main">

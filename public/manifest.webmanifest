@@ -1,7 +1,7 @@
 {
-    "name": "Lucy Play",
-    "short_name": "Lucy Play",
-    "description": "Lucy Play is a local Ethiopian game experience with a Birr-denominated wallet.",
+    "name": "Birr Games",
+    "short_name": "Birr Games",
+    "description": "Birr Games is a local Ethiopian game experience with a Birr-denominated wallet.",
     "id": "/",
     "start_url": "/?source=pwa",
     "scope": "/",

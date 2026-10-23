@@ -1988,3 +1988,22 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
    running "Available banks" straight into "Configuration only…" on one line. */
 .operations-toolbar > div:not([class]) { display: grid; gap: 3px; }
 .operations-toolbar > div:not([class]) small { color: var(--faint); font-size: 12px; font-weight: 500; }
+
+/* ---------- Create-agent form --------------------------------------------
+   `.admin-form > div` turns every direct child div into a two-column grid. A
+   form section is one of those divs, so its heading landed in the left column
+   and its fields in the right, and the rows below it stepped sideways. A
+   section is a single column; the fields lay themselves out inside it. */
+.admin-form > .form-section { grid-template-columns: 1fr; }
+.operation-form-card { padding: 30px; }
+.operation-form-card .admin-form { gap: 26px; }
+.form-grid-2 { align-items: start; }
+.form-section > label, .form-grid-2 > label { align-content: start; }
+
+/* ---------- Brand in the staff sidebars -------------------------------------
+   The logo's lettering is cream, made for a dark ground. The admin and agent
+   screens are light by default, where it vanished, so the logo sits on a dark
+   chip that reads on either theme. */
+.admin-brand-logo, .agent-brand-logo { padding: 6px 10px; background: #0b0d10; border-radius: 10px; box-sizing: content-box; }
+.admin-brand-logo { height: 28px; }
+.agent-brand-logo { height: 28px; }

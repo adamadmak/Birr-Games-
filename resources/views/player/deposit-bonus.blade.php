@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Deposit Bonus - Lucy Play')
+@section('title', 'Deposit Bonus - Birr Games')
 
 @section('content')
 <div class="player-account-page bonus-page">
@@ -15,7 +15,7 @@
         <div class="bonus-copy">
             <span class="bonus-label">One-time local reward</span>
             <h2>Power up your first session.</h2>
-            <p>Claim <strong>{{ \App\Support\Money::format($bonusCredits) }}</strong> for exploring Lucy Play. No payment is required.</p>
+            <p>Claim <strong>{{ \App\Support\Money::format($bonusCredits) }}</strong> for exploring Birr Games. No payment is required.</p>
             @if($claim)
                 <div class="bonus-claimed-state"><span>&#10003;</span><div><strong>Bonus claimed</strong><small>{{ \App\Support\Money::format($claim->credits) }} added {{ $claim->claimed_at->diffForHumans() }}</small></div></div>
             @else
@@ -28,7 +28,7 @@
     <section class="bonus-how-it-works">
         <div class="wallet-section-title"><div><p>Simple and transparent</p><h2>How it works</h2></div><span>Local only</span></div>
         <div class="bonus-steps">
-            <article><span>1</span><div><h3>Sign in</h3><p>The offer is attached to your local Lucy Play account.</p></div></article>
+            <article><span>1</span><div><h3>Sign in</h3><p>The offer is attached to your local Birr Games account.</p></div></article>
             <article><span>2</span><div><h3>Claim once</h3><p>One claim is allowed per player and stored in your bonus history.</p></div></article>
             <article><span>3</span><div><h3>Play agents</h3><p>The Birr balance can be used with Lucky Dice, Coin Flip, and High / Low.</p></div></article>
         </div>

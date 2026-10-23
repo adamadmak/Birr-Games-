@@ -62,7 +62,7 @@ final class Mailer
             'mail.mailers.smtp.password' => $password !== '' ? $password : null,
             'mail.mailers.smtp.timeout' => 15,
             'mail.from.address' => self::fromAddress(),
-            'mail.from.name' => RuntimeEnv::get(null, 'mail_from_name', 'MAIL_FROM_NAME', (string) PlatformSetting::valueFor('site_title', config('app.name', 'Lucy Play'))),
+            'mail.from.name' => RuntimeEnv::get(null, 'mail_from_name', 'MAIL_FROM_NAME', (string) PlatformSetting::valueFor('site_title', config('app.name', 'Birr Games'))),
         ]);
 
         // The manager memoises a mailer once built; drop it so these values apply.

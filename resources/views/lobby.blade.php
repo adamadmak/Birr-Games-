@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Lucy Play — Game lobby')
+@section('title', 'Birr Games — Game lobby')
 
 @section('content')
 @auth

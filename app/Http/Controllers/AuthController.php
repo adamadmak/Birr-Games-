@@ -193,7 +193,7 @@ class AuthController
         Auth::login($user);
         $request->session()->regenerate();
 
-        $status = 'Welcome to Lucy Play. Your '.Money::format($welcomeBalance).' balance is ready.';
+        $status = 'Welcome to Birr Games. Your '.Money::format($welcomeBalance).' balance is ready.';
         if ($sent) {
             $status .= ' We sent a confirmation link to '.$email.'.';
         }

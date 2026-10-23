@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Promotions — Lucy Play')
+@section('title', 'Promotions — Birr Games')
 @section('content')
 <div class="content-page">
     <div class="page-intro"><p class="eyebrow">Player rewards</p><h1>More ways to explore.</h1><p>Local rewards designed to showcase the complete player journey.</p></div>
