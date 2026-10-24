@@ -3916,3 +3916,125 @@ body.player-guest {
 .home-casino-card .game-info { display: grid; gap: 2px; padding: 0 2px; }
 .home-casino-card .game-info strong { font-size: 13px; }
 .home-casino-card .game-info small { color: var(--muted); font-size: 11px; }
+
+/* ============================================================================
+   PHONE CHROME — sportsbook style
+   On phones the shell takes the look of a classic betting app: a solid blue
+   top bar with Log in / Register, a white strip of quick-link tiles, a promo
+   banner, a Sports / Casino switch above the odds board, and a solid blue
+   bottom bar. Desktop keeps the glass layout above; these rules only apply
+   under 700px, the same breakpoint as the bottom bar.
+   ========================================================================== */
+.player-quicknav, .player-search-link, .home-mobile-banner, .home-switch { display: none; }
+.player-auth-btn {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px;
+    border-radius: 9px; font-size: 12px; font-weight: 800; letter-spacing: .02em;
+    text-decoration: none; color: #fff; white-space: nowrap;
+}
+.player-auth-login { background: var(--glass); border: 1px solid var(--glass-line-strong); }
+.player-auth-register { background: linear-gradient(135deg, var(--brand-royal), var(--brand-blue)); border: 1px solid var(--lime-line); box-shadow: 0 6px 18px rgba(47, 123, 255, .28); }
+
+@media (max-width: 700px) {
+    /* ---- Top bar: solid blue, cells divided by hairlines ---- */
+    .player-topbar {
+        gap: 0; padding: 0 10px 0 0;
+        background: linear-gradient(180deg, #0f3fa6, #0b2f85);
+        border-bottom: 0;
+        box-shadow: 0 6px 20px rgba(4, 12, 40, .45);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    .player-menu-toggle {
+        width: 52px; height: 100%; min-height: 60px; order: -1;
+        border: 0; border-right: 1px solid rgba(255, 255, 255, .18); border-radius: 0;
+        background: transparent; color: #fff; font-size: 24px;
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    .player-brand { display: flex; align-items: center; height: 100%; padding: 0 10px; border-right: 1px solid rgba(255, 255, 255, .18); }
+    .player-brand .brand-logo { height: 26px; max-width: 120px; padding: 4px 8px; border-radius: 8px; box-shadow: none; }
+    .player-search-link { display: grid; place-items: center; width: 48px; height: 100%; min-height: 60px; color: #fff; border-right: 1px solid rgba(255, 255, 255, .18); }
+    .player-search-link svg { width: 22px; height: 22px; }
+    .player-account-actions { margin-left: auto; gap: 6px; }
+    .player-auth-btn { min-height: 38px; padding: 0 13px; border-radius: 4px; border: 0; box-shadow: none; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    .player-auth-login { background: rgba(255, 255, 255, .22); }
+    .player-auth-register { background: #2f7bff; }
+    .player-deposit-btn { min-height: 36px; border: 0; border-radius: 4px; box-shadow: none; background: #2f7bff; text-transform: uppercase; letter-spacing: .05em; }
+    .player-wallet-pill { background: rgba(255, 255, 255, .16); border-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .player-avatar { border: 0; background: rgba(255, 255, 255, .22); }
+    .player-sidebar, .player-sidebar-overlay { top: calc(60px + var(--tg-top-inset)); }
+
+    /* ---- Quick-link tiles: a white strip under the bar ---- */
+    .player-quicknav {
+        display: flex; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        background: #fff; border-bottom: 1px solid #dfe5f0;
+    }
+    .player-quicknav::-webkit-scrollbar { display: none; }
+    .player-quicknav a {
+        flex: 0 0 25%; min-width: 96px; height: 92px;
+        display: grid; place-items: center; align-content: center; gap: 8px;
+        color: #152238; text-decoration: none; font-size: 13px; font-weight: 600;
+        border-right: 1px solid #e3e8f2;
+    }
+    .player-quicknav a svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .player-quicknav a.active { color: #1d5fe0; box-shadow: inset 0 -3px 0 #1d5fe0; }
+    .player-quicknav a:active { background: #f1f5fb; }
+
+    /* ---- Front page ---- */
+    .sports-home { padding: 0 0 20px; gap: 0; }
+    .sports-hero { display: none; }
+    .home-mobile-banner { display: block; }
+    .home-mobile-banner .hero-banner { margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
+    .sports-home .win-ticker { margin: 8px 10px; }
+    .home-switch { display: flex; background: #e9edf4; }
+    .home-switch button, .home-switch a {
+        flex: 1 1 0; min-height: 50px; display: grid; place-items: center;
+        border: 0; background: transparent; color: #5a6480; cursor: pointer; text-decoration: none;
+        font: inherit; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .home-switch [aria-selected="true"] { background: #fff; color: #1d5fe0; box-shadow: inset 0 -3px 0 #1d5fe0; }
+    .sports-book { margin: 0; border: 0; border-radius: 0; box-shadow: none; scroll-margin-top: 60px; }
+    .sports-book iframe { height: calc(100dvh - 60px - 64px); min-height: 480px; }
+    .home-casino { padding: 14px 10px 0; }
+    .home-casino-head .sports-eyebrow { display: none; }
+    .home-casino-rail { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-columns: auto; gap: 12px 8px; padding: 0; overflow: visible; }
+    .home-casino-card .game-art { border-radius: 12px; }
+    .home-casino-card .game-info strong { font-size: 12px; }
+    .sports-home[data-view="sports"] .home-casino { display: none; }
+    .sports-home[data-view="casino"] .sports-book { display: none; }
+
+    /* ---- Bottom bar: a solid blue slab on the screen edge ---- */
+    .player-mobile-nav {
+        left: 0; right: 0; transform: none; width: 100%; max-width: none; bottom: 0;
+        height: calc(64px + var(--safe-b)); padding: 0 0 var(--safe-b);
+        border: 0; border-radius: 0;
+        background: linear-gradient(180deg, #0f3fa6, #0b2f85);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+        box-shadow: 0 -8px 24px rgba(4, 12, 40, .45);
+    }
+    .player-mobile-nav a, .player-mobile-nav button { color: #fff; gap: 5px; border-radius: 0; }
+    .player-mobile-nav svg.nav-icon { width: 24px; height: 24px; }
+    .player-mobile-nav strong { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .player-mobile-nav a:hover, .player-mobile-nav button:hover { color: #fff; }
+    .player-mobile-nav a.active, .player-mobile-nav button.active,
+    .player-mobile-nav a.active strong, .player-mobile-nav button.active strong { color: var(--brand-gold); }
+    .player-mobile-nav a.active svg.nav-icon, .player-mobile-nav button.active svg.nav-icon { filter: none; }
+    .member-lobby, .player-stage, body.player-guest > main { padding-bottom: calc(64px + var(--safe-b) + 16px); }
+    .player-content-column .site-footer { margin-bottom: calc(64px + var(--safe-b)); }
+}
+
+/* Guest pages (marketing header) take the same phone chrome as the player shell. */
+@media (max-width: 700px) {
+    body.player-guest .site-header {
+        background: linear-gradient(180deg, #0f3fa6, #0b2f85);
+        border-bottom: 0;
+        box-shadow: 0 6px 20px rgba(4, 12, 40, .45);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
+    body.player-guest .site-header .brand-logo { height: 26px; max-width: 120px; padding: 4px 8px; border-radius: 8px; box-shadow: none; }
+    body.player-guest .menu-toggle { border: 0; border-radius: 0; background: transparent; color: #fff; font-size: 24px; }
+    body.player-guest .header-actions .button { min-height: 38px; padding: 0 13px; border: 0; border-radius: 4px; box-shadow: none; color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    body.player-guest .header-actions .button-ghost { background: rgba(255, 255, 255, .22); }
+    body.player-guest .header-actions .button-primary { background: #2f7bff; }
+    body.player-guest .header-lang a { color: #fff; }
+    body.player-guest .header-lang a.active { background: rgba(255, 255, 255, .22); color: #fff; }
+    body.player-guest > main { padding-top: 0; }
+}

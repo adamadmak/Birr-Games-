@@ -200,6 +200,8 @@
                 <a class="brand player-brand" href="{{ url('/') }}" aria-label="Vamoseone home">
                     <img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async">
                 </a>
+                {{-- Phone only: the lobby carries the game search. --}}
+                <a class="player-search-link" href="{{ route('home') }}" aria-label="{{ __('Search games') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg></a>
 
                 <nav class="player-topnav" aria-label="Primary navigation">
                     <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}">{{ __('Sports') }}</a>
@@ -225,10 +227,8 @@
                             <span class="player-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                         </a>
                     @else
-                        <a class="player-deposit-btn" href="{{ route('login') }}">{{ __('Sign in') }}</a>
-                        <a class="player-profile-link" href="{{ route('register') }}" aria-label="Create an account">
-                            <span class="player-avatar">+</span>
-                        </a>
+                        <a class="player-auth-btn player-auth-login" href="{{ route('login') }}">{{ __('Log in') }}</a>
+                        <a class="player-auth-btn player-auth-register" href="{{ route('register') }}">{{ __('Register') }}</a>
                     @endauth
                 </div>
             </header>
@@ -306,6 +306,7 @@
             <button class="player-sidebar-overlay" type="button" data-player-sidebar-overlay aria-label="Close player navigation"></button>
 
             <div class="player-content-column">
+                @include('partials.mobile-quicknav')
                 @if (session('status'))<div class="flash flash-success">{{ session('status') }}</div>@endif
                 {{-- Pages that flash `error` mostly print it themselves — the Shamo page
                      does. This is the backstop for the ones that do not, so a refusal
@@ -380,6 +381,7 @@
                 <a class="button button-primary" href="{{ route('register') }}">{{ __('Create account') }}</a>
             </div>
         </header>
+        @include('partials.mobile-quicknav')
         @if (session('status'))<div class="flash flash-success">{{ session('status') }}</div>@endif
         @if (session('error'))<div class="flash flash-error">{{ session('error') }}</div>@endif
         @if ($errors->any())<div class="flash flash-error">{{ $errors->first() }}</div>@endif

@@ -6,7 +6,10 @@
 {{-- The front page. The sportsbook is the product; the hero above it is a
      short brand band, not a billboard, so the odds board starts within the
      first screen. A casino shelf under the book links through to /casino. --}}
-<div class="sports-home">
+<div class="sports-home" data-view="sports">
+    {{-- Phones get the lobby's promo banner instead of the brand band. --}}
+    <div class="home-mobile-banner">@include('partials.hero-banner')</div>
+
     <section class="sports-hero" aria-labelledby="sports-hero-title">
         <div class="sports-hero-pitch" aria-hidden="true"></div>
         <div class="sports-hero-copy">
@@ -31,6 +34,14 @@
     </section>
 
     @include('partials.win-ticker')
+
+    {{-- Phones: one thing at a time. The switch shows the book or the casino
+         shelf; desktop shows both and hides the switch. --}}
+    <div class="home-switch" role="tablist" aria-label="{{ __('Home sections') }}">
+        <button type="button" role="tab" aria-selected="true" data-home-view="sports">{{ __('Sports') }}</button>
+        <button type="button" role="tab" aria-selected="false" data-home-view="casino">{{ __('Casino') }}</button>
+        <a role="tab" aria-selected="false" href="{{ route('promotions') }}">{{ __('Promos') }}</a>
+    </div>
 
     <section class="sports-book" id="sportsbook" aria-label="{{ __('Sportsbook') }}">
         <iframe
@@ -64,4 +75,17 @@
         </section>
     @endif
 </div>
+<script>
+(function () {
+    var root = document.querySelector('.sports-home');
+    if (!root) return;
+    var tabs = root.querySelectorAll('[data-home-view]');
+    Array.prototype.forEach.call(tabs, function (tab) {
+        tab.addEventListener('click', function () {
+            root.setAttribute('data-view', tab.getAttribute('data-home-view'));
+            Array.prototype.forEach.call(tabs, function (t) { t.setAttribute('aria-selected', t === tab ? 'true' : 'false'); });
+        });
+    });
+})();
+</script>
 @endsection
