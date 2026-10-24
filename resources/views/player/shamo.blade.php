@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Shamo - Birr Games')
+@section('title', 'Shamo - Vamoseone')
 
 @section('content')
 <div class="player-account-page shamo-page">

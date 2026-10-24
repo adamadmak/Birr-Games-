@@ -10,7 +10,7 @@ class ShamoSeeder extends Seeder
     public function run(): void
     {
         ShamoCampaign::query()->updateOrCreate(
-            ['name' => 'Lucy Launch Sprint'],
+            ['name' => 'Vamoseone Launch Sprint'],
             [
                 'description' => 'Join the launch campaign, play local agents, and compete for demo-credit rewards.',
                 'entry_cost' => 250,

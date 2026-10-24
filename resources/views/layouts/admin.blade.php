@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') — Birr Games</title>
+    <title>@yield('title', 'Admin') — Vamoseone</title>
     <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/icons/icon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
@@ -39,7 +39,7 @@
 <body class="admin-body">
     <aside class="admin-sidebar" data-admin-sidebar>
         <div class="admin-brand">
-            <img class="admin-brand-logo" src="/logo.png" alt="Birr Games logo">
+            <img class="admin-brand-logo" src="/logo.png" alt="Vamoseone logo">
             <button type="button" data-sidebar-toggle aria-label="Toggle navigation"><i class="admin-collapse-icon fa-solid fa-table-columns"></i><i class="admin-close-icon fa-solid fa-xmark"></i></button>
         </div>
 

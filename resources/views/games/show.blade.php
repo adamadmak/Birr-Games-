@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $game->title.' — Birr Games')
+@section('title', $game->title.' — Vamoseone')
 
 @section('content')
 <div class="game-page">

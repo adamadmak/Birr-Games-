@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>{{ $game->title }} — Birr Games</title>
+    <title>{{ $game->title }} — Vamoseone</title>
     <script src="https://telegram.org/js/telegram-web-app.js?v=8.0"></script>
     <style>
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }

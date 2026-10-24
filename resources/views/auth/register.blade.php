@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Create an account — Birr Games')
+@section('title', 'Create an account — Vamoseone')
 
 @if ($turnstileSiteKey !== '')
     @push('head')

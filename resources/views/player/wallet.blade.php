@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Wallet - Birr Games')
+@section('title', 'My Wallet - Vamoseone')
 
 @section('content')
 @php

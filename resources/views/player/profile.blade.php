@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Profile - Birr Games')
+@section('title', 'My Profile - Vamoseone')
 
 @section('content')
 <div class="player-account-page profile-page">
@@ -12,7 +12,7 @@
 
     <section class="profile-hero-card">
         <div class="profile-avatar-large">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-        <div class="profile-identity"><small>Birr Games member</small><h2>{{ auth()->user()->name }}</h2><p>{{ auth()->user()->handle() }}{{ auth()->user()->phone ? ' · '.\App\Support\PhoneNumber::format(auth()->user()->phone) : '' }}</p></div>
+        <div class="profile-identity"><small>Vamoseone member</small><h2>{{ auth()->user()->name }}</h2><p>{{ auth()->user()->handle() }}{{ auth()->user()->phone ? ' · '.\App\Support\PhoneNumber::format(auth()->user()->phone) : '' }}</p></div>
         <a class="profile-wallet-link" href="{{ route('player.wallet') }}"><span>Birr balance</span><strong>{{ \App\Support\Money::format(auth()->user()->credits) }}</strong><small>Open wallet &#8594;</small></a>
     </section>
 

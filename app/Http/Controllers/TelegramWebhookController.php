@@ -265,7 +265,7 @@ class TelegramWebhookController
                     $telegram->mainMenuKeyboard()
                 );
             } elseif (str_starts_with($command, '/status')) {
-                $status = $subscriber->active ? 'Your Birr Games bot is active.' : 'Your bot is paused. Send /start to activate it.';
+                $status = $subscriber->active ? 'Your Vamoseone bot is active.' : 'Your bot is paused. Send /start to activate it.';
                 $account = $subscriber->user_id
                     ? ' Your player account is connected to '.e(PhoneNumber::format($subscriber->phone)).'.'
                     : ' Press Play Games to open your player account.';
@@ -276,7 +276,7 @@ class TelegramWebhookController
                 $subscriber->refresh();
                 $url = $players->createLoginLink($subscriber, 'lobby');
                 $message = $wasNew
-                    ? '<b>Your Birr Games account is ready! 🎉</b>'."\n\nWelcome balance: ".$this->birr($user->credits).'. Tap below to start playing.'
+                    ? '<b>Your Vamoseone account is ready! 🎉</b>'."\n\nWelcome balance: ".$this->birr($user->credits).'. Tap below to start playing.'
                     : '<b>Ready to play? 🎮</b>'."\n\nYour balance is ".$this->birr($user->credits).'. Tap below to open the games.';
                 $telegram->sendText($subscriber->chat_id, $message, [
                     ['text' => '🎮 Open Game', 'type' => 'web_app', 'value' => $url],
@@ -352,8 +352,8 @@ class TelegramWebhookController
         ]);
 
         $caption = '<b>Hey '.e($subscriber->first_name ?: 'Player')."! 👋</b>\n\n"
-            ."Birr Games needs your phone number before you can play.\n\n"
-            ."Tap <b>📱 Share My Phone Number</b> below. Telegram verifies the number for us, and if you already have a Birr Games account we reconnect you to it instead of creating a new one.\n\n"
+            ."Vamoseone needs your phone number before you can play.\n\n"
+            ."Tap <b>📱 Share My Phone Number</b> below. Telegram verifies the number for us, and if you already have a Vamoseone account we reconnect you to it instead of creating a new one.\n\n"
             .'Typing the number will not work — please use the button.';
 
         $logoPath = public_path('logo.png');
@@ -430,7 +430,7 @@ class TelegramWebhookController
                 .'⚠️ <b>Save this password.</b> Sign in on the website with your phone number and this password. '
                 .'Send /password any time to get a new one.';
         } elseif ($reconnected) {
-            $message .= "\n".'We reconnected you to your existing Birr Games account, so your balance and history are unchanged. '
+            $message .= "\n".'We reconnected you to your existing Vamoseone account, so your balance and history are unchanged. '
                 .'Send /password if you need a new website password.';
         } else {
             $message .= "\n".'Your player account is ready. Choose an action below.';

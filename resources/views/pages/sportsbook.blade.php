@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Sportsbook — Birr Games')
+@section('title', 'Sportsbook — Vamoseone')
 @section('content')
 @php
     /*

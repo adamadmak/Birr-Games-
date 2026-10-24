@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daily Tournament - Birr Games')
+@section('title', 'Daily Tournament - Vamoseone')
 
 @section('content')
 @php
@@ -149,7 +149,7 @@
     <section class="tn-how">
         <article><span>1</span><div><strong>Play any game</strong><p>Every bet you place today counts toward your total stake.</p></div></article>
         <article><span>2</span><div><strong>Climb the board</strong><p>The highest total stake takes first place. Ties go to whoever got there first.</p></div></article>
-        <article><span>3</span><div><strong>Get paid</strong><p>Prizes are paid by the Birr Games team after the board closes at midnight.</p></div></article>
+        <article><span>3</span><div><strong>Get paid</strong><p>Prizes are paid by the Vamoseone team after the board closes at midnight.</p></div></article>
     </section>
 </div>
 

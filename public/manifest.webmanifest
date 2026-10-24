@@ -1,7 +1,7 @@
 {
-    "name": "Birr Games",
-    "short_name": "Birr Games",
-    "description": "Birr Games is a local Ethiopian game experience with a Birr-denominated wallet.",
+    "name": "Vamoseone",
+    "short_name": "Vamoseone",
+    "description": "Vamoseone is a local Ethiopian game experience with a Birr-denominated wallet.",
     "id": "/",
     "start_url": "/?source=pwa",
     "scope": "/",

@@ -20,7 +20,7 @@ class VerifyEmailAddress extends Mailable
 
     public function envelope(): Envelope
     {
-        $site = (string) PlatformSetting::valueFor('site_title', config('app.name', 'Birr Games'));
+        $site = (string) PlatformSetting::valueFor('site_title', config('app.name', 'Vamoseone'));
 
         return new Envelope(subject: 'Confirm your email for '.$site);
     }
@@ -28,7 +28,7 @@ class VerifyEmailAddress extends Mailable
     public function content(): Content
     {
         return new Content(view: 'emails.verify-email', with: [
-            'site' => (string) PlatformSetting::valueFor('site_title', config('app.name', 'Birr Games')),
+            'site' => (string) PlatformSetting::valueFor('site_title', config('app.name', 'Vamoseone')),
             'hours' => \App\Services\EmailVerification::LINK_LIFETIME_HOURS,
         ]);
     }

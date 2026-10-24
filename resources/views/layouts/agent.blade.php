@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Agent Dashboard') · Birr Games</title>
+    <title>@yield('title', 'Agent Dashboard') · Vamoseone</title>
     <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/icons/icon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
@@ -24,7 +24,7 @@
 @php($currentAgent = auth('agent')->user())
 <div class="agent-shell" data-agent-shell>
     <aside class="agent-sidebar">
-        <div class="agent-brand"><img class="agent-brand-logo" src="/logo.png" alt="Birr Games logo"></div>
+        <div class="agent-brand"><img class="agent-brand-logo" src="/logo.png" alt="Vamoseone logo"></div>
         <nav class="agent-nav">
             <p>Agent dashboard</p>
             <a class="{{ request()->routeIs('agent.dashboard') ? 'active' : '' }}" href="{{ route('agent.dashboard') }}"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Stats</a>
