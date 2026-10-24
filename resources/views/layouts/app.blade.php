@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#0b0b0c">
+    <meta name="theme-color" content="#070d1c">
     <title>@yield('title', config('app.name'))</title>
     <meta name="description" content="Vamoseone is a local Ethiopian game experience with a Birr-denominated wallet.">
 
@@ -184,7 +184,7 @@
 @endphp
 <body class="@auth player-authenticated @else player-guest @endauth{{ $playerShell ? ' player-shell' : '' }}" data-telegram-user-id="{{ auth()->user()?->telegramSubscriber?->telegram_user_id }}">
     <div class="splash-screen" id="splashScreen">
-        <img class="splash-logo" src="{{ asset('logo.png') }}" alt="Vamoseone" width="866" height="288" fetchpriority="high" decoding="async">
+        <img class="splash-logo" src="{{ asset('logo.png') }}" alt="Vamoseone" width="816" height="306" fetchpriority="high" decoding="async">
         <div class="splash-loading-track">
             <div class="splash-loading-bar"></div>
         </div>
@@ -197,13 +197,13 @@
             <header class="player-topbar">
                 <button class="player-menu-toggle" type="button" data-player-menu-toggle aria-label="Open player navigation">&#9776;</button>
 
-                <a class="brand player-brand" href="{{ route('home') }}" aria-label="Vamoseone home">
-                    <img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="866" height="288" fetchpriority="high" decoding="async">
+                <a class="brand player-brand" href="{{ url('/') }}" aria-label="Vamoseone home">
+                    <img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async">
                 </a>
 
                 <nav class="player-topnav" aria-label="Primary navigation">
-                    <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Home') }}</a>
                     <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}">{{ __('Sports') }}</a>
+                    <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Casino') }}</a>
                     <a class="{{ request()->routeIs('promotions') ? 'active' : '' }}" href="{{ route('promotions') }}">{{ __('Promotions') }}</a>
                     @auth
                         @if (auth()->user()->isAdmin())<a href="{{ route('admin.dashboard') }}">{{ __('Admin') }}</a>@endif
@@ -255,8 +255,8 @@
 
                 <p class="side-heading">{{ __('Menu') }}</p>
                 <nav class="player-side-nav" aria-label="Player navigation">
-                    <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 00352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 00-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><circle cx="292" cy="224" r="20"/><path d="M336 288a20 20 0 1120-19.95A20 20 0 01336 288z"/><circle cx="336" cy="180" r="20"/><circle cx="380" cy="224" r="20"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96M208 224h-96"/></svg></span>{{ __('Lobby') }}</a>
                     <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><circle cx="256" cy="256" r="192" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 175.15l-76.09 63.83L200 320h112l20.09-81.02L256 175.15zM332.09 238.98l52.87-22.4 25.78-73.26M447 269.97l-62.04-53.39M179.91 238.98l-52.87-22.4-25.78-73.26M65 269.97l62.04-53.39M256 175.15v-57.57l64-42.64M192 74.93l64 42.65M312 320l28 48-28 71M410.74 368H342M200 320l-28 48 28.37 71.5M101.63 368H172"/></svg></span>{{ __('Sports') }}</a>
+                    <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 00352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 00-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><circle cx="292" cy="224" r="20"/><path d="M336 288a20 20 0 1120-19.95A20 20 0 01336 288z"/><circle cx="336" cy="180" r="20"/><circle cx="380" cy="224" r="20"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96M208 224h-96"/></svg></span>{{ __('Casino') }}</a>
                     <a class="{{ request()->routeIs('promotions') ? 'active' : '' }}" href="{{ route('promotions') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path d="M256 104v56h56a56 56 0 10-56-56zM256 104v56h-56a56 56 0 1156-56z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><rect x="64" y="160" width="384" height="112" rx="32" ry="32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M416 272v144a48 48 0 01-48 48H144a48 48 0 01-48-48V272M256 160v304" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg></span>{{ __('Promotions') }}</a>
                     @auth
                         <a class="{{ request()->routeIs('player.tournament') ? 'active' : '' }}" href="{{ route('player.tournament') }}"><span><svg class="side-ico" viewBox="0 0 512 512" width="18" height="18" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M176 464h160M256 464V336M384 224c0-50.64-.08-134.63-.12-160a16 16 0 00-16-16l-223.79.26a16 16 0 00-16 15.95c0 30.58-.13 129.17-.13 159.79 0 64.28 83 112 128 112S384 288.28 384 224z"/><path d="M128 96H48v16c0 55.22 33.55 112 80 112M384 96h80v16c0 55.22-33.55 112-80 112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg></span>{{ __('Daily Tournament') }}</a>
@@ -322,7 +322,7 @@
                 @endauth
                 <main class="player-stage">@yield('content')</main>
                 <footer class="site-footer player-footer">
-                    <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="866" height="288" fetchpriority="high" decoding="async"></a><p>Original local games with an Ethiopian Birr-denominated wallet.</p></div>
+                    <div><a class="brand footer-brand" href="{{ url('/') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a><p>Original local games with an Ethiopian Birr-denominated wallet.</p></div>
                     <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ auth()->check() ? route('player.wallet') : route('login') }}">{{ __('Birr wallet') }}</a></div>
                     <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a href="{{ route('about') }}">{{ __('About Vamoseone') }}</a><span>18+ interface concept</span></div>
                     <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
@@ -330,13 +330,13 @@
             </div>
 
             <nav class="player-mobile-nav" aria-label="Mobile navigation">
-                <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}">
-                    <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path fill="none" stroke-miterlimit="10" stroke-width="32" d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 0 0 352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 0 0-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z"></path><circle cx="292" cy="224" r="20"></circle><path d="M336 288a20 20 0 1 1 20-19.95A20 20 0 0 1 336 288z"></path><circle cx="336" cy="180" r="20"></circle><circle cx="380" cy="224" r="20"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96m48-48h-96"></path></svg>
-                    <strong>{{ __('Games') }}</strong>
-                </a>
                 <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}">
                     <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><circle cx="256" cy="256" r="192" fill="none" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m256 175.15-76.09 63.83L200 320h112l20.09-81.02L256 175.15zm76.09 63.83 52.87-22.4 25.78-73.26M447 269.97l-62.04-53.39m-205.05 22.4-52.87-22.4-25.78-73.26M65 269.97l62.04-53.39M256 175.15v-57.57l64-42.64m-128-.01 64 42.65M312 320l28 48-28 71m98.74-71H342m-142-48-28 48 28.37 71.5M101.63 368H172"></path></svg>
                     <strong>{{ __('Sports') }}</strong>
+                </a>
+                <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}">
+                    <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path fill="none" stroke-miterlimit="10" stroke-width="32" d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 0 0 352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 0 0-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z"></path><circle cx="292" cy="224" r="20"></circle><path d="M336 288a20 20 0 1 1 20-19.95A20 20 0 0 1 336 288z"></path><circle cx="336" cy="180" r="20"></circle><circle cx="380" cy="224" r="20"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96m48-48h-96"></path></svg>
+                    <strong>{{ __('Casino') }}</strong>
                 </a>
                 <a class="{{ request()->routeIs('player.wallet') ? 'active' : '' }}" href="{{ auth()->check() ? route('player.wallet') : route('login') }}">
                     <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><rect width="416" height="288" x="48" y="144" fill="none" stroke-linejoin="round" stroke-width="32" rx="48" ry="48"></rect><path fill="none" stroke-linejoin="round" stroke-width="32" d="M411.36 144v-30A50 50 0 0 0 352 64.9L88.64 109.85A50 50 0 0 0 48 159v49"></path><path d="M368 320a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"></path></svg>
@@ -358,11 +358,11 @@
         </div>
     @else
         <header class="site-header">
-            <a class="brand" href="{{ route('home') }}" aria-label="Vamoseone home"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="866" height="288" fetchpriority="high" decoding="async"></a>
+            <a class="brand" href="{{ url('/') }}" aria-label="Vamoseone home"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a>
             <button class="menu-toggle" type="button" data-menu-toggle aria-label="Toggle navigation">&#9776;</button>
             <nav class="main-nav" data-menu>
-                <a class="{{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Lobby') }}</a>
                 <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}">{{ __('Sports') }}</a>
+                <a class="{{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Casino') }}</a>
                 <a class="{{ request()->routeIs('promotions') ? 'active' : '' }}" href="{{ route('promotions') }}">{{ __('Promotions') }}</a>
                 <a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a>
             </nav>
@@ -385,16 +385,20 @@
         @if ($errors->any())<div class="flash flash-error">{{ $errors->first() }}</div>@endif
         <main>@yield('content')</main>
         <footer class="site-footer">
-            <div><a class="brand footer-brand" href="{{ route('home') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="866" height="288" fetchpriority="high" decoding="async"></a><p>Original entertainment built for Ethiopia with Birr-denominated play.</p></div>
+            <div><a class="brand footer-brand" href="{{ url('/') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a><p>Original entertainment built for Ethiopia with Birr-denominated play.</p></div>
             <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ route('about') }}">{{ __('About Vamoseone') }}</a></div>
             <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a class="footer-telegram" href="{{ \App\Models\PlatformSetting::telegramSupportUrl() }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 240 240" width="18" height="18" aria-hidden="true"><circle cx="120" cy="120" r="120" fill="#29a9eb"></circle><path fill="#fff" d="m53 122 130-50c6-2 11 1 9 10l-22 104c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 4-8 4l3-40 73-66c3-3-1-4-4-2l-90 57-39-12c-8-3-8-9 2-12z"></path></svg><span>{{ __('Chat with support') }}</span></a><span>Play-money experience</span><span>18+ interface concept</span></div>
             <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
         </footer>
 
         <nav class="player-mobile-nav" aria-label="Mobile navigation">
+            <a class="{{ request()->routeIs('sportsbook') ? 'active' : '' }}" href="{{ route('sportsbook') }}">
+                    <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><circle cx="256" cy="256" r="192" fill="none" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m256 175.15-76.09 63.83L200 320h112l20.09-81.02L256 175.15zm76.09 63.83 52.87-22.4 25.78-73.26M447 269.97l-62.04-53.39m-205.05 22.4-52.87-22.4-25.78-73.26M65 269.97l62.04-53.39M256 175.15v-57.57l64-42.64m-128-.01 64 42.65M312 320l28 48-28 71m98.74-71H342m-142-48-28 48 28.37 71.5M101.63 368H172"></path></svg>
+                    <strong>{{ __('Sports') }}</strong>
+                </a>
             <a class="{{ request()->routeIs('home', 'games.*') ? 'active' : '' }}" href="{{ route('home') }}">
                 <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><path fill="none" stroke-miterlimit="10" stroke-width="32" d="M467.51 248.83c-18.4-83.18-45.69-136.24-89.43-149.17A91.5 91.5 0 0 0 352 96c-26.89 0-48.11 16-96 16s-69.15-16-96-16a99.09 99.09 0 0 0-27.2 3.66C89 112.59 61.94 165.7 43.33 248.83c-19 84.91-15.56 152 21.58 164.88 26 9 49.25-9.61 71.27-37 25-31.2 55.79-40.8 119.82-40.8s93.62 9.6 118.66 40.8c22 27.41 46.11 45.79 71.42 37.16 41.02-14.01 40.44-79.13 21.43-165.04z"></path><circle cx="292" cy="224" r="20"></circle><path d="M336 288a20 20 0 1 1 20-19.95A20 20 0 0 1 336 288z"></path><circle cx="336" cy="180" r="20"></circle><circle cx="380" cy="224" r="20"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 176v96m48-48h-96"></path></svg>
-                <strong>{{ __('Home') }}</strong>
+                <strong>{{ __('Casino') }}</strong>
             </a>
             <a class="{{ request()->routeIs('player.wallet') ? 'active' : '' }}" href="{{ route('login') }}">
                 <svg class="nav-icon" viewBox="0 0 512 512" width="19" height="19" stroke="currentColor" fill="currentColor" stroke-width="0" aria-hidden="true"><rect width="416" height="288" x="48" y="144" fill="none" stroke-linejoin="round" stroke-width="32" rx="48" ry="48"></rect><path fill="none" stroke-linejoin="round" stroke-width="32" d="M411.36 144v-30A50 50 0 0 0 352 64.9L88.64 109.85A50 50 0 0 0 48 159v49"></path><path d="M368 320a32 32 0 1 1 32-32 32 32 0 0 1-32 32z"></path></svg>

@@ -436,5 +436,5 @@ button.is-busy::after, .is-busy[type="submit"]::after {
 .agent-theme-button:hover { opacity: 1; }
 .agent-theme-button:focus-visible { opacity: 1; outline: 2px solid var(--agent-teal); outline-offset: 2px; }
 
-/* The logo's lettering is cream, made for a dark ground; this portal is light by default. */
-.agent-brand-logo { height: 28px; width: auto; padding: 6px 10px; background: #0b0d10; border-radius: 10px; box-sizing: content-box; object-fit: contain; }
+/* The logo is blue on a light ground; this portal is light by default. */
+.agent-brand-logo { height: 28px; width: auto; padding: 6px 10px; background: #ffffff; border-radius: 10px; box-sizing: content-box; object-fit: contain; }

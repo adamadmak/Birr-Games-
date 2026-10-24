@@ -32,11 +32,11 @@
     --on-solid: #0d1219;
 
     /* --- brand accent ---------------------------------------------------- */
-    --primary: #17e495;
-    --primary-ink: #3df7af;
-    --primary-deep: #0dc07a;
-    --primary-soft: rgba(23,228,149, .14);
-    --primary-line: rgba(23,228,149, .30);
+    --primary: #2f7bff;
+    --primary-ink: #6ea4ff;
+    --primary-deep: #1d5fe0;
+    --primary-soft: rgba(47,123,255, .16);
+    --primary-line: rgba(47,123,255, .34);
     --on-primary: #ffffff;
 
     /* --- semantic -------------------------------------------------------- */
@@ -2001,9 +2001,9 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
 .form-section > label, .form-grid-2 > label { align-content: start; }
 
 /* ---------- Brand in the staff sidebars -------------------------------------
-   The logo's lettering is cream, made for a dark ground. The admin and agent
+   The logo is blue on a light ground. The admin and agent
    screens are light by default, where it vanished, so the logo sits on a dark
    chip that reads on either theme. */
-.admin-brand-logo, .agent-brand-logo { padding: 6px 10px; background: #0b0d10; border-radius: 10px; box-sizing: content-box; }
+.admin-brand-logo, .agent-brand-logo { padding: 6px 10px; background: #ffffff; border-radius: 10px; box-sizing: content-box; }
 .admin-brand-logo { height: 28px; }
 .agent-brand-logo { height: 28px; }

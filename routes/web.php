@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PlayerReportController as AdminPlayerReportContro
 use App\Http\Controllers\Admin\QuickSearchController as AdminQuickSearchController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\LobbyController;
+use App\Http\Controllers\SportsHomeController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\PlayerDepositController;
 use App\Http\Controllers\PlayerPromotionController;
@@ -31,7 +32,11 @@ use App\Http\Controllers\TelegramWebAppAuthController;
 use App\Http\Controllers\AgentPortalController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [LobbyController::class, 'index'])->name('home');
+// The sportsbook is the front page; the casino lobby keeps its route name so
+// every lobby link, filter form and pager keeps working from /casino.
+Route::get('/', [SportsHomeController::class, 'index'])->name('sportsbook');
+Route::get('/casino', [LobbyController::class, 'index'])->name('home');
+Route::redirect('/sportsbook', '/', 301);
 Route::get('/promotions', [LobbyController::class, 'promotions'])->name('promotions');
 
 // Operator-uploaded hero artwork, served from the database (see App\Models\SiteMedia).
@@ -52,7 +57,6 @@ Route::get('/language/{locale}', function (string $locale) {
         $locale
     ));
 })->name('language.switch');
-Route::view('/sportsbook', 'pages.sportsbook')->name('sportsbook');
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/responsible-play', 'pages.responsible')->name('responsible');
 Route::get('/telegram/login/{token}', TelegramLoginController::class)
