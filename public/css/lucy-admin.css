@@ -2007,3 +2007,29 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
 .admin-brand-logo, .agent-brand-logo { padding: 6px 10px; background: #ffffff; border-radius: 10px; box-sizing: content-box; }
 .admin-brand-logo { height: 28px; }
 .agent-brand-logo { height: 28px; }
+
+/* ---------- Sports: bet tickets ---------------------------------------------
+   The WinHouse ticket list and its receipt links. Table chrome is the casino
+   transaction table; only the ticket-specific bits are here. */
+.sports-ticket-notice { display: grid; gap: 4px; margin-bottom: 16px; }
+.sports-ticket-code { font-size: 12px; padding: 3px 7px; border-radius: 6px; background: var(--surface-3); color: var(--ink); }
+.sports-ticket-table td small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+.sports-ticket-selections summary { cursor: pointer; color: var(--primary-ink); font-weight: 600; list-style: none; }
+.sports-ticket-selections summary::-webkit-details-marker { display: none; }
+.sports-ticket-selections summary::after { content: " ▾"; font-size: 10px; }
+.sports-ticket-selections[open] summary::after { content: " ▴"; }
+.sports-ticket-selections ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; min-width: 240px; }
+.sports-ticket-selections li { display: grid; gap: 1px; padding: 6px 8px; border-radius: 8px; background: var(--surface-2); font-size: 12px; }
+.sports-ticket-selections li span { color: var(--ink-2); }
+.sports-ticket-selections li em { font-style: normal; color: var(--muted); font-size: 11px; }
+.sports-ticket-muted { color: var(--faint); }
+.sports-ticket-status { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border: 1px solid transparent; }
+.sports-ticket-status.open { color: var(--info); background: rgba(90, 162, 255, .12); border-color: rgba(90, 162, 255, .3); }
+.sports-ticket-status.won { color: var(--success); background: rgba(53, 209, 139, .12); border-color: rgba(53, 209, 139, .3); }
+.sports-ticket-status.lost { color: var(--danger); background: rgba(255, 100, 112, .12); border-color: rgba(255, 100, 112, .3); }
+.sports-ticket-status.void { color: var(--warn); background: rgba(245, 183, 61, .12); border-color: rgba(245, 183, 61, .3); }
+.sports-ticket-actions { white-space: nowrap; }
+.sports-ticket-actions .casino-page-button { margin-left: 4px; }
+.sports-ticket-footnote { margin: 14px 2px 0; color: var(--muted); font-size: 12px; }
+.sports-ticket-footnote code { font-size: 11px; }
+.sports-ticket-live { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background: rgba(255, 100, 112, .16); color: var(--danger); font-size: 9px; font-style: normal; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; vertical-align: 1px; }

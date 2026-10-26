@@ -61,6 +61,8 @@ return [
         'iframe_key' => env('WINHOUSE_IFRAME_KEY'),
         'api_key' => env('WINHOUSE_API_KEY'),
         'callback_token' => env('WINHOUSE_CALLBACK_TOKEN'),
+        // Optional CA bundle for the tickets API client, like the Telegram one.
+        'ca_bundle' => env('WINHOUSE_CA_BUNDLE'),
     ],
 
     'postmark' => [

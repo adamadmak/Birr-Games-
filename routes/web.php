@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PaymentGatewayController as AdminPaymentGatewayCo
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\CasinoReportController as AdminCasinoReportController;
 use App\Http\Controllers\Admin\CasinoTransactionController as AdminCasinoTransactionController;
+use App\Http\Controllers\Admin\SportsTicketController as AdminSportsTicketController;
 use App\Http\Controllers\Admin\AgentController as AdminAgentController;
 use App\Http\Controllers\Admin\TelegramBroadcastController as AdminTelegramBroadcastController;
 use App\Http\Controllers\Admin\WageringController as AdminWageringController;
@@ -242,6 +243,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', 'audit.admi
     Route::get('/transactions/export', [AdminTransactionController::class, 'export'])->middleware('throttle:10,1')->name('transactions.export');
     Route::get('/casino/report', [AdminCasinoReportController::class, 'index'])->name('casino.report');
     Route::get('/casino/transactions', [AdminCasinoTransactionController::class, 'index'])->name('casino.transactions');
+    // Sportsbook tickets from WinHouse, with a printable receipt (SportsTicketController).
+    Route::get('/sports/tickets', [AdminSportsTicketController::class, 'index'])->name('sports.tickets');
+    Route::get('/sports/tickets/{ticket}/print', [AdminSportsTicketController::class, 'print'])->where('ticket', '[A-Za-z0-9_.:\-]{1,80}')->name('sports.tickets.print');
     Route::get('/payment-gateways', [AdminPaymentGatewayController::class, 'index'])->name('payment-gateways.index');
     Route::post('/payment-gateways', [AdminPaymentGatewayController::class, 'store'])->name('payment-gateways.store');
     Route::patch('/payment-gateways/{gateway}/toggle', [AdminPaymentGatewayController::class, 'toggle'])->name('payment-gateways.toggle');

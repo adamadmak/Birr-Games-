@@ -81,6 +81,9 @@
             <a class="{{ request()->routeIs('admin.casino.report') || request()->routeIs('admin.rounds.*') ? 'active' : '' }}" href="{{ route('admin.casino.report') }}" data-testid="nav-game-reports"><span><i class="fa-solid fa-chart-column"></i></span><em>Casino report</em></a>
             <a class="{{ request()->routeIs('admin.casino.transactions') ? 'active' : '' }}" href="{{ route('admin.casino.transactions') }}" data-testid="nav-casino-transactions"><span><i class="fa-solid fa-right-left"></i></span><em>Transactions</em></a>
 
+            <p>Sports</p>
+            <a class="{{ request()->routeIs('admin.sports.*') ? 'active' : '' }}" href="{{ route('admin.sports.tickets') }}" data-testid="nav-sports-tickets"><span><i class="fa-solid fa-ticket"></i></span><em>Bet tickets</em></a>
+
             <p>Growth</p>
             <a class="{{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}" href="{{ route('admin.promotions.index') }}" data-testid="nav-promotions"><span><i class="fa-solid fa-gift"></i></span><em>Promotions</em></a>
             <a class="{{ request()->routeIs('admin.wagering.*') ? 'active' : '' }}" href="{{ route('admin.wagering.index') }}" data-testid="nav-wagering"><span><i class="fa-solid fa-percent"></i></span><em>Wagering config</em></a>
