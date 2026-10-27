@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/agent-portal.css?v={{ @filemtime(public_path('css/agent-portal.css')) ?: time() }}">
     {{-- Shows what is being typed into a password box. A stored password is a
          bcrypt hash and cannot be turned back into text, so this is the only
@@ -82,7 +82,7 @@
     });
     const key = 'lucy-agent-theme';
     const apply = value => document.documentElement.dataset.agentTheme = value;
-    apply(localStorage.getItem(key) || 'dark');
+    apply(localStorage.getItem(key) || 'light');
     document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', () => {
         const next = document.documentElement.dataset.agentTheme === 'dark' ? 'light' : 'dark';
         localStorage.setItem(key, next); apply(next);

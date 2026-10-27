@@ -472,3 +472,58 @@ a.ops-count:focus-visible { outline: 2px solid var(--primary); outline-offset: 2
     .ops-welcome, .ops-security { animation: none; }
     .ops-welcome::after, .ops-chip i, .ops-security-head h2::before { animation: none; }
 }
+
+/* --- headline tiles ------------------------------------------------------- */
+/* Four figures with a fourteen-day line each, the way an operator reads a
+   period at a glance before the position and the ledger explain it. The
+   colour of each tile is one custom property, so the border, the icon, the
+   figure and the line always agree. */
+.ops-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--ops-gap);
+}
+.ops-kpi {
+    --kpi: var(--primary);
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding: 16px 18px 12px;
+    overflow: hidden;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--kpi);
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(16, 23, 32, .05);
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+a.ops-kpi:hover { box-shadow: 0 6px 18px rgba(16, 23, 32, .10); transform: translateY(-1px); }
+a.ops-kpi:focus-visible { outline: 2px solid var(--kpi); outline-offset: 2px; }
+.ops-kpi.is-ggr { --kpi: var(--success); }
+.ops-kpi.is-stake { --kpi: var(--m-blue); }
+.ops-kpi.is-in { --kpi: var(--info); }
+.ops-kpi.is-out { --kpi: var(--m-orange); }
+.ops-kpi-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.ops-kpi-label { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.ops-kpi-icon {
+    width: 36px; height: 36px; flex: 0 0 auto;
+    display: grid; place-items: center;
+    border-radius: 8px; color: var(--kpi);
+    background: color-mix(in srgb, var(--kpi) 12%, transparent);
+    font-size: 14px;
+}
+.ops-kpi-value {
+    font-size: clamp(22px, 2vw, 28px); font-weight: 700; line-height: 1.05;
+    letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--kpi);
+}
+.ops-kpi-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; }
+.ops-kpi-foot > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ops-spark { display: block; width: calc(100% + 36px); height: 34px; margin: 6px -18px -12px; }
+.ops-kpi polyline { stroke: var(--kpi); }
+.ops-kpi polygon { fill: var(--kpi); opacity: .10; }
+
+/* --- position beside the ledger ------------------------------------------ */
+.ops-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ops-gap); align-items: start; }
+.ops-two .ops-position { grid-template-columns: 1fr; align-items: start; align-self: stretch; }
+@media (max-width: 1100px) { .ops-two { grid-template-columns: 1fr; } }

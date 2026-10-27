@@ -16,6 +16,28 @@
             .'<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'.$arrow.'"/></svg>'
             .$sign.number_format($value, 1).'%</span>';
     };
+
+    /* A fourteen-day line under each headline figure, drawn from the same
+       series as the charts below. Colour comes from the tile (CSS), not here. */
+    $spark = function (array $series): string {
+        $series = array_map('floatval', array_values($series));
+        $n = count($series);
+        if ($n < 2) {
+            return '';
+        }
+        $min = min(min($series), 0.0);
+        $range = max(max($series) - $min, 0.0001);
+        $points = [];
+        foreach ($series as $i => $v) {
+            $points[] = round($i / ($n - 1) * 100, 2).','.round(26 - (($v - $min) / $range) * 22, 2);
+        }
+        $line = implode(' ', $points);
+
+        return '<svg class="ops-spark" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">'
+            .'<polygon points="0,28 '.$line.' 100,28"/>'
+            .'<polyline points="'.$line.'" fill="none" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+            .'</svg>';
+    };
 @endphp
 @php
     /* The period the operator is looking at, expressed the way each destination
@@ -86,6 +108,35 @@
     </form>
 </section>
 
+{{-- Four headline figures for the period, each with its fourteen-day line. --}}
+<section class="ops-kpis" aria-label="Headline figures">
+    <a class="ops-kpi is-ggr" href="{{ route('admin.casino.report') }}">
+        <div class="ops-kpi-top"><span class="ops-kpi-label">Gross gaming revenue</span><span class="ops-kpi-icon"><i class="fa-solid fa-sack-dollar"></i></span></div>
+        <strong class="ops-kpi-value">{{ \App\Support\Money::format($stats['ggr']) }}</strong>
+        <div class="ops-kpi-foot"><span>{{ $holdPct === null ? 'No rounds yet' : ($holdPct < 0 ? 'Players ahead' : 'House kept '.number_format($holdPct, 1).'%') }}</span>{!! $deltaChip($deltas['ggr'] ?? null) !!}</div>
+        {!! $spark($trend['ggr']) !!}
+    </a>
+    <a class="ops-kpi is-stake" href="{{ route('admin.rounds.index', $windowDates) }}">
+        <div class="ops-kpi-top"><span class="ops-kpi-label">Staked</span><span class="ops-kpi-icon"><i class="fa-solid fa-dice"></i></span></div>
+        <strong class="ops-kpi-value">{{ \App\Support\Money::format($stats['volume']) }}</strong>
+        <div class="ops-kpi-foot"><span>{{ number_format($stats['bets']) }} {{ \Illuminate\Support\Str::plural('round', $stats['bets']) }} · avg {{ \App\Support\Money::format($stats['average']) }}</span>{!! $deltaChip($deltas['volume'] ?? null) !!}</div>
+        {!! $spark($trend['volume']) !!}
+    </a>
+    <a class="ops-kpi is-in" href="{{ route('admin.transactions.index', $ledgerWindow + ['type' => 'deposit', 'status' => 'success']) }}">
+        <div class="ops-kpi-top"><span class="ops-kpi-label">Deposits</span><span class="ops-kpi-icon"><i class="fa-solid fa-arrow-down-to-bracket"></i></span></div>
+        <strong class="ops-kpi-value">{{ \App\Support\Money::format($stats['deposits']) }}</strong>
+        <div class="ops-kpi-foot"><span>{{ number_format($stats['depositCount']) }} settled</span>{!! $deltaChip($deltas['deposits'] ?? null) !!}</div>
+        {!! $spark($trend['deposits']) !!}
+    </a>
+    <a class="ops-kpi is-out" href="{{ route('admin.transactions.index', $ledgerWindow + ['type' => 'withdrawal', 'status' => 'success']) }}">
+        <div class="ops-kpi-top"><span class="ops-kpi-label">Withdrawals</span><span class="ops-kpi-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span></div>
+        <strong class="ops-kpi-value">{{ \App\Support\Money::format($stats['withdrawals']) }}</strong>
+        <div class="ops-kpi-foot"><span>{{ number_format($stats['withdrawalCount']) }} paid out · net {{ \App\Support\Money::format($stats['netCash']) }}</span>{!! $deltaChip($deltas['withdrawals'] ?? null) !!}</div>
+        {!! $spark($trend['withdrawals']) !!}
+    </a>
+</section>
+
+<div class="ops-two">
 {{-- The house's position for the period, and the two flows that produce it. --}}
 <section class="ops-position" data-testid="metric-ggr">
     <div class="ops-position-figure">
@@ -155,6 +206,7 @@
     </a>
 </section>
 @endif
+</div>
 
 {{-- Counts, kept deliberately quiet: they are context, not the job. --}}
 <section class="ops-counts">

@@ -46,20 +46,20 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
 :root,
 [data-agent-theme="dark"] {
     color-scheme: dark;
-    --agent-bg: #07120e;
-    --agent-panel: #0e1c17;
-    --agent-panel-2: #0f221b;
-    --agent-line: #1b332a;
-    --agent-line-strong: #2a463b;
-    --agent-text: #e6f4ef;
-    --agent-muted: #8f9c85;
-    --agent-faint: #6a7860;
+    --agent-bg: #070d1c;
+    --agent-panel: #0e1830;
+    --agent-panel-2: #142040;
+    --agent-line: #1f2d4d;
+    --agent-line-strong: #2c3d66;
+    --agent-text: #eef2f6;
+    --agent-muted: #8e9bab;
+    --agent-faint: #64717f;
 
-    --agent-teal: #17e495;            /* legacy alias — now the brand lime */
-    --agent-teal-soft: rgba(23,228,149, .14);
-    --agent-accent: #17e495;
-    --agent-accent-deep: #0dc07a;
-    --agent-accent-line: rgba(23,228,149, .30);
+    --agent-teal: #2f7bff;            /* legacy alias — now the brand lime */
+    --agent-teal-soft: rgba(47,123,255, .16);
+    --agent-accent: #2f7bff;
+    --agent-accent-deep: #1d5fe0;
+    --agent-accent-line: rgba(47,123,255, .34);
     --agent-on-accent: #ffffff;
 
     --agent-blue: #5aa2ff;   --agent-blue-soft: rgba(90, 162, 255, .14);
@@ -68,7 +68,7 @@ svg, nav[role="navigation"] svg, .pagination svg, .simple-pagination svg, .agent
     --agent-pink: #ff6470;   --agent-pink-soft: rgba(255, 100, 112, .14);
 
     --agent-shadow: 0 18px 40px rgba(0, 0, 0, .45);
-    --agent-glass: rgba(15,34,27, .72);
+    --agent-glass: rgba(14,24,48, .78);
 }
 
 [data-agent-theme="light"] {
@@ -438,3 +438,70 @@ button.is-busy::after, .is-busy[type="submit"]::after {
 
 /* The logo is blue on a light ground; this portal is light by default. */
 .agent-brand-logo { height: 28px; width: auto; padding: 6px 10px; background: #ffffff; border-radius: 10px; box-sizing: content-box; object-fit: contain; }
+
+
+/* ============================================================================
+   CONSOLE LOOK — matches the admin console (October 2026)
+   Source Sans, a navy sidebar with a solid blue active item, a light grey
+   page, white cards with hairline borders and square corners, uppercase stat
+   labels, striped tables and solid pills. Light is the default; the dark
+   theme stays on the toggle and is untouched.
+   ========================================================================== */
+[data-agent-theme="light"] {
+    --agent-bg: #f4f6f9;
+    --agent-panel: #ffffff;
+    --agent-panel-2: #f8f9fb;
+    --agent-line: #dfe3e8;
+    --agent-line-strong: #c9d1da;
+    --agent-text: #1f2d3d;
+    --agent-muted: #6c7a89;
+    --agent-faint: #98a4b3;
+    --agent-teal: #1b6ef3;
+    --agent-teal-soft: rgba(27, 110, 243, .10);
+    --agent-accent: #1b6ef3;
+    --agent-accent-deep: #0f4fb3;
+    --agent-accent-line: rgba(27, 110, 243, .30);
+    --agent-shadow: 0 1px 2px rgba(16, 23, 32, .05);
+}
+body { font-family: "Source Sans 3", "Source Sans Pro", Inter, system-ui, sans-serif; }
+
+[data-agent-theme="light"] .agent-sidebar { background: #0f1b3d; border-right: 0; }
+[data-agent-theme="light"] .agent-brand { margin-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+[data-agent-theme="light"] .agent-nav p { color: #8290b3; }
+[data-agent-theme="light"] .agent-nav a { color: #c9d3e6; border-radius: 6px; }
+[data-agent-theme="light"] .agent-nav a span,
+[data-agent-theme="light"] .agent-nav a .ag-nav-ico { color: #8290b3; }
+[data-agent-theme="light"] .agent-nav a:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+[data-agent-theme="light"] .agent-nav a.active { color: #fff; background: #1b6ef3; font-weight: 600; }
+[data-agent-theme="light"] .agent-nav a.active span,
+[data-agent-theme="light"] .agent-nav a.active .ag-nav-ico,
+[data-agent-theme="light"] .agent-nav a:hover span,
+[data-agent-theme="light"] .agent-nav a:hover .ag-nav-ico { color: #fff; }
+[data-agent-theme="light"] .agent-profile-chip { color: #fff; border-top-color: rgba(255, 255, 255, .08); }
+[data-agent-theme="light"] .agent-profile-chip > span { color: #fff; border-color: rgba(255, 255, 255, .2); }
+[data-agent-theme="light"] .agent-profile-chip small,
+[data-agent-theme="light"] .agent-profile-chip form button,
+[data-agent-theme="light"] .agent-sidebar .agent-theme-button { color: #8290b3; }
+
+[data-agent-theme="light"] .agent-stat,
+[data-agent-theme="light"] .agent-panel,
+[data-agent-theme="light"] .agent-account,
+[data-agent-theme="light"] .agent-form-card,
+[data-agent-theme="light"] .agent-login-card { border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 23, 32, .05); }
+[data-agent-theme="light"] .agent-stat p { color: var(--agent-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+[data-agent-theme="light"] .agent-stat strong { font-size: 26px; font-weight: 700; }
+[data-agent-theme="light"] .agent-page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: 0; }
+[data-agent-theme="light"] .agent-page-head p { color: var(--agent-teal); }
+[data-agent-theme="light"] .agent-button,
+[data-agent-theme="light"] .agent-primary,
+[data-agent-theme="light"] .agent-toolbar input,
+[data-agent-theme="light"] .agent-toolbar select,
+[data-agent-theme="light"] .agent-form input,
+[data-agent-theme="light"] .agent-form select,
+[data-agent-theme="light"] .agent-form textarea { border-radius: 4px; }
+[data-agent-theme="light"] .agent-table th { color: var(--agent-text); background: var(--agent-panel); font-size: 12.5px; text-transform: none; letter-spacing: 0; border-bottom: 2px solid var(--agent-line); }
+[data-agent-theme="light"] .agent-table tbody tr:nth-child(even) td { background: var(--agent-panel-2); }
+[data-agent-theme="light"] .agent-badge { border-radius: 3px; }
+[data-agent-theme="light"] .agent-badge.success { color: #fff; background: #28a745; }
+[data-agent-theme="light"] .agent-badge.rejected,
+[data-agent-theme="light"] .agent-badge.cancelled { color: #fff; background: #dc3545; }
