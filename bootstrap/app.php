@@ -35,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'trim',
             explode(',', (string) env('TRUSTED_PROXIES', 'REMOTE_ADDR'))
         )));
+        // The site is behind Cloudflare: its edges are forwarding proxies too, or
+        // every visitor would carry a Cloudflare address (App\Support\Cloudflare).
+        $trustedProxies = array_values(array_unique(array_merge($trustedProxies, \App\Support\Cloudflare::ranges())));
         $middleware->trustProxies(at: $trustedProxies, headers:
             \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
             \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
