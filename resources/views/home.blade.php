@@ -79,6 +79,13 @@
 (function () {
     var root = document.querySelector('.sports-home');
     if (!root) return;
+    // The book posts this when a signed-out player taps Log in inside it
+    // (WinHouse docs §3); the site's own login is the only sign-in.
+    window.addEventListener('message', function (event) {
+        if (event.origin === 'https://iframe.winhouse.bet' && event.data && event.data.type === 'winhouse:login-required') {
+            window.location.href = @json(route('login'));
+        }
+    });
     var tabs = root.querySelectorAll('[data-home-view]');
     Array.prototype.forEach.call(tabs, function (tab) {
         tab.addEventListener('click', function () {

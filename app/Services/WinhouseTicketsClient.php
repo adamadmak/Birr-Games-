@@ -21,8 +21,11 @@ use Throwable;
  *
  * Probed the same day. The endpoint identifies the operator by a
  * `customer_key` query parameter, which is the iframe key, and takes the API
- * key in the headers. It pages with `limit` and `offset` (`page` is ignored),
- * filters by `status`, and answers `{ total, tickets: [...] }` where a ticket is
+ * key in the headers. Their docs/agent.md §4.7 names the headers X-Customer-Key
+ * and Authorization: Bearer, the filters `player_id`, `status` (open, pending,
+ * won, lost, cashed_out, cancelled, rejected), `from`/`to` (ISO, `to` exclusive),
+ * and paging with `limit` (max 200) and `offset`. It answers
+ * `{ total, tickets: [...] }` where a ticket is
  *
  *   { ticket_id, player_id: "player_12", username: "<tenant>_player_12",
  *     status: open|won|lost|void, type: single|multiple, placed_at, settled_at,
@@ -39,7 +42,7 @@ final class WinhouseTicketsClient
     public const DEFAULT_BASE_URL = 'https://iframe.winhouse.bet';
 
     /** The most tickets one call asks for when a filter has to be applied here. */
-    public const SCAN_LIMIT = 500;
+    public const SCAN_LIMIT = 200;   // the API caps limit at 200
 
     /** @var list<string> */
     private const TICKET_LISTS = ['tickets', 'data', 'items', 'results'];
@@ -111,7 +114,7 @@ final class WinhouseTicketsClient
             // fall through to the scan
         }
 
-        for ($offset = 0; $offset < 5 * self::SCAN_LIMIT; $offset += self::SCAN_LIMIT) {
+        for ($offset = 0; $offset < 10 * self::SCAN_LIMIT; $offset += self::SCAN_LIMIT) {
             $page = $this->tickets(['limit' => self::SCAN_LIMIT, 'offset' => $offset]);
             if (! $page['ok']) {
                 return null;
@@ -151,7 +154,8 @@ final class WinhouseTicketsClient
         // is sent the two usual ways at once; the server reads the one it knows.
         $request = Http::baseUrl(self::baseUrl())
             ->acceptJson()
-            ->withHeaders(['X-API-Key' => $key])
+            // Documented (docs/agent.md §4.7): X-Customer-Key plus a Bearer API key.
+            ->withHeaders(['X-Customer-Key' => Winhouse::iframeKey(), 'X-API-Key' => $key])
             ->withToken($key)
             ->connectTimeout(5)
             ->timeout(20)

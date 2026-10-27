@@ -5,7 +5,7 @@
     $pageUrl = fn (int $p) => route('admin.sports.tickets', array_filter(array_merge(request()->except('page'), ['page' => $p]), fn ($v) => $v !== null && $v !== ''));
     $statusClass = fn (string $s) => match ($s) {
         'won', 'win', 'paid', 'cashout', 'cashed_out' => 'won',
-        'lost', 'lose', 'loss' => 'lost',
+        'lost', 'lose', 'loss', 'rejected' => 'lost',
         'void', 'cancelled', 'canceled', 'refunded' => 'void',
         default => 'open',
     };
@@ -29,7 +29,7 @@
     <label class="casino-search-box"><i class="fa-solid fa-ticket"></i><input type="search" name="ticket" value="{{ $ticketSearch }}" placeholder="Ticket number..."></label>
     <label class="casino-search-box"><i class="fa-solid fa-phone"></i><input type="search" name="phone" value="{{ $phone }}" placeholder="Player phone or name..."></label>
     <details class="casino-filter-menu"><summary><i class="fa-regular fa-calendar"></i> {{ $date ? $date->format('d M Y') : 'Date' }}</summary><div><label>Placed on<input type="date" name="date" value="{{ $date?->toDateString() }}"></label></div></details>
-    <details class="casino-filter-menu"><summary><i class="fa-regular fa-circle-plus"></i> {{ $status !== '' ? ucfirst($status) : 'Status' }}</summary><div><label>Status<select name="status"><option value="">All statuses</option>@foreach(['open' => 'Open', 'won' => 'Won', 'lost' => 'Lost', 'void' => 'Void', 'cashout' => 'Cash out'] as $value => $label)<option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>@endforeach</select></label></div></details>
+    <details class="casino-filter-menu"><summary><i class="fa-regular fa-circle-plus"></i> {{ $status !== '' ? ucfirst($status) : 'Status' }}</summary><div><label>Status<select name="status"><option value="">All statuses</option>@foreach(['open' => 'Open', 'pending' => 'Pending', 'won' => 'Won', 'lost' => 'Lost', 'cashed_out' => 'Cashed out', 'cancelled' => 'Cancelled', 'rejected' => 'Rejected'] as $value => $label)<option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>@endforeach</select></label></div></details>
     <input type="hidden" name="per_page" value="{{ $perPage }}">
     <button class="casino-filter-submit" type="submit">Search</button>
     @if(request()->except(['page', 'per_page']))<a class="casino-filter-reset" href="{{ route('admin.sports.tickets') }}">Reset</a>@endif

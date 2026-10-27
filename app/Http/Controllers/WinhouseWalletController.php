@@ -278,13 +278,38 @@ class WinhouseWalletController
             return false;
         }
 
+        // Five fields, no separator, in this order; amount as it read on the
+        // wire (WinHouse docs §4.3). json_decode has already turned `-25` into a
+        // float, so it is put back the way JavaScript would print it.
         $base = (string) ($payload['username'] ?? '')
-            .(string) ($payload['amount'] ?? '')
+            .$this->wireString($payload['amount'] ?? '')
             .(string) ($payload['action'] ?? '')
             .(string) ($payload['ticket_id'] ?? '')
             .(string) ($payload['transaction_id'] ?? '');
 
         return hash_equals(hash_hmac('sha256', $base, $secret), $provided);
+    }
+
+    /**
+     * A JSON number the way its sender printed it: WinHouse sign the amount
+     * as `-25` or `-25.5`, never `-25.00`, and PHP's (string) of a float can
+     * differ from that (it rounds to 14 digits). Integral floats print without
+     * a fraction; others in the shortest round-trip form, which is what
+     * JavaScript's String() gives.
+     */
+    private function wireString(mixed $value): string
+    {
+        if (is_float($value)) {
+            if (floor($value) === $value && abs($value) < 1e15) {
+                return (string) (int) $value;
+            }
+
+            return rtrim(rtrim(sprintf('%.17g', $value), '0'), '.') === (string) $value
+                ? (string) $value
+                : json_encode($value);
+        }
+
+        return (string) $value;
     }
 
     private function user(string $token): ?User

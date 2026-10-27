@@ -38,11 +38,16 @@ class SportsTicketController
             ? User::query()->where('phone', 'like', '%'.$phone.'%')->orWhere('name', 'like', '%'.$phone.'%')->first()
             : null;
 
-        // WinHouse pages with limit/offset and filters by status. A ticket
-        // number, player or date is not a filter it knows, so for those the
-        // recent tickets are fetched in one go and sifted here.
-        $sift = $ticketSearch !== '' || $player !== null || $date !== null;
-        $query = ['status' => $status !== '' ? $status : null];
+        // WinHouse filters by player, status and placement date and pages with
+        // limit/offset. A ticket number is not a filter it knows, so for that the
+        // recent tickets are fetched in pages of the maximum and sifted here.
+        $sift = $ticketSearch !== '';
+        $query = [
+            'status' => $status !== '' ? $status : null,
+            'player_id' => $player ? 'player_'.$player->id : null,
+            'from' => $date?->toIso8601String(),
+            'to' => $date?->copy()->addDay()->toIso8601String(),
+        ];
         if ($sift) {
             $query['limit'] = WinhouseTicketsClient::SCAN_LIMIT;
             $query['offset'] = 0;
@@ -56,9 +61,6 @@ class SportsTicketController
         if ($result['ok']) {
             $tickets = collect($result['tickets'])
                 ->when($ticketSearch !== '', fn (Collection $c) => $c->filter(fn ($t) => str_contains(strtolower($t['id']), strtolower($ticketSearch))))
-                ->when($player, fn (Collection $c) => $c->filter(fn ($t) => $t['player_id'] === $player->id))
-                ->when($status !== '', fn (Collection $c) => $c->filter(fn ($t) => $t['status'] === $status))
-                ->when($date, fn (Collection $c) => $c->filter(fn ($t) => $t['placed_at'] !== null && $t['placed_at']->isSameDay($date)))
                 ->values();
             $total = $sift ? $tickets->count() : (int) ($result['meta']['total'] ?? $tickets->count());
             if ($sift) {
