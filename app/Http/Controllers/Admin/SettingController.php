@@ -616,6 +616,17 @@ class SettingController
             : back()->withErrors(['qtech' => 'QTech refused the connection: '.$result['message'].$seen]);
     }
 
+    /** Can this server reach BigBang, and from which address? See BigBangCasinoClient::probe(). */
+    public function testBigBang(\App\Services\BigBangCasinoClient $client): RedirectResponse
+    {
+        $result = $client->probe();
+        $seen = $result['egress_ip'] ? ' This server calls out from '.$result['egress_ip'].'.' : ' The outgoing address could not be read.';
+
+        return $result['ok']
+            ? back()->with('admin_status', 'BigBang connection OK — '.$result['message'].$seen)
+            : back()->withErrors(['bigbang' => $result['message'].$seen]);
+    }
+
     /**
      * Prove the saved WinHouse keys work by reading one ticket through their
      * tickets API: it is the one WinHouse call this site makes with the same

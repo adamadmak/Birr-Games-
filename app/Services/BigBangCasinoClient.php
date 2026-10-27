@@ -129,6 +129,60 @@ class BigBangCasinoClient
         return 'player_'.$user->id;
     }
 
+    /**
+     * Can this server reach BigBang with the key it holds?
+     *
+     * One catalogue page, because that is the cheapest authenticated call. It
+     * also reports the address BigBang see this server from: on 27 Oct 2026
+     * every call from the vamosonebet.com host timed out while connecting,
+     * while the same key answered at once from elsewhere, which is what an
+     * address missing from BigBang's allow-list looks like. The address is the
+     * one thing the operator needs to send them.
+     *
+     * @return array{ok: bool, message: string, egress_ip: string|null}
+     */
+    public function probe(): array
+    {
+        $egress = null;
+        try {
+            $caBundle = trim((string) config('services.bigbang.ca_bundle'));
+            $seen = Http::withOptions(['verify' => $caBundle !== '' ? $caBundle : true])->connectTimeout(4)->timeout(6)->get('https://api.ipify.org', ['format' => 'json']);
+            $egress = $seen->successful() ? (trim((string) ($seen->json('ip') ?? '')) ?: null) : null;
+        } catch (\Throwable) {
+            // Cosmetic. The call below is the real answer.
+        }
+
+        if (! $this->configured()) {
+            return ['ok' => false, 'message' => 'No BigBang API key is set on this server.', 'egress_ip' => $egress];
+        }
+
+        try {
+            $page = $this->catalogPage(1, 1);
+        } catch (\Illuminate\Http\Client\ConnectionException $exception) {
+            return [
+                'ok' => false,
+                'message' => 'BigBang did not answer from this server ('.self::shortCurl($exception->getMessage()).'). The key was never checked: the connection itself was dropped, which is what BigBang\'s IP allow-list does to an address it does not know.',
+                'egress_ip' => $egress,
+            ];
+        } catch (\Throwable $exception) {
+            return ['ok' => false, 'message' => $exception->getMessage(), 'egress_ip' => $egress];
+        }
+
+        $total = (int) (data_get($page, 'pagination.total') ?? count($page['data'] ?? []));
+
+        return ['ok' => true, 'message' => 'BigBang accepted the key at '.rtrim((string) config('services.bigbang.base_url'), '/').' ('.number_format($total).' game(s) in the catalogue, '.($this->sandbox() ? 'sandbox' : 'live').' mode).', 'egress_ip' => $egress];
+    }
+
+    /** "cURL error 28: Connection timed out after 5002 milliseconds (see https://…) for https://…" → "connection timed out". */
+    public static function shortCurl(string $message): string
+    {
+        if (preg_match('/cURL error (\d+): ([^(]+?)(?: \(see |$| for http)/i', $message, $m)) {
+            return strtolower(trim($m[2])).' (cURL '.$m[1].')';
+        }
+
+        return mb_substr($message, 0, 160);
+    }
+
     private function request(bool $retrySafe = false): PendingRequest
     {
         if (!$this->configured()) {

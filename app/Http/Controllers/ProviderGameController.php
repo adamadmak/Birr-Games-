@@ -46,9 +46,15 @@ class ProviderGameController
             $launchUrl = $this->validatedLaunchUrl((string) ($payload['launch_url'] ?? ''));
         } catch (Throwable $exception) {
             report($exception);
-            $message = $exception instanceof RuntimeException
-                ? $exception->getMessage()
-                : 'BigBang could not be reached. Check the provider API base URL and try again.';
+            // A dropped connection is not a wrong base URL: on 27 Oct 2026 it was
+            // BigBang's allow-list not knowing this server's address. Name that,
+            // and point at the test button that shows the address to send them.
+            $message = match (true) {
+                $exception instanceof \Illuminate\Http\Client\ConnectionException
+                    => 'BigBang did not answer from this server ('.\App\Services\BigBangCasinoClient::shortCurl($exception->getMessage()).'). An administrator can see the address BigBang need to allow under Configuration → System → Test BigBang connection.',
+                $exception instanceof RuntimeException => $exception->getMessage(),
+                default => 'BigBang could not be reached. Check the provider API base URL and try again.',
+            };
             return redirect()->route('games.show', $game)->withErrors(['provider' => $message]);
         }
 

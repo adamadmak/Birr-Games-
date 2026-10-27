@@ -153,6 +153,7 @@
                  whole document regardless of nesting. --}}
             <form id="qtech-test-form" method="POST" action="{{ route('admin.settings.qtech.test') }}">@csrf</form>
             <form id="winhouse-test-form" method="POST" action="{{ route('admin.settings.winhouse.test') }}">@csrf</form>
+            <form id="bigbang-test-form" method="POST" action="{{ route('admin.settings.bigbang.test') }}">@csrf</form>
             <form id="qtech-credentials-form" method="POST" action="{{ route('admin.settings.qtech.credentials') }}">@csrf</form>
             <form id="qtech-repair-form" method="POST" action="{{ route('admin.settings.qtech.repair') }}">@csrf</form>
             <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="system">
@@ -291,6 +292,13 @@
                             @endif
                         </small>
                     </label>
+                </div>
+                @if ($errors->has('bigbang'))
+                    <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first('bigbang') }}</div></div>
+                @endif
+                <div class="configuration-inline-action">
+                    <button type="submit" form="bigbang-test-form" formnovalidate><i class="fa-solid fa-plug"></i> Test BigBang connection</button>
+                    <p>Reads one catalogue page from BigBang with this server's key and reports the address BigBang see it from. A connection that times out means that address is not on BigBang's allow-list: send it to them from Portal → API Keys.</p>
                 </div>
                 @if ($errors->has('qtech'))
                     <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first('qtech') }}</div></div>

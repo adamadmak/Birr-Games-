@@ -323,6 +323,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', 'audit.admi
     Route::post('/settings/mail/test', [AdminSettingController::class, 'testMail'])->middleware('throttle:5,1')->name('settings.mail.test');
     Route::post('/settings/qtech/test', [AdminSettingController::class, 'testQtech'])->name('settings.qtech.test');
     Route::post('/settings/winhouse/test', [AdminSettingController::class, 'testWinhouse'])->name('settings.winhouse.test');
+    Route::post('/settings/bigbang/test', [AdminSettingController::class, 'testBigBang'])->name('settings.bigbang.test');
     Route::post('/settings/qtech/test-credentials', [AdminSettingController::class, 'issueQtechTestCredentials'])->name('settings.qtech.credentials');
     Route::post('/settings/qtech/repair-test-players', [AdminSettingController::class, 'repairQtechTestPlayers'])->name('settings.qtech.repair');
     Route::get('/telegram/broadcast-bot', [AdminTelegramBroadcastController::class, 'index'])->name('telegram.index');
