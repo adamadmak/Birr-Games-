@@ -4082,3 +4082,34 @@ body.player-guest {
     /* History rows scroll sideways inside their frame instead of widening the page. */
     .wallet-history-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+
+/* Casino lobby on a phone: the banner at a quarter of the picture's height
+   (hero-banner.blade.php quadruples the ratio for phones; desktop keeps half),
+   the promo slides compacted to fit it, and only the search box above the
+   shelves — the studio dropdown and the studio chips are desktop tools. */
+@media (max-width: 700px) {
+    .hero-banner-image, .hero-banner-image.is-slider { min-height: 0; }
+    .hero-slide { padding: 10px 14px 26px; align-content: center; }
+    .promo-copy { gap: 5px; max-width: 64%; }
+    .promo-eyebrow { display: none; }
+    .promo-copy h2 { font-size: clamp(16px, 4.6vw, 19px); line-height: 1.1; }
+    .promo-copy p { display: none; }
+    .promo-actions { margin-top: 2px; }
+    .promo-actions .button { min-height: 32px; padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+    .hero-slide .promo-art { width: 44%; height: 86%; top: 7%; right: -2%; }
+    .lobby-toolbar .provider-select,
+    .member-lobby-toolbar .member-provider-select,
+    .lobby-chips { display: none; }
+    .lobby-toolbar, .member-lobby-toolbar { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+    /* The slider's img is `height: 100%` of a box that takes its height from
+       the img — with the 224px floor gone that loop collapsed to nothing. The
+       picture's ratio decides again. */
+    .hero-banner-image.is-slider .hero-media img { height: auto; aspect-ratio: var(--hero-ratio-m, 3.3); min-height: 0; }
+}
+@media (max-width: 700px) {
+    /* In slider mode the picture and the slides are stacked absolutely, so
+       the box has no content height of its own: give it the picture's ratio. */
+    .hero-banner-image.is-slider { height: auto; aspect-ratio: var(--hero-ratio-m, 3.3); min-height: 0; }
+}

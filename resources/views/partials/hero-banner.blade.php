@@ -8,7 +8,7 @@
 @php([$heroMobileW, $heroMobileH] = \App\Support\HeroBanner::size('mobile'))
 {{-- Half the picture's natural height: the ratio is doubled, and the image
      is cropped evenly top and bottom to fit. --}}
-<section class="hero-banner hero-banner-image" data-hero-slider aria-roledescription="carousel" aria-label="Featured" style="--hero-src: url('{{ \App\Support\HeroBanner::desktopUrl() }}'); --hero-ratio: {{ round(2 * $heroW / max($heroH, 1), 4) }}; --hero-ratio-m: {{ round(2 * $heroMobileW / max($heroMobileH, 1), 4) }}">
+<section class="hero-banner hero-banner-image" data-hero-slider aria-roledescription="carousel" aria-label="Featured" style="--hero-src: url('{{ \App\Support\HeroBanner::desktopUrl() }}'); --hero-ratio: {{ round(2 * $heroW / max($heroH, 1), 4) }}; --hero-ratio-m: {{ round(4 * $heroMobileW / max($heroMobileH, 1), 4) }}">
     {{-- width/height are the uploaded picture's own size: on desktop the
          hero takes that picture's height, so nothing is cropped. --}}
     <picture class="hero-media">
