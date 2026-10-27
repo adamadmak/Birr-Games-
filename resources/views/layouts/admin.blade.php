@@ -10,9 +10,9 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400..700;1,400..700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     <link rel="stylesheet" href="/css/lucy-admin.css?v={{ @filemtime(public_path('css/lucy-admin.css')) ?: time() }}">
     {{-- Shows what is being typed into a password box. A stored password is a
          bcrypt hash and cannot be turned back into text, so this is the only
@@ -25,14 +25,15 @@
     @stack('styles')
     <script>
     /* Runs before first paint: applies the saved theme so the page never flashes
-       the wrong palette. Dark is the default when nothing has been chosen. */
+       the wrong palette. Light is the default when nothing has been chosen;
+       the toggle still saves either choice. */
     (function () {
+        var theme = 'light';
         try {
             var saved = localStorage.getItem('lucy-admin-theme');
-            if (saved === 'light' || saved === 'dark') {
-                document.documentElement.setAttribute('data-theme', saved);
-            }
-        } catch (e) { /* private mode: fall back to the dark default */ }
+            if (saved === 'light' || saved === 'dark') { theme = saved; }
+        } catch (e) { /* private mode: light */ }
+        document.documentElement.setAttribute('data-theme', theme);
     })();
     </script>
 </head>

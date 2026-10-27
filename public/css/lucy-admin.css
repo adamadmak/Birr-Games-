@@ -1,6 +1,7 @@
 /* ============================================================================
    Vamoseone — Admin console design system
-   Dark is the default surface; [data-theme="light"] flips the same tokens.
+   Light is the default surface (set before first paint in layouts/admin);
+   [data-theme="dark"] is the older dark console, kept behind the toggle.
    Every rule below consumes tokens, so a theme change never edits a component.
    ========================================================================== */
 :root {
@@ -55,8 +56,8 @@
     --radius: 16px;
     --radius-sm: 10px;
     --radius-lg: 20px;
-    --font-ui: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
-    --font-display: "Bricolage Grotesque", var(--font-ui);
+    --font-ui: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-ui);
     --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 
     /* --- metric-card accents (brighter on dark, deeper on light) --------- */
@@ -70,45 +71,44 @@
 [data-theme="light"] {
     color-scheme: light;
 
-    --bg: #f7f8fa;
-    --bg-tint: radial-gradient(1100px 560px at 80% -10%, rgba(13,192,122, .07), transparent 60%),
-               radial-gradient(820px 460px at 6% 2%, rgba(84, 122, 200, .05), transparent 58%);
+    --bg: #f4f6f9;
+    --bg-tint: none;
     --surface: #ffffff;
-    --surface-2: #f6f7f9;
-    --surface-3: #eef0f4;
+    --surface-2: #f8f9fb;
+    --surface-3: #eef1f5;
     --surface-raised: #ffffff;
-    --glass: rgba(255, 255, 255, .82);
+    --glass: rgba(255, 255, 255, .92);
 
-    --line: #e4e7ec;
-    --line-soft: #eef0f3;
-    --line-strong: #cdd3db;
+    --line: #dfe3e8;
+    --line-soft: #edf0f3;
+    --line-strong: #c9d1da;
 
-    --ink: #101720;
-    --ink-2: #3c4756;
-    --muted: #667286;
-    --faint: #9aa4b2;
+    --ink: #1f2d3d;
+    --ink-2: #3d4b5c;
+    --muted: #6c7a89;
+    --faint: #98a4b3;
 
-    --solid: #14191f;
+    --solid: #1f2d3d;
     --on-solid: #ffffff;
 
-    --primary: #0aa56a;
-    --primary-ink: #058856;
-    --primary-deep: #047147;
-    --primary-soft: rgba(10,165,106, .12);
-    --primary-line: rgba(10,165,106, .30);
+    --primary: #1b6ef3;
+    --primary-ink: #155fd0;
+    --primary-deep: #0f4fb3;
+    --primary-soft: rgba(27, 110, 243, .10);
+    --primary-line: rgba(27, 110, 243, .30);
     --on-primary: #ffffff;
 
-    --success: #12945f;      --success-soft: rgba(18, 148, 95, .11);
-    --danger: #d92d3f;       --danger-soft: rgba(217, 45, 63, .10);
-    --warn: #b57e08;         --warn-soft: rgba(181, 126, 8, .12);
-    --info: #2a6ff0;         --info-soft: rgba(42, 111, 240, .10);
+    --success: #28a745;      --success-soft: rgba(40, 167, 69, .12);
+    --danger: #dc3545;       --danger-soft: rgba(220, 53, 69, .10);
+    --warn: #b07d00;         --warn-soft: rgba(255, 193, 7, .16);
+    --info: #1b6ef3;         --info-soft: rgba(27, 110, 243, .10);
 
-    --m-blue: #2569f2;  --m-mint: #05a66d;  --m-purple: #8b30f0;
-    --m-orange: #f2591c; --m-green: #0aa350; --m-teal: #0a9d9d;
+    --m-blue: #1b6ef3;  --m-mint: #17a2b8;  --m-purple: #6f42c1;
+    --m-orange: #fd7e14; --m-green: #28a745; --m-teal: #20c997;
 
     --shadow-sm: 0 1px 2px rgba(16, 23, 32, .05), 0 1px 3px rgba(16, 23, 32, .04);
-    --shadow-md: 0 2px 6px rgba(16, 23, 32, .06), 0 12px 30px rgba(16, 23, 32, .08);
-    --shadow-lg: 0 26px 64px rgba(16, 23, 32, .18);
+    --shadow-md: 0 2px 6px rgba(16, 23, 32, .06), 0 10px 24px rgba(16, 23, 32, .07);
+    --shadow-lg: 0 20px 48px rgba(16, 23, 32, .16);
 }
 
 * { box-sizing: border-box; }
@@ -2033,3 +2033,152 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
 .sports-ticket-footnote { margin: 14px 2px 0; color: var(--muted); font-size: 12px; }
 .sports-ticket-footnote code { font-size: 11px; }
 .sports-ticket-live { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background: rgba(255, 100, 112, .16); color: var(--danger); font-size: 9px; font-style: normal; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; vertical-align: 1px; }
+
+/* ============================================================================
+   LIGHT CONSOLE — the default look since October 2026
+   Modelled on the WinHouse agent panel the operators also use: Source Sans, a
+   navy sidebar and a dark top bar over a light grey page, white cards with
+   hairline borders and square corners, uppercase stat labels over big coloured
+   figures, flat striped tables, solid status pills. Dark stays one click away
+   on the toggle and is untouched by this block.
+   ========================================================================== */
+[data-theme="light"] {
+    --radius: 8px; --radius-sm: 6px; --radius-lg: 10px;
+    --bg-tint: none;
+    --console-nav: #0f1b3d;
+    --console-nav-2: #0b1530;
+    --console-nav-ink: #c9d3e6;
+    --console-nav-faint: #8290b3;
+    --console-card-shadow: 0 1px 2px rgba(16, 23, 32, .05);
+}
+[data-theme="light"] body { background-image: none; font-size: 14px; }
+[data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3 { letter-spacing: 0; }
+
+/* ---- Sidebar: navy, white active item ---- */
+[data-theme="light"] .admin-sidebar { background: var(--console-nav); border-right: 0; backdrop-filter: none; color: var(--console-nav-ink); }
+[data-theme="light"] .admin-brand { border-bottom-color: rgba(255, 255, 255, .08); }
+[data-theme="light"] .admin-brand button { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-brand button:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+[data-theme="light"] .admin-quick-trigger { color: var(--console-nav-faint); background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .1); border-radius: 6px; }
+[data-theme="light"] .admin-quick-trigger:hover { color: #fff; background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .16); }
+[data-theme="light"] .admin-quick-trigger kbd { color: var(--console-nav-faint); background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .12); }
+[data-theme="light"] .admin-nav { scrollbar-color: rgba(255, 255, 255, .18) transparent; }
+[data-theme="light"] .admin-nav p { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-nav a { color: var(--console-nav-ink); border-radius: 6px; font-weight: 500; }
+[data-theme="light"] .admin-nav a span { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-nav a b { color: #ffd75e; background: rgba(255, 215, 94, .14); }
+[data-theme="light"] .admin-nav a:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+[data-theme="light"] .admin-nav a:hover span { color: #fff; }
+[data-theme="light"] .admin-nav a.active { color: #fff; background: var(--primary); box-shadow: none; font-weight: 600; }
+[data-theme="light"] .admin-nav a.active span { color: #fff; }
+[data-theme="light"] .admin-nav a.active::before { display: none; }
+[data-theme="light"] .admin-profile { border-top-color: rgba(255, 255, 255, .08); }
+[data-theme="light"] .admin-profile > span { background: var(--primary); border-radius: 50%; }
+[data-theme="light"] .admin-profile strong { color: #fff; }
+[data-theme="light"] .admin-profile small { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-profile button { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-profile button:hover { color: #fff; background: rgba(220, 53, 69, .45); }
+
+/* ---- Top bar: dark, like the sidebar ---- */
+[data-theme="light"] .admin-topbar { background: var(--console-nav-2); border-bottom: 0; backdrop-filter: none; color: #fff; }
+[data-theme="light"] .admin-topbar-title small { color: var(--console-nav-faint); }
+[data-theme="light"] .admin-topbar-title strong { color: #fff; font-weight: 600; }
+[data-theme="light"] .topbar-button { color: #e6ebf5; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); border-radius: 6px; }
+[data-theme="light"] .topbar-button:hover,
+[data-theme="light"] .theme-toggle:hover { color: #fff; background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .24); transform: none; }
+[data-theme="light"] .topbar-search { color: #aab6cf; }
+[data-theme="light"] .topbar-search kbd { color: #aab6cf; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .12); }
+[data-theme="light"] .admin-topbar-avatar { background: var(--primary); border-radius: 50%; }
+
+/* ---- Page frame ---- */
+[data-theme="light"] .admin-main { animation: none; padding-top: 24px; }
+[data-theme="light"] .admin-page-heading { margin-bottom: 18px; animation: none; }
+[data-theme="light"] .admin-page-heading p { display: none; }
+[data-theme="light"] .admin-page-heading h1 { font-size: 24px; font-weight: 600; }
+[data-theme="light"] .admin-page-heading span { margin-top: 3px; font-size: 13px; }
+[data-theme="light"] .admin-view-site { border-radius: 4px; box-shadow: none; }
+[data-theme="light"] .admin-flash { border-radius: 4px; animation: none; }
+
+/* ---- Cards: white, hairline, square ---- */
+[data-theme="light"] .admin-panel,
+[data-theme="light"] .casino-table-card,
+[data-theme="light"] .configuration-panel,
+[data-theme="light"] .ops-dash .ops-position,
+[data-theme="light"] .ops-dash .ops-ledger,
+[data-theme="light"] .ops-dash .ops-welcome,
+[data-theme="light"] .ops-dash .ops-security { border-radius: 6px; border: 1px solid var(--line); box-shadow: var(--console-card-shadow); animation: none; }
+[data-theme="light"] .admin-panel:hover { box-shadow: var(--console-card-shadow); }
+[data-theme="light"] .ops-dash .ops-welcome { background: var(--surface); }
+[data-theme="light"] .ops-dash .ops-welcome::after { display: none; }
+[data-theme="light"] .ops-dash .ops-welcome-copy h2 { font-size: 22px; font-weight: 600; }
+[data-theme="light"] .ops-dash .ops-chip { border-radius: 4px; }
+[data-theme="light"] .ops-dash .ops-period-tabs { border-radius: 4px; }
+[data-theme="light"] .ops-dash .ops-period-tabs a { border-radius: 3px; }
+[data-theme="light"] .panel-title h2,
+[data-theme="light"] .ops-dash .ops-ledger-head h2 { font-size: 16px; font-weight: 600; }
+[data-theme="light"] .panel-title p { color: var(--muted); }
+
+/* ---- Stat tiles: uppercase label, big coloured figure ---- */
+[data-theme="light"] .ops-dash .ops-counts {
+    padding: 0; gap: 14px; background: transparent; border: 0; box-shadow: none;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+[data-theme="light"] .ops-dash .ops-count {
+    padding: 16px 18px; gap: 4px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--surface); box-shadow: var(--console-card-shadow);
+}
+[data-theme="light"] .ops-dash .ops-count span { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+[data-theme="light"] .ops-dash .ops-count b { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--m-blue); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(2) b { color: var(--m-green); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(3) b { color: var(--m-orange); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(4) b { color: var(--m-purple); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(5) b { color: var(--m-green); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(6) b { color: var(--m-teal); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(7) b { color: var(--m-blue); }
+[data-theme="light"] .ops-dash .ops-count:nth-child(8) b { color: var(--m-orange); }
+[data-theme="light"] .ops-dash a.ops-count:hover b { text-decoration: underline; text-underline-offset: 4px; }
+[data-theme="light"] .ops-dash .ops-position-value { font-weight: 700; }
+[data-theme="light"] .ops-dash .ops-security-stats span { text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+
+/* ---- Tables: flat, striped ---- */
+[data-theme="light"] .casino-table-card { border-radius: 6px; }
+[data-theme="light"] .casino-data-table { font-size: 13px; }
+[data-theme="light"] .casino-data-table th { height: 44px; color: var(--ink); font-size: 12.5px; font-weight: 700; border-bottom: 2px solid var(--line); }
+[data-theme="light"] .casino-data-table th i { color: var(--faint); }
+[data-theme="light"] .casino-data-table td { height: 48px; }
+[data-theme="light"] .casino-data-table tbody tr:nth-child(even) { background: var(--surface-2); }
+[data-theme="light"] .casino-data-table tbody tr:hover { background: #eef4ff; }
+[data-theme="light"] .casino-pagination { font-size: 12px; }
+
+/* ---- Status pills: solid, squared ---- */
+[data-theme="light"] .casino-transaction-status,
+[data-theme="light"] .status-badge,
+[data-theme="light"] .sports-ticket-status { padding: 3px 8px; border: 0; border-radius: 3px; font-size: 11px; font-weight: 700; letter-spacing: .02em; text-transform: none; }
+[data-theme="light"] .casino-transaction-status.success,
+[data-theme="light"] .status-badge.won,
+[data-theme="light"] .sports-ticket-status.won { color: #fff; background: #28a745; }
+[data-theme="light"] .casino-transaction-status.danger,
+[data-theme="light"] .sports-ticket-status.lost { color: #fff; background: #dc3545; }
+[data-theme="light"] .status-badge.admin,
+[data-theme="light"] .sports-ticket-status.open { color: #fff; background: var(--primary); }
+[data-theme="light"] .sports-ticket-status.void { color: #1c1400; background: #ffc107; }
+[data-theme="light"] .status-badge.expired { color: #fff; background: #6c757d; }
+
+/* ---- Controls: flat, square corners ---- */
+[data-theme="light"] .casino-filter-submit,
+[data-theme="light"] .configuration-form-actions button,
+[data-theme="light"] .configuration-inline-action button,
+[data-theme="light"] .ops-dash .ops-period form button { border-radius: 4px; border: 1px solid var(--primary-deep); background: var(--primary); color: #fff; box-shadow: none; font-weight: 600; }
+[data-theme="light"] .casino-filter-submit:hover,
+[data-theme="light"] .configuration-form-actions button:hover,
+[data-theme="light"] .configuration-inline-action button:hover,
+[data-theme="light"] .ops-dash .ops-period form button:hover { background: var(--primary-deep); transform: none; }
+[data-theme="light"] .casino-filter-reset,
+[data-theme="light"] .casino-page-button,
+[data-theme="light"] .casino-filter-menu summary,
+[data-theme="light"] .casino-search-box,
+[data-theme="light"] .casino-pagination select,
+[data-theme="light"] .configuration-form-grid input,
+[data-theme="light"] .configuration-form-grid select,
+[data-theme="light"] .configuration-form-grid textarea,
+[data-theme="light"] .ops-dash .ops-period form input { border-radius: 4px; }
