@@ -152,6 +152,7 @@
                  the button below reaches it by id, which HTML allows across the
                  whole document regardless of nesting. --}}
             <form id="qtech-test-form" method="POST" action="{{ route('admin.settings.qtech.test') }}">@csrf</form>
+            <form id="winhouse-test-form" method="POST" action="{{ route('admin.settings.winhouse.test') }}">@csrf</form>
             <form id="qtech-credentials-form" method="POST" action="{{ route('admin.settings.qtech.credentials') }}">@csrf</form>
             <form id="qtech-repair-form" method="POST" action="{{ route('admin.settings.qtech.repair') }}">@csrf</form>
             <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="system">

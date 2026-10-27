@@ -55,3 +55,12 @@
         <small>Portal → Seamless wallet → Wallet base URL. WinHouse call <code>/user-data</code>, <code>/balance-change</code> and <code>/transaction</code> under it.</small>
     </label>
 </div>
+@if ($errors->has('winhouse'))
+    <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first('winhouse') }}</div></div>
+@endif
+{{-- Its own form (declared beside the QTech one at the top of the tab): a
+     button inside the settings form would inherit its PUT spoof. --}}
+<div class="configuration-inline-action">
+    <button type="submit" form="winhouse-test-form" formnovalidate><i class="fa-solid fa-plug"></i> Test WinHouse connection</button>
+    <p>Save first, then test. Reads one ticket from WinHouse with the saved iframe key and API key — the same two the book uses — and moves no money. It does not exercise the callback token; that is proven by the first bet.</p>
+</div>

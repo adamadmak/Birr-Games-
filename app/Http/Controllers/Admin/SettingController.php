@@ -616,4 +616,27 @@ class SettingController
             : back()->withErrors(['qtech' => 'QTech refused the connection: '.$result['message'].$seen]);
     }
 
+    /**
+     * Prove the saved WinHouse keys work by reading one ticket through their
+     * tickets API: it is the one WinHouse call this site makes with the same
+     * iframe key and API key the book itself uses, and it moves no money.
+     */
+    public function testWinhouse(\App\Services\WinhouseTicketsClient $client): RedirectResponse
+    {
+        if (! \App\Support\Winhouse::configured()) {
+            return back()->withErrors(['winhouse' => 'Save the WinHouse iframe key, wallet API key and callback token first.']);
+        }
+
+        $result = $client->tickets(['limit' => 1]);
+        if (! $result['ok']) {
+            return back()->withErrors(['winhouse' => $result['error']]);
+        }
+
+        $total = (int) ($result['meta']['total'] ?? count($result['tickets']));
+        $latest = $result['tickets'][0]['placed_at'] ?? null;
+
+        return back()->with('admin_status', 'WinHouse connection OK — the keys are accepted; '.number_format($total).' ticket(s) on the account'
+            .($latest ? ', the latest placed '.$latest->diffForHumans() : '').'. Mode: '.\App\Support\Winhouse::mode().'.');
+    }
+
 }
