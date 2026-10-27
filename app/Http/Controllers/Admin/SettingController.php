@@ -16,7 +16,7 @@ class SettingController
     private const TABS = ['promotion', 'company', 'contact', 'system', 'frontend', 'agent', 'bonus', 'security'];
 
     /** Write-only fields: a blank box means "keep what is stored", never "erase". */
-    private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password'];
+    private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password', 'winhouse_api_key', 'winhouse_callback_token'];
 
     public function index(Request $request): View
     {
@@ -37,6 +37,7 @@ class SettingController
             // Counted only for the tab that shows it: one COUNT per table.
             'goLiveReset' => $tab === 'system' ? $this->goLiveResetPreview() : null,
             'qtechIntegrationMode' => \App\Support\Qtech::integrationMode(),
+            'winhouse' => $tab === 'system' ? $this->winhouseState($request) : null,
             'hero' => $tab === 'frontend' ? $this->heroState() : null,
             'security' => $tab === 'security' ? $this->securityState() : null,
             'bonus' => $tab === 'bonus' ? $this->bonusState() : null,
@@ -217,6 +218,34 @@ class SettingController
             'counts' => $counts,
             'events' => $events,
             'log_ready' => $logReady,
+        ];
+    }
+
+    /**
+     * What the System tab shows for the WinHouse sportsbook: whether each key
+     * resolves and from where, never a key itself, plus the wallet address to
+     * hand to WinHouse for this host.
+     */
+    private function winhouseState(Request $request): array
+    {
+        $sources = [
+            'iframe_key' => \App\Support\Winhouse::source('iframe_key'),
+            'api_key' => \App\Support\Winhouse::source('api_key'),
+            'callback_token' => \App\Support\Winhouse::source('callback_token'),
+        ];
+        $labels = ['iframe_key' => 'iframe key', 'api_key' => 'wallet API key', 'callback_token' => 'callback token'];
+
+        return [
+            'iframe_key' => \App\Support\Winhouse::iframeKey(),
+            'api_key_set' => \App\Support\Winhouse::apiKey() !== '',
+            'callback_set' => \App\Support\Winhouse::callbackToken() !== '',
+            'mode' => \App\Support\Winhouse::mode(),
+            'currency' => \App\Support\Winhouse::currency(),
+            'sources' => $sources,
+            'missing' => array_values(array_map(fn ($k) => $labels[$k], array_keys(array_filter($sources, fn ($s) => $s === '')))),
+            'configured' => \App\Support\Winhouse::configured(),
+            'host' => $request->getHost(),
+            'wallet_base_url' => $request->getSchemeAndHttpHost().'/api/integrations/winhouse',
         ];
     }
 
@@ -456,6 +485,12 @@ class SettingController
                 'qtech_api_username' => ['nullable', 'string', 'max:120'],
                 'qtech_api_password' => ['nullable', 'string', 'max:190'],
                 'qtech_live_to_players' => ['nullable', 'boolean'],
+                // WinHouse sportsbook (App\Support\Winhouse). The two secrets are
+                // write-only like the QTech ones; a blank box keeps the stored value.
+                'winhouse_iframe_key' => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_\-]*$/'],
+                'winhouse_api_key' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
+                'winhouse_callback_token' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
+                'winhouse_mode' => ['nullable', Rule::in(['sandbox', 'live'])],
                 'bigbang_live' => ['nullable', 'boolean'],
                 'max_payout' => ['required', 'numeric', 'min:0'],
                 'min_deposit_amount' => ['required', 'numeric', 'min:0'],

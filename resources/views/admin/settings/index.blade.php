@@ -241,6 +241,10 @@
                         </small>
                     </label>
                 </div>
+                @if ($winhouse)
+                    @include('admin.settings._winhouse')
+                @endif
+
                 <div class="configuration-form-section divided">
                     <h3>Schema updates</h3>
                     <p>Whether a deploy applies schema changes depends on this app's build command in the hosting dashboard, and it is not the same on both brands. This shows what is waiting and applies it without one.</p>

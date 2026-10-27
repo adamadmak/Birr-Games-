@@ -26,7 +26,11 @@ use App\Models\PlatformSetting;
  * customer's wallet, and that must not happen twice.
  *
  * A row in platform_settings outranks the literal, so the secrets can be moved
- * into the admin panel and rotated without a deploy.
+ * into the admin panel and rotated without a deploy. That is how any other
+ * domain (vamosonebet.com has its own WinHouse account) is connected: the keys
+ * are pasted under Configuration → System → WinHouse sportsbook, which writes
+ * winhouse_iframe_key, winhouse_api_key, winhouse_callback_token and
+ * winhouse_mode. The literal below belongs to the original account only.
  */
 final class Winhouse
 {
@@ -68,6 +72,38 @@ final class Winhouse
     public static function isLive(): bool
     {
         return self::mode() === 'live';
+    }
+
+    /** All three keys resolve; without any one of them the book cannot settle a bet. */
+    public static function configured(): bool
+    {
+        return self::iframeKey() !== '' && self::apiKey() !== '' && self::callbackToken() !== '';
+    }
+
+    /**
+     * Where a value comes from, for the admin page: 'config', 'settings', 'env',
+     * 'built-in' or '' when nothing resolves. Mirrors value()'s order.
+     */
+    public static function source(string $name): string
+    {
+        if (trim((string) config('services.winhouse.'.$name)) !== '') {
+            return 'config';
+        }
+        try {
+            if (trim((string) PlatformSetting::valueFor('winhouse_'.$name, '')) !== '') {
+                return 'settings';
+            }
+        } catch (\Throwable) {
+            // not configured, same as value()
+        }
+        if (trim((string) (getenv('WINHOUSE_'.strtoupper($name)) ?: '')) !== '') {
+            return 'env';
+        }
+        if (self::isOwnHost() && (self::BOUND[$name] ?? '') !== '') {
+            return 'built-in';
+        }
+
+        return '';
     }
 
     private static function value(string $name): string
