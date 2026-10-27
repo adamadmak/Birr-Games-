@@ -397,7 +397,7 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                     <h3>Hero banner</h3>
                     <p>The large picture at the top of the lobby for signed-out visitors. Upload a wide image for desktop and tablet, and optionally a taller one for phones. JPG, PNG or WebP up to 6MB; {{ $hero['optimised'] ? 'uploads are resized and converted to WebP automatically.' : 'this server cannot resize images, so upload them at the size you want served.' }}</p>
                 </div>
-                @foreach (['hero_desktop', 'hero_mobile', 'hero_image_alt'] as $heroField)
+                @foreach (['hero_desktop', 'hero_mobile', 'hero_sports', 'hero_image_alt'] as $heroField)
                     @if ($errors->has($heroField))
                         <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first($heroField) }}</div></div>
                     @endif
@@ -441,6 +441,26 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                         <label class="configuration-checkbox">
                             <input type="checkbox" name="remove_mobile" value="1" @disabled(! $hero['mobile_custom'] && ! $hero['mobile_missing'])>
                             <span>Reset phone image</span>
+                        </label>
+                    </div>
+                    <div class="hero-banner-slot full">
+                        <div class="hero-banner-preview hero-banner-preview-band">
+                            <img src="{{ $hero['sports_url'] }}" alt="Current sports banner">
+                            <span class="hero-banner-badge">{{ $hero['sports_custom'] ? 'Custom' : 'Default artwork' }}</span>
+                        </div>
+                        @if ($hero['sports_missing'])
+                            <div class="form-errors">The saved sports banner is no longer on the server, so visitors see the drawn stadium. Upload it again, or tick reset to clear it.</div>
+                        @endif
+                        <label class="game-image-dropzone hero-banner-dropzone" data-image-dropzone>
+                            <input type="file" name="hero_sports" accept="image/png,image/jpeg,image/webp" data-image-input>
+                            <img src="" alt="Sports banner preview" data-image-preview hidden>
+                            <span class="game-upload-icon"><i class="fa-solid fa-futbol"></i></span>
+                            <strong data-upload-title>Sports banner (front page band)</strong>
+                            <small>Wide and short: 1600×260 recommended, at least 960×150. Shown behind the headline on desktop; phones do not show the band.</small>
+                        </label>
+                        <label class="configuration-checkbox">
+                            <input type="checkbox" name="remove_sports" value="1" @disabled(! $hero['sports_custom'] && ! $hero['sports_missing'])>
+                            <span>Reset sports banner to the drawn stadium</span>
                         </label>
                     </div>
                     <label class="full">Image description

@@ -9,7 +9,8 @@
 <div class="sports-home" data-view="sports">
     {{-- Phones get no banner at all: the quick tiles, the switch and the book
          are the page, and the first screen is the odds board. --}}
-    <section class="sports-hero" aria-labelledby="sports-hero-title">
+    {{-- The backdrop is whatever an operator uploaded as the sports banner (Configuration → Frontend), else the drawn stadium. --}}
+    <section class="sports-hero" aria-labelledby="sports-hero-title" style="--sports-src: url('{{ \App\Support\HeroBanner::sportsUrl() }}')">
         <div class="sports-hero-pitch" aria-hidden="true"></div>
         <div class="sports-hero-copy">
             <span class="sports-eyebrow"><i></i>{{ __('Betting & Casino') }}</span>

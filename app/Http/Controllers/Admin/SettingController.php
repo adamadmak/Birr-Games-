@@ -122,7 +122,7 @@ class SettingController
      */
     public function updateHero(Request $request, \App\Services\HeroImageProcessor $images): RedirectResponse
     {
-        foreach (['hero_desktop', 'hero_mobile'] as $field) {
+        foreach (['hero_desktop', 'hero_mobile', 'hero_sports'] as $field) {
             $this->ensureValidUpload($request, $field, 6);
         }
 
@@ -131,9 +131,12 @@ class SettingController
             // and the hero is served to every anonymous visitor.
             'hero_desktop' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144', 'dimensions:min_width=960,min_height=360'],
             'hero_mobile' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144', 'dimensions:min_width=480,min_height=480'],
+            // The sports band is wide and short: 1600×260 is the drawn default's shape.
+            'hero_sports' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144', 'dimensions:min_width=960,min_height=150'],
             'hero_image_alt' => ['nullable', 'string', 'max:160'],
             'remove_desktop' => ['nullable', 'boolean'],
             'remove_mobile' => ['nullable', 'boolean'],
+            'remove_sports' => ['nullable', 'boolean'],
         ]);
 
         $values = [\App\Support\HeroBanner::SETTING_ALT => trim((string) ($validated['hero_image_alt'] ?? ''))];
@@ -141,9 +144,9 @@ class SettingController
         $changed = [];
 
         try {
-            foreach (['desktop' => 'hero_desktop', 'mobile' => 'hero_mobile'] as $slot => $field) {
-                $settingKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE : \App\Support\HeroBanner::SETTING_DESKTOP;
-                $sizeKey = $slot === 'mobile' ? \App\Support\HeroBanner::SETTING_MOBILE_SIZE : \App\Support\HeroBanner::SETTING_DESKTOP_SIZE;
+            foreach (['desktop' => 'hero_desktop', 'mobile' => 'hero_mobile', 'sports' => 'hero_sports'] as $slot => $field) {
+                $settingKey = \App\Support\HeroBanner::settingKey($slot);
+                $sizeKey = \App\Support\HeroBanner::sizeKey($slot);
                 // The reference as saved, even when its image is gone, so a broken
                 // one can still be reset.
                 $current = \App\Support\HeroBanner::storedReference($slot);
@@ -316,6 +319,9 @@ class SettingController
             'mobile_custom' => \App\Support\HeroBanner::isCustom('mobile'),
             'desktop_missing' => \App\Support\HeroBanner::isMissing('desktop'),
             'mobile_missing' => \App\Support\HeroBanner::isMissing('mobile'),
+            'sports_url' => \App\Support\HeroBanner::sportsUrl(),
+            'sports_custom' => \App\Support\HeroBanner::isCustom('sports'),
+            'sports_missing' => \App\Support\HeroBanner::isMissing('sports'),
             'alt' => (string) PlatformSetting::valueFor(\App\Support\HeroBanner::SETTING_ALT, ''),
             'optimised' => extension_loaded('gd'),
         ];

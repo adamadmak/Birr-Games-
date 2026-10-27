@@ -18,7 +18,7 @@ class MediaController
      */
     public function hero(Request $request, string $slot, string $version): Response
     {
-        abort_unless(in_array($slot, ['desktop', 'mobile'], true), 404);
+        abort_unless(in_array($slot, \App\Support\HeroBanner::SLOTS, true), 404);
 
         $row = SiteMedia::available()
             ? SiteMedia::query()->where('slot', 'hero-'.$slot)->first()

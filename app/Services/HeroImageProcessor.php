@@ -33,7 +33,7 @@ final class HeroImageProcessor
     public const REFERENCE_PREFIX = 'media:';
 
     /** Longest edge kept, per slot. Anything wider is scaled down. */
-    private const MAX_WIDTH = ['desktop' => 2200, 'mobile' => 1200];
+    private const MAX_WIDTH = ['desktop' => 2200, 'mobile' => 1200, 'sports' => 2200];
 
     private const WEBP_QUALITY = 82;
     private const JPEG_QUALITY = 84;
@@ -41,7 +41,7 @@ final class HeroImageProcessor
     /** @return string the reference to save in platform_settings */
     public function store(UploadedFile $file, string $slot): string
     {
-        $slot = $slot === 'mobile' ? 'mobile' : 'desktop';
+        $slot = \App\Support\HeroBanner::slot($slot);
 
         [$binary, $mime] = $this->optimise($file, self::MAX_WIDTH[$slot]) ?? $this->original($file);
 

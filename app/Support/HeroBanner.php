@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Storage;
 /**
  * The lobby hero artwork, as an operator set it.
  *
- * Two images, both optional: a wide one for desktop and tablet, and a taller
- * one for phones. Either falls back to the bundled artwork, and the mobile
- * slot falls back to the desktop image before that, so a brand that uploads
- * one picture gets it everywhere.
+ * Three images, all optional: a wide one for the lobby on desktop and
+ * tablet, a taller one for the lobby on phones, and the band across the top
+ * of the sports front page. Each falls back to the bundled artwork, and the
+ * mobile slot falls back to the desktop image before that, so a brand that
+ * uploads one lobby picture gets it everywhere.
  *
  * A stored reference is either `media:<slot>-<version>` (a row in
  * `site_media`, served by MediaController) or a legacy `hero/…` path on the
@@ -26,17 +27,46 @@ final class HeroBanner
 {
     public const SETTING_DESKTOP = 'hero_image_desktop';
     public const SETTING_MOBILE = 'hero_image_mobile';
+    public const SETTING_SPORTS = 'hero_image_sports';
     public const SETTING_ALT = 'hero_image_alt';
 
     /** "WIDTHxHEIGHT" of what was uploaded, so the lobby can size the hero to the picture. */
     public const SETTING_DESKTOP_SIZE = 'hero_image_desktop_size';
     public const SETTING_MOBILE_SIZE = 'hero_image_mobile_size';
+    public const SETTING_SPORTS_SIZE = 'hero_image_sports_size';
 
     public const DEFAULT_DESKTOP = 'images/hero-casino-gold.svg';
     public const DEFAULT_MOBILE = 'images/hero-casino-gold-mobile.svg';
+    public const DEFAULT_SPORTS = 'images/hero-sports.svg';
 
     private const DEFAULT_DESKTOP_SIZE = [1600, 720];
     private const DEFAULT_MOBILE_SIZE = [900, 1100];
+    private const DEFAULT_SPORTS_SIZE = [1600, 260];
+
+    /** @var list<string> */
+    public const SLOTS = ['desktop', 'mobile', 'sports'];
+
+    /** A slot name as stored, anything unknown reading as the desktop slot. */
+    public static function slot(string $slot): string
+    {
+        return in_array($slot, self::SLOTS, true) ? $slot : 'desktop';
+    }
+
+    public static function settingKey(string $slot): string
+    {
+        return match (self::slot($slot)) { 'mobile' => self::SETTING_MOBILE, 'sports' => self::SETTING_SPORTS, default => self::SETTING_DESKTOP };
+    }
+
+    public static function sizeKey(string $slot): string
+    {
+        return match (self::slot($slot)) { 'mobile' => self::SETTING_MOBILE_SIZE, 'sports' => self::SETTING_SPORTS_SIZE, default => self::SETTING_DESKTOP_SIZE };
+    }
+
+    /** @return array{0: int, 1: int} */
+    private static function defaultSize(string $slot): array
+    {
+        return match (self::slot($slot)) { 'mobile' => self::DEFAULT_MOBILE_SIZE, 'sports' => self::DEFAULT_SPORTS_SIZE, default => self::DEFAULT_DESKTOP_SIZE };
+    }
 
     /**
      * Pixel size of the image a slot is showing, as [width, height].
@@ -49,33 +79,30 @@ final class HeroBanner
      */
     public static function size(string $slot): array
     {
-        $slot = $slot === 'mobile' ? 'mobile' : 'desktop';
+        $slot = self::slot($slot);
 
         if ($slot === 'mobile' && self::path('mobile') === null) {
             return self::path('desktop') !== null ? self::size('desktop') : self::DEFAULT_MOBILE_SIZE;
         }
 
         if (self::path($slot) === null) {
-            return $slot === 'mobile' ? self::DEFAULT_MOBILE_SIZE : self::DEFAULT_DESKTOP_SIZE;
+            return self::defaultSize($slot);
         }
 
-        $raw = (string) PlatformSetting::valueFor($slot === 'mobile' ? self::SETTING_MOBILE_SIZE : self::SETTING_DESKTOP_SIZE, '');
+        $raw = (string) PlatformSetting::valueFor(self::sizeKey($slot), '');
 
         if (preg_match('/^(\d{2,5})x(\d{2,5})$/', $raw, $m) && (int) $m[1] > 0 && (int) $m[2] > 0) {
             return [(int) $m[1], (int) $m[2]];
         }
 
-        return $slot === 'mobile' ? self::DEFAULT_MOBILE_SIZE : self::DEFAULT_DESKTOP_SIZE;
+        return self::defaultSize($slot);
     }
 
     /** The stored reference for a slot, or null when nothing usable is stored. */
     public static function path(string $slot): ?string
     {
-        $slot = $slot === 'mobile' ? 'mobile' : 'desktop';
-        $value = trim((string) PlatformSetting::valueFor(
-            $slot === 'mobile' ? self::SETTING_MOBILE : self::SETTING_DESKTOP,
-            ''
-        ));
+        $slot = self::slot($slot);
+        $value = trim((string) PlatformSetting::valueFor(self::settingKey($slot), ''));
 
         return $value !== '' && self::present($slot, $value) ? $value : null;
     }
@@ -83,10 +110,7 @@ final class HeroBanner
     /** The reference as saved, usable or not — the admin uses it to say a file is missing. */
     public static function storedReference(string $slot): ?string
     {
-        $value = trim((string) PlatformSetting::valueFor(
-            $slot === 'mobile' ? self::SETTING_MOBILE : self::SETTING_DESKTOP,
-            ''
-        ));
+        $value = trim((string) PlatformSetting::valueFor(self::settingKey($slot), ''));
 
         return $value !== '' ? $value : null;
     }
@@ -109,6 +133,14 @@ final class HeroBanner
         // A brand that uploaded only the wide picture should still see it on
         // a phone rather than the stock mobile artwork.
         return self::path('desktop') ? self::desktopUrl() : asset(self::DEFAULT_MOBILE);
+    }
+
+    /** The band across the top of the sports front page; the drawn stadium until an operator uploads one. */
+    public static function sportsUrl(): string
+    {
+        $path = self::path('sports');
+
+        return $path ? self::urlFor('sports', $path) : asset(self::DEFAULT_SPORTS);
     }
 
     public static function alt(): string

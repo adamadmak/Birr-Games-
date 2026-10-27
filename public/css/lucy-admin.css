@@ -2182,3 +2182,7 @@ a.metric-card:focus-visible, a.cash-card:focus-visible {
 [data-theme="light"] .configuration-form-grid select,
 [data-theme="light"] .configuration-form-grid textarea,
 [data-theme="light"] .ops-dash .ops-period form input { border-radius: 4px; }
+
+/* The sports band preview keeps the band's own 1600×260 shape. */
+.hero-banner-preview-band { aspect-ratio: 6 / 1; }
+.hero-banner-slot.full { grid-column: 1 / -1; }

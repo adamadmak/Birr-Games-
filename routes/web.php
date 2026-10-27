@@ -42,7 +42,7 @@ Route::get('/promotions', [LobbyController::class, 'promotions'])->name('promoti
 
 // Operator-uploaded hero artwork, served from the database (see App\Models\SiteMedia).
 Route::get('/media/hero/{slot}/{version}', [\App\Http\Controllers\MediaController::class, 'hero'])
-    ->where(['slot' => 'desktop|mobile', 'version' => '[A-Za-z0-9_\-]{6,40}'])
+    ->where(['slot' => 'desktop|mobile|sports', 'version' => '[A-Za-z0-9_\-]{6,40}'])
     ->middleware('throttle:240,1')
     ->name('media.hero');
 

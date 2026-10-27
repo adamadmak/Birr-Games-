@@ -4125,7 +4125,7 @@ body.player-guest {
 .sports-hero {
     background:
         linear-gradient(90deg, rgba(8, 24, 72, .94) 0%, rgba(8, 24, 72, .72) 38%, rgba(8, 24, 72, .35) 70%, rgba(8, 24, 72, .55) 100%),
-        url('/images/hero-sports.svg') center / cover no-repeat,
+        var(--sports-src, url('/images/hero-sports.svg')) center / cover no-repeat,
         #0a1f5c;
     border-color: rgba(140, 180, 255, .28);
 }
