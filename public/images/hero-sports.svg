@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 260" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050c24"/>
+      <stop offset=".55" stop-color="#0b2566"/>
+      <stop offset="1" stop-color="#113f9c"/>
+    </linearGradient>
+    <linearGradient id="pitch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c6d3c"/>
+      <stop offset="1" stop-color="#0f4f2a"/>
+    </linearGradient>
+    <linearGradient id="pitchFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b2566" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#0b2566" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="beam" cx="50%" cy="0%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset=".35" stop-color="#9fc2ff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#9fc2ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lamp" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".5" stop-color="#dbe8ff" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#dbe8ff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="crowd" width="14" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.3" fill="#8fb3ff" opacity=".55"/>
+      <circle cx="10" cy="7" r="1.1" fill="#ffd75e" opacity=".45"/>
+    </pattern>
+    <pattern id="stripes" width="130" height="260" patternUnits="userSpaceOnUse">
+      <rect width="65" height="260" fill="#ffffff" opacity=".035"/>
+    </pattern>
+  </defs>
+
+  <!-- sky -->
+  <rect width="1600" height="260" fill="url(#sky)"/>
+
+  <!-- stands: two tiers of a wide bowl, filled with a crowd dot pattern -->
+  <path d="M0 120 Q 800 20 1600 120 L1600 180 Q 800 95 0 180 Z" fill="#0a1a46"/>
+  <path d="M0 120 Q 800 20 1600 120 L1600 180 Q 800 95 0 180 Z" fill="url(#crowd)"/>
+  <path d="M0 165 Q 800 90 1600 165 L1600 196 Q 800 125 0 196 Z" fill="#071338"/>
+  <path d="M0 165 Q 800 90 1600 165 L1600 196 Q 800 125 0 196 Z" fill="url(#crowd)" opacity=".7"/>
+  <!-- roof line glow -->
+  <path d="M0 118 Q 800 18 1600 118" fill="none" stroke="#9fc2ff" stroke-width="2" opacity=".35"/>
+
+  <!-- floodlight towers -->
+  <g>
+    <rect x="286" y="28" width="6" height="150" fill="#1f3b7a"/>
+    <rect x="258" y="18" width="62" height="18" rx="3" fill="#dbe8ff"/>
+    <ellipse cx="289" cy="27" rx="150" ry="44" fill="url(#lamp)" opacity=".5"/>
+    <path d="M258 36 L130 260 L450 260 L320 36 Z" fill="url(#beam)"/>
+  </g>
+  <g>
+    <rect x="1308" y="28" width="6" height="150" fill="#1f3b7a"/>
+    <rect x="1280" y="18" width="62" height="18" rx="3" fill="#dbe8ff"/>
+    <ellipse cx="1311" cy="27" rx="150" ry="44" fill="url(#lamp)" opacity=".5"/>
+    <path d="M1280 36 L1150 260 L1470 260 L1342 36 Z" fill="url(#beam)"/>
+  </g>
+  <g>
+    <rect x="797" y="12" width="6" height="90" fill="#1f3b7a"/>
+    <rect x="766" y="4" width="68" height="16" rx="3" fill="#dbe8ff"/>
+    <ellipse cx="800" cy="12" rx="170" ry="40" fill="url(#lamp)" opacity=".45"/>
+  </g>
+
+  <!-- pitch in perspective -->
+  <path d="M0 196 L1600 196 L1600 260 L0 260 Z" fill="url(#pitch)"/>
+  <path d="M0 196 L1600 196 L1600 260 L0 260 Z" fill="url(#stripes)"/>
+  <path d="M0 196 L1600 196 L1600 232 L0 232 Z" fill="url(#pitchFade)" opacity=".55"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity=".8" stroke-width="2.5">
+    <!-- touchline and halfway line -->
+    <path d="M60 206 L1540 206"/>
+    <path d="M800 206 L800 260"/>
+    <!-- centre circle, foreshortened -->
+    <ellipse cx="800" cy="236" rx="110" ry="26"/>
+    <!-- penalty areas -->
+    <path d="M60 206 L140 206 L190 260 L0 260"/>
+    <path d="M1540 206 L1460 206 L1410 260 L1600 260"/>
+    <!-- goal boxes -->
+    <path d="M60 206 L90 206 L108 236 L30 236"/>
+    <path d="M1540 206 L1510 206 L1492 236 L1570 236"/>
+  </g>
+  <circle cx="800" cy="236" r="3.5" fill="#ffffff" opacity=".9"/>
+
+  <!-- the ball, on the centre spot -->
+  <g transform="translate(800 222)">
+    <ellipse cx="0" cy="22" rx="16" ry="4" fill="#000" opacity=".35"/>
+    <circle r="15" fill="#ffffff"/>
+    <path fill="#0b1a45" d="M0 -8.5l4.4 3.2-1.7 5.3h-5.4l-1.7-5.3zM-8.5 -2l4.3 1.4 1.6 5.1-3.2 3.9-4.2-2.8zM8.5 -2l1 7.6-4.2 2.8-3.2-3.9 1.6-5.1zM-4.5 11.4l4.5-2 4.5 2-1 2.1a15 15 0 0 1-7 0zM0 -15a15 15 0 0 1 6.3 1.4l-1.6 3.5-4.7-1.3-4.7 1.3-1.6-3.5A15 15 0 0 1 0 -15z" opacity=".92"/>
+    <circle r="15" fill="none" stroke="#0b1a45" stroke-width="1.2" opacity=".8"/>
+  </g>
+
+  <!-- haze and sparks -->
+  <g fill="#ffffff">
+    <circle cx="520" cy="60" r="1.6" opacity=".6"/>
+    <circle cx="640" cy="40" r="1.2" opacity=".45"/>
+    <circle cx="980" cy="52" r="1.4" opacity=".5"/>
+    <circle cx="1120" cy="70" r="1.2" opacity=".4"/>
+    <circle cx="700" cy="88" r="1" opacity=".35"/>
+    <circle cx="900" cy="92" r="1" opacity=".35"/>
+  </g>
+</svg>

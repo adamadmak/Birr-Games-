@@ -4113,3 +4113,23 @@ body.player-guest {
        the box has no content height of its own: give it the picture's ratio. */
     .hero-banner-image.is-slider { height: auto; aspect-ratio: var(--hero-ratio-m, 3.3); min-height: 0; }
 }
+
+/* ============================================================================
+   SPORTS BAND — stadium backdrop
+   The band's own picture (public/images/hero-sports.svg, drawn at 1600×260,
+   the band's proportions): a floodlit bowl over a pitch, with the ball on
+   the centre spot. A navy wash from the left keeps the copy readable and the
+   perk chips sit on the darker right. The CSS pitch lines and the loose ball
+   are retired, since the picture carries both.
+   ========================================================================== */
+.sports-hero {
+    background:
+        linear-gradient(90deg, rgba(8, 24, 72, .94) 0%, rgba(8, 24, 72, .72) 38%, rgba(8, 24, 72, .35) 70%, rgba(8, 24, 72, .55) 100%),
+        url('/images/hero-sports.svg') center / cover no-repeat,
+        #0a1f5c;
+    border-color: rgba(140, 180, 255, .28);
+}
+.sports-hero-pitch, .sports-hero-ball { display: none; }
+.sports-hero h1 { text-shadow: 0 2px 22px rgba(0, 0, 0, .45); }
+.sports-hero p { text-shadow: 0 1px 10px rgba(0, 0, 0, .4); }
+.sports-hero-perks li { background: rgba(5, 16, 50, .62); }
