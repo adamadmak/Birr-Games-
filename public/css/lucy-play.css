@@ -4039,3 +4039,63 @@ body.player-guest {
     body.player-guest .header-lang a.active { background: rgba(255, 255, 255, .22); color: #fff; }
     body.player-guest > main { padding-top: 0; }
 }
+
+/* ============================================================================
+   PHONE FLOWS — sign-up, sign-in, wallet
+   One job per screen, nothing off the right edge, the primary action in reach.
+   ========================================================================== */
+/* Short label on phones for the header's sign-up button. */
+.site-header .header-actions .button-primary .label-short { display: none; }
+@media (max-width: 700px) {
+    .site-header .header-actions .button-primary .label-long { display: none; }
+    .site-header .header-actions .button-primary .label-short { display: inline; }
+    .site-header .header-actions { gap: 6px; }
+    .site-header .header-lang a { padding: 6px 8px; font-size: 11px; }
+}
+
+/* Sign-up: phone first, the name on one row, extras folded away. */
+.auth-card-header > div { min-width: 0; }
+.auth-card-lead { margin: 4px 0 0; color: var(--muted); font-size: 13px; font-weight: 400; }
+.auth-name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stacked-form label em { font-style: normal; font-weight: 500; color: var(--faint, #7c8894); }
+.auth-more { display: grid; gap: 14px; padding: 12px 14px; border: 1px dashed var(--glass-line-strong); border-radius: 12px; }
+.auth-more summary { cursor: pointer; list-style: none; color: var(--ink-2, #d0d7da); font-size: 13px; font-weight: 700; }
+.auth-more summary::-webkit-details-marker { display: none; }
+.auth-more summary::before { content: "+"; display: inline-block; width: 18px; color: var(--brand-sky); font-weight: 800; }
+.auth-more[open] summary::before { content: "–"; }
+.auth-more summary small { font-weight: 400; color: var(--muted); }
+.auth-fineprint { margin: 2px 0 0; text-align: center; color: var(--muted); font-size: 11px; }
+@media (max-width: 700px) {
+    .auth-modal-wrapper { min-height: 0; padding: 10px 0 24px; width: min(480px, calc(100vw - 20px)); }
+    .auth-card.auth-modal-card { padding: 20px 16px 24px; border-radius: 16px; }
+    .auth-card-header { margin-bottom: 14px; }
+    .auth-card-header h2 { font-size: 22px; }
+    .stacked-form { gap: 12px; }
+    .stacked-form input:not([type="checkbox"]) { min-height: 48px; font-size: 16px; }   /* 16px stops iOS zooming into the field */
+    .auth-submit-btn { min-height: 52px; }
+}
+@media (max-width: 340px) {
+    .auth-name-row { grid-template-columns: 1fr; }
+}
+
+/* Wallet on a phone: the balance board stacked, and no grid track wider than
+   the screen. The form grid used `1fr`, whose minimum is the widest child's
+   min-content — the amount input — so the whole form ran 60px off the right
+   edge; minmax(0, 1fr) lets the track shrink and the inputs follow. */
+@media (max-width: 700px) {
+    .wallet-balance-board { grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
+    .wallet-balance-board .wallet-total { grid-column: 1 / -1; min-width: 0; }
+    .wallet-balance-board .wallet-total strong,
+    .wallet-balance-board .wallet-total b { font-size: clamp(26px, 9vw, 36px); overflow-wrap: anywhere; }
+    .wallet-balance-board .wallet-stat { min-width: 0; }
+    .wd-form, .wd-form-section, .wd-bank-grid { grid-template-columns: minmax(0, 1fr); }
+    .wd-form-section, .wd-input-wrap, .wd-amount-display, .wd-amount-hints, .wd-bank-option { min-width: 0; max-width: 100%; }
+    .wd-amount-display input, .wd-amount-input, .wd-input-wrap input { width: 100%; min-width: 0; }
+    .wd-amount-display input { font-size: 22px; }
+    .wd-submit-btn, .wd-actions button[type="submit"] { width: 100%; min-height: 52px; }
+    .wallet-mode-tabs { position: sticky; top: calc(60px + var(--tg-top-inset)); z-index: 5; }
+    .deposit-method-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .deposit-method-card { min-height: 96px; }
+    /* History rows scroll sideways inside their frame instead of widening the page. */
+    .wallet-history-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}

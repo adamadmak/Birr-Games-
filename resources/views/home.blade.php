@@ -7,9 +7,8 @@
      short brand band, not a billboard, so the odds board starts within the
      first screen. A casino shelf under the book links through to /casino. --}}
 <div class="sports-home" data-view="sports">
-    {{-- Phones get the lobby's promo banner instead of the brand band. --}}
-    <div class="home-mobile-banner">@include('partials.hero-banner')</div>
-
+    {{-- Phones get no banner at all: the quick tiles, the switch and the book
+         are the page, and the first screen is the odds board. --}}
     <section class="sports-hero" aria-labelledby="sports-hero-title">
         <div class="sports-hero-pitch" aria-hidden="true"></div>
         <div class="sports-hero-copy">
