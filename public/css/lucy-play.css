@@ -3920,12 +3920,11 @@ body.player-guest {
 /* ============================================================================
    PHONE CHROME — sportsbook style
    On phones the shell takes the look of a classic betting app: a solid blue
-   top bar with Log in / Register, a white strip of quick-link tiles, a promo
-   banner, a Sports / Casino switch above the odds board, and a solid blue
-   bottom bar. Desktop keeps the glass layout above; these rules only apply
+   top bar with Log in / Register, a Sports / Casino switch above the odds
+   board, and a solid blue bottom bar. Desktop keeps the glass layout above; these rules only apply
    under 700px, the same breakpoint as the bottom bar.
    ========================================================================== */
-.player-quicknav, .player-search-link, .home-mobile-banner, .home-switch { display: none; }
+.player-search-link, .home-mobile-banner, .home-switch { display: none; }
 .player-auth-btn {
     display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px;
     border-radius: 9px; font-size: 12px; font-weight: 800; letter-spacing: .02em;
@@ -3961,22 +3960,6 @@ body.player-guest {
     .player-wallet-pill { background: rgba(255, 255, 255, .16); border-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
     .player-avatar { border: 0; background: rgba(255, 255, 255, .22); }
     .player-sidebar, .player-sidebar-overlay { top: calc(60px + var(--tg-top-inset)); }
-
-    /* ---- Quick-link tiles: a white strip under the bar ---- */
-    .player-quicknav {
-        display: flex; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-        background: #fff; border-bottom: 1px solid #dfe5f0;
-    }
-    .player-quicknav::-webkit-scrollbar { display: none; }
-    .player-quicknav a {
-        flex: 0 0 25%; min-width: 96px; height: 92px;
-        display: grid; place-items: center; align-content: center; gap: 8px;
-        color: #152238; text-decoration: none; font-size: 13px; font-weight: 600;
-        border-right: 1px solid #e3e8f2;
-    }
-    .player-quicknav a svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-    .player-quicknav a.active { color: #1d5fe0; box-shadow: inset 0 -3px 0 #1d5fe0; }
-    .player-quicknav a:active { background: #f1f5fb; }
 
     /* ---- Front page ---- */
     .sports-home { padding: 0 0 20px; gap: 0; }

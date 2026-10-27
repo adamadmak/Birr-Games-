@@ -306,7 +306,6 @@
             <button class="player-sidebar-overlay" type="button" data-player-sidebar-overlay aria-label="Close player navigation"></button>
 
             <div class="player-content-column">
-                @include('partials.mobile-quicknav')
                 @if (session('status'))<div class="flash flash-success">{{ session('status') }}</div>@endif
                 {{-- Pages that flash `error` mostly print it themselves — the Shamo page
                      does. This is the backstop for the ones that do not, so a refusal
@@ -382,10 +381,6 @@
                 <a class="button button-primary" href="{{ route('register') }}"><span class="label-long">{{ __('Create account') }}</span><span class="label-short">{{ __('Sign up') }}</span></a>
             </div>
         </header>
-        {{-- Not on the sign-in and sign-up screens: one job each, nothing to wander to. --}}
-        @unless (request()->routeIs('login', 'register', 'password.*'))
-            @include('partials.mobile-quicknav')
-        @endunless
         @if (session('status'))<div class="flash flash-success">{{ session('status') }}</div>@endif
         @if (session('error'))<div class="flash flash-error">{{ session('error') }}</div>@endif
         @if ($errors->any())<div class="flash flash-error">{{ $errors->first() }}</div>@endif
