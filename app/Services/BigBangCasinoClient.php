@@ -209,9 +209,23 @@ class BigBangCasinoClient
         // sync meeting a provider brownout froze the whole site. Eight seconds an
         // attempt keeps the retries and bounds the worst page near half a minute,
         // inside the sync's own time budget.
-        return $retrySafe
-            ? $request->timeout(8)->retry(4, 500, throw: false)
-            : $request;
+        if ($retrySafe) {
+            return $request->timeout(8)->retry(4, 500, throw: false);
+        }
+
+        // A write (player create, game launch) must not be replayed after BigBang
+        // may have acted on it, but a connection that never opened reached no
+        // one. From the vamosonebet.com host those drops come and go within a
+        // minute (27 Oct 2026: the probe passed on its retries while every
+        // launch, which had none, failed), so the connect phase alone is retried.
+        return $request->retry(3, 400, fn (\Throwable $e) => $e instanceof \Illuminate\Http\Client\ConnectionException
+            && self::connectPhaseFailure($e->getMessage()));
+    }
+
+    /** cURL's wording for a connection that never opened, as opposed to one that went quiet mid-request. */
+    public static function connectPhaseFailure(string $message): bool
+    {
+        return (bool) preg_match('/Connection timed out|Failed to connect|Could not resolve host|Connection refused|Connection reset by peer|SSL connect error|Empty reply from server/i', $message);
     }
 
     /**
