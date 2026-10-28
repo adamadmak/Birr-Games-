@@ -505,5 +505,9 @@
     "Get a booking code": "የቦኪንግ ኮድ ያግኙ",
     "Add your picks to the bet slip and set the stake. Do not press Place Bet.": "ምርጫዎችዎን ወደ ቤት ስሊፕ ያክሉ እና የውርርድ መጠኑን ያስገቡ። Place Bet አይጫኑ።",
     "Under Place Bet, open Save or Load Bet Slip and tap Get booking code.": "ከ Place Bet በታች Save or Load Bet Slip ይክፈቱ እና Get booking code ይጫኑ።",
-    "Show the 7-character code to the agent and pay them. They place the bet and print your ticket.": "ባለ 7 ፊደሉን ኮድ ለወኪሉ ያሳዩ እና ይክፈሉ። ወኪሉ ውርርዱን አስቀምጦ ትኬትዎን ያትማል።"
+    "Show the 7-character code to the agent and pay them. They place the bet and print your ticket.": "ባለ 7 ፊደሉን ኮድ ለወኪሉ ያሳዩ እና ይክፈሉ። ወኪሉ ውርርዱን አስቀምጦ ትኬትዎን ያትማል።",
+    "Enter the bank reference or add a screenshot of the transfer.": "የባንክ ማጣቀሻውን ያስገቡ ወይም የዝውውሩን ቅጽበታዊ ገጽ እይታ ያያይዙ።",
+    "Optional when you add a screenshot.": "ቅጽበታዊ ገጽ እይታ ካያያዙ አማራጭ ነው።",
+    "Add a screenshot of the transfer, or enter the reference above. One of the two is needed.": "የዝውውሩን ቅጽበታዊ ገጽ እይታ ያያይዙ ወይም ከላይ ማጣቀሻውን ያስገቡ። ከሁለቱ አንዱ ያስፈልጋል።",
+    "Transfer the exact amount, then add a screenshot or the bank reference.": "ትክክለኛውን መጠን ያስተላልፉ፣ ከዚያ ቅጽበታዊ ገጽ እይታ ወይም የባንክ ማጣቀሻ ያክሉ።"
 }

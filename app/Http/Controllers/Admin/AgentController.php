@@ -685,8 +685,8 @@ class AgentController
         if ($order->status !== 'pending' || ! in_array($validated['status'], ['success', 'rejected'], true)) {
             throw ValidationException::withMessages(['status' => 'This deposit request has already been processed.']);
         }
-        if ($validated['status'] === 'success' && (blank($order->reference) || ! $agent)) {
-            throw ValidationException::withMessages(['status' => 'A bank reference and assigned agent are required.']);
+        if ($validated['status'] === 'success' && (! $order->hasPaymentEvidence() || ! $agent)) {
+            throw ValidationException::withMessages(['status' => 'A bank reference or payment screenshot, and an assigned agent, are required.']);
         }
         if ($validated['status'] === 'success') {
             if (WalletTransaction::query()->where('ledger_key', 'player-deposit-order-'.$order->id)->exists()) {

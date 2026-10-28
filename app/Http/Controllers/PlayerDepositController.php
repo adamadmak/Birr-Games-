@@ -27,12 +27,15 @@ class PlayerDepositController
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:1000000000'],
             'agent_bank_account_id' => ['required', 'integer', Rule::exists('agent_bank_accounts', 'id')],
-            'reference' => ['required', 'string', 'min:3', 'max:100'],
+            // A reference or a screenshot: either lets the agent find the transfer.
+            'reference' => ['nullable', 'required_without:proof', 'string', 'min:3', 'max:100'],
             'idempotency_key' => ['nullable', 'uuid'],
             // The payment screenshot the agent checks the transfer against. Optional:
             // the bank reference is still what identifies the payment.
-            'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'proof' => ['nullable', 'required_without:reference', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ], [
+            'reference.required_without' => __('Enter the bank reference or add a screenshot of the transfer.'),
+            'proof.required_without' => __('Enter the bank reference or add a screenshot of the transfer.'),
             'proof.mimes' => __('Upload the screenshot as a JPG, PNG or WEBP picture.'),
             'proof.max' => __('That picture is larger than 10 MB. Take a screenshot instead of a photo.'),
         ]);
@@ -43,7 +46,8 @@ class PlayerDepositController
             if (AgentOrder::query()->where('user_id', $user->id)->where('type', 'deposit')->where('idempotency_key', $validated['idempotency_key'])->exists()) {
                 return null;
             }
-            if (AgentOrder::query()->where('reference', trim($validated['reference']))->exists()) {
+            $reference = filled($validated['reference'] ?? null) ? trim($validated['reference']) : null;
+            if ($reference !== null && AgentOrder::query()->where('reference', $reference)->exists()) {
                 throw ValidationException::withMessages(['reference' => 'That bank reference has already been submitted.']);
             }
             $account = AgentBankAccount::query()
@@ -70,7 +74,7 @@ class PlayerDepositController
                 'type' => 'deposit',
                 'amount' => number_format((float) $validated['amount'], 2, '.', ''),
                 'commission' => 0,
-                'reference' => trim($validated['reference']),
+                'reference' => $reference,
                 'idempotency_key' => $validated['idempotency_key'],
                 'account_name' => $account->account_name,
                 'account_number' => $account->account_number,

@@ -27,7 +27,7 @@ final class AgentNotifier
     {
         $this->send($order->agent, "<b>💰 New deposit to confirm</b>\n\n"
             .$this->orderLines($order)
-            .'Reference: <code>'.e((string) $order->reference)."</code>\n"
+            .(filled($order->reference) ? 'Reference: <code>'.e((string) $order->reference)."</code>\n" : "No reference: check the screenshot.\n")
             .($withProof ? "📎 The player attached a payment screenshot.\n" : '')
             ."\nCheck the transfer in your account, then approve or reject it in the portal.",
             SiteUrl::route('agent.deposit-orders'));
@@ -37,7 +37,7 @@ final class AgentNotifier
     {
         $this->send($order->agent, "<b>📎 Payment screenshot added</b>\n\n"
             .$this->orderLines($order)
-            .'Reference: <code>'.e((string) $order->reference)."</code>",
+            .(filled($order->reference) ? 'Reference: <code>'.e((string) $order->reference).'</code>' : 'No reference: check the screenshot.'),
             SiteUrl::route('agent.deposit-orders'));
     }
 

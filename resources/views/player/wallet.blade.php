@@ -218,7 +218,7 @@
                             <span>{{ __('Account Name') }}<strong>{{ $order->account_name }}</strong></span>
                             <span>{{ __('Amount') }}<strong>{{ \App\Support\Money::exact($order->amount) }}</strong><button type="button" class="copy-button" data-copy="{{ number_format((float) $order->amount, 2, '.', '') }}" data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
                             <span>{{ __('Agent') }}<strong>{{ $order->agent?->nickname ?: __('Assigned agent') }}</strong></span>
-                            <span>{{ __('Your reference') }}<strong>{{ $order->reference }}</strong></span>
+                            @if($order->reference)<span>{{ __('Your reference') }}<strong>{{ $order->reference }}</strong></span>@endif
                         </div>
                         <div class="deposit-proof-row">
                             @if(isset($openProofIds[$order->id]))
@@ -363,7 +363,7 @@
                 </section>
 
                 <section class="deposit-flow-step" data-deposit-step="reference">
-                    <header><div><small>{{ __('Final step') }}</small><h2>{{ __('Send Payment') }}</h2><p>{{ __('Transfer the exact amount, then enter the bank reference.') }}</p></div><button type="button" data-deposit-close aria-label="{{ __('Close') }}">&times;</button></header>
+                    <header><div><small>{{ __('Final step') }}</small><h2>{{ __('Send Payment') }}</h2><p>{{ __('Transfer the exact amount, then add a screenshot or the bank reference.') }}</p></div><button type="button" data-deposit-close aria-label="{{ __('Close') }}">&times;</button></header>
                     <div class="deposit-instructions">
                         <span>{{ __('Amount') }}<strong data-confirm-amount></strong><button type="button" class="copy-button" data-copy="" data-copy-amount data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
                         <span>{{ __('Bank') }}<strong data-confirm-bank></strong></span>
@@ -372,9 +372,9 @@
                         <span>{{ __('Agent') }}<strong data-confirm-agent></strong></span>
                     </div>
                     <p class="deposit-flow-error" data-deposit-form-error hidden></p>
-                    <label>{{ __('Bank reference or confirmation message') }}<input name="reference" value="{{ old('reference') }}" minlength="3" maxlength="100" placeholder="{{ __('Enter payment reference') }}" required></label>
+                    <label class="deposit-proof-field">{{ __('Bank reference or confirmation message') }} <span>{{ __('Optional when you add a screenshot.') }}</span><input name="reference" value="{{ old('reference') }}" minlength="3" maxlength="100" placeholder="{{ __('Enter payment reference') }}"></label>
 
-                    <label class="deposit-proof-field">{{ __('Payment screenshot') }} <span>{{ __('Optional. A screenshot of the transfer helps your agent confirm faster.') }}</span><input type="file" name="proof" accept="image/png,image/jpeg,image/webp" data-deposit-proof></label>
+                    <label class="deposit-proof-field">{{ __('Payment screenshot') }} <span>{{ __('Add a screenshot of the transfer, or enter the reference above. One of the two is needed.') }}</span><input type="file" name="proof" accept="image/png,image/jpeg,image/webp" data-deposit-proof></label>
                     <img class="deposit-proof-preview" data-deposit-proof-preview alt="{{ __('Your payment screenshot') }}" hidden>
                     <footer><button type="button" class="deposit-flow-secondary" data-deposit-back-agent>{{ __('Back') }}</button><button type="submit" class="deposit-flow-primary">{{ __('Submit For Approval') }}</button></footer>
                     <p class="deposit-flow-hint">{{ __('Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. These details stay on your wallet page until it is confirmed.', ['minutes' => $reviewTimes['deposit_minutes']]) }}</p>

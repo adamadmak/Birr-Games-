@@ -530,8 +530,8 @@ class AgentPortalController
             if ($lockedOrder->status !== 'pending') {
                 throw ValidationException::withMessages(['status' => 'This deposit has already been processed.']);
             }
-            if (blank($lockedOrder->reference)) {
-                throw ValidationException::withMessages(['status' => 'The player has not submitted a bank reference yet.']);
+            if ($validated['status'] === 'success' && ! $lockedOrder->hasPaymentEvidence()) {
+                throw ValidationException::withMessages(['status' => 'The player has not sent a bank reference or a payment screenshot yet.']);
             }
 
             $lockedAgent = Agent::query()->lockForUpdate()->findOrFail($agent->id);

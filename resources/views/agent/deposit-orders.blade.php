@@ -32,7 +32,7 @@
                 <tbody>
                 @forelse($orders as $order)
                     <tr>
-                        <td><code>{{ $order->reference ?: 'Awaiting reference' }}</code>@if(isset($proofOrderIds[$order->id]))<br><small><a href="{{ route('agent.deposit-orders.proof', $order) }}" target="_blank" rel="noopener">&#128206; View payment screenshot</a></small>@endif</td>
+                        <td><code>{{ $order->reference ?: (isset($proofOrderIds[$order->id]) ? 'Screenshot only' : 'Awaiting reference') }}</code>@if(isset($proofOrderIds[$order->id]))<br><small><a href="{{ route('agent.deposit-orders.proof', $order) }}" target="_blank" rel="noopener">&#128206; View payment screenshot</a></small>@endif</td>
                         <td><strong>{{ $order->user?->name ?: 'Member' }}</strong><br><small>{{ $order->user?->phone ?: ($order->user?->username ? '@'.$order->user->username : '—') }}</small></td>
                         <td><strong>{{ \App\Support\Money::format($order->amount,2) }}</strong></td>
                         <td>{{ $order->gateway?->name ?: 'Agent bank' }}</td>
@@ -40,7 +40,7 @@
                         <td><span class="agent-badge {{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
                         <td>{{ $order->created_at?->format('M d, Y h:i A') }}</td>
                         <td>
-                            @if($order->status === 'pending' && $order->reference)
+                            @if($order->status === 'pending' && ($order->reference || isset($proofOrderIds[$order->id])))
                                 <div class="agent-deposit-actions">
                                     <form method="POST" action="{{ route('agent.deposit-orders.process', $order) }}" data-confirm="Approve this payment and credit the player wallet?" >
                                         @csrf @method('PATCH')
@@ -54,7 +54,7 @@
                                     </form>
                                 </div>
                             @elseif($order->status === 'pending')
-                                <small>Waiting for player reference</small>
+                                <small>Waiting for a reference or screenshot</small>
                             @else
                                 <small>{{ $order->processed_at?->format('M d, h:i A') ?: '-' }}</small>
                             @endif

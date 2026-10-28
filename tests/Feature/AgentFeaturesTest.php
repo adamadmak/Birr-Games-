@@ -247,3 +247,57 @@ it('lets an administrator set the float levels and the public site address', fun
     // A malformed address is refused rather than breaking every link the bot sends.
     expect(\App\Support\SiteUrl::clean('vamosonebet.com'))->toBe('');
 });
+
+/* ---------------- Reference or screenshot ---------------- */
+
+it('takes a deposit with a screenshot and no reference, and lets the agent approve it', function () {
+    afBot();
+    $player = player(0);
+    $agent = afAgent('Abel');
+    $account = afAccount($agent, afGateway());
+
+    test()->actingAs($player)->post('/player/wallet/deposits', [
+        'amount' => 500, 'agent_bank_account_id' => $account->id, 'proof' => afScreenshot(),
+    ])->assertRedirect('/player/wallet?tab=deposit')->assertSessionHasNoErrors();
+
+    $order = AgentOrder::query()->firstOrFail();
+    expect($order->reference)->toBeNull()->and($order->hasPaymentEvidence())->toBeTrue();
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/sendMessage')
+        && str_contains($request['text'], 'No reference: check the screenshot'));
+
+    test()->actingAs($agent, 'agent')->get(route('agent.deposit-orders'))->assertOk()
+        ->assertSee('Screenshot only')
+        ->assertSee(route('agent.deposit-orders.process', $order), false);
+
+    test()->actingAs($agent->fresh(), 'agent')
+        ->patch(route('agent.deposit-orders.process', $order), ['status' => 'success'])
+        ->assertSessionHasNoErrors();
+    expect($order->fresh()->status)->toBe('success')
+        ->and((float) $player->fresh()->credits)->toBe(500.0);
+});
+
+it('still needs one of the two: no reference and no screenshot is refused', function () {
+    $player = player(0);
+    $account = afAccount(afAgent('Abel'), afGateway());
+
+    test()->actingAs($player)->post('/player/wallet/deposits', ['amount' => 500, 'agent_bank_account_id' => $account->id])
+        ->assertSessionHasErrors('reference');
+    expect(AgentOrder::query()->count())->toBe(0);
+});
+
+it('does not let an agent approve an order with neither, but lets them reject it', function () {
+    $player = player(0);
+    $agent = afAgent('Abel');
+    $order = AgentOrder::query()->create([
+        'user_id' => $player->id, 'agent_id' => $agent->id, 'payment_gateway_id' => afGateway()->id,
+        'type' => 'deposit', 'amount' => 300, 'reference' => null, 'status' => 'pending',
+    ]);
+
+    test()->actingAs($agent, 'agent')->patch(route('agent.deposit-orders.process', $order), ['status' => 'success'])
+        ->assertSessionHasErrors('status');
+    expect($order->fresh()->status)->toBe('pending');
+
+    test()->actingAs($agent->fresh(), 'agent')->patch(route('agent.deposit-orders.process', $order), ['status' => 'rejected'])
+        ->assertSessionHasNoErrors();
+    expect($order->fresh()->status)->toBe('rejected');
+});
