@@ -28,6 +28,12 @@ Route::post('/integrations/qtech/sync-catalog', QtechCatalogSyncController::clas
     ->middleware('throttle:6,1,integrations-qtech-sync-catalog')
     ->name('integrations.qtech.sync-catalog');
 
+// The scheduler's clock. The same timer calls this once a minute with the same
+// token; it runs schedule:run, which includes the queue worker (SystemTickController).
+Route::match(['get', 'post'], '/system/tick', \App\Http\Controllers\SystemTickController::class)
+    ->middleware('throttle:6,1,system-tick')
+    ->name('system.tick');
+
 // WinHouse sportsbook. `transaction` is read-only on purpose: it lets the book's
 // sweeper resolve a stake whose call timed out instead of blind-retrying it,
 // which would charge a player twice for one bet.

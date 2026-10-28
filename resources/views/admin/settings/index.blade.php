@@ -247,6 +247,30 @@
                     @include('admin.settings._winhouse')
                 @endif
 
+                @php
+                    $tickAt = $tick['heartbeat'] ? \Illuminate\Support\Carbon::parse($tick['heartbeat']) : null;
+                @endphp
+                <div class="configuration-form-section divided">
+                    <h3>Background work</h3>
+                    <p>This host runs no cron, so the scheduler only runs when an outside timer calls the tick address below once a minute. The scheduler deletes bot password messages, expires deposit bonuses and sessions, reconciles the wallet, refreshes the catalogues and works the queue.</p>
+                </div>
+                @if ($tickAt && $tickAt->gt(now()->subMinutes(5)))
+                    <div class="configuration-form-feedback"><strong>Running.</strong> The scheduler last ran {{ $tickAt->diffForHumans() }}{{ $tick['last'] ? ', taking '.$tick['last']['seconds'].' s' : '' }}.</div>
+                @elseif ($tickAt)
+                    <div class="configuration-form-feedback"><div class="form-errors"><strong>Stalled.</strong> The scheduler last ran {{ $tickAt->diffForHumans() }}. Check the timer that calls the tick address.</div></div>
+                @else
+                    <div class="configuration-form-feedback"><div class="form-errors"><strong>Never run.</strong> Nothing scheduled has happened on this host yet. Point a timer at the tick address below.</div></div>
+                @endif
+                <div class="configuration-form-grid two">
+                    <label>Tick address
+                        <input value="{{ $tick['url'] }}" readonly>
+                        <small>Call it every minute, GET or POST, with <code>?token=</code> set to the sync token ({{ $tick['token_set'] ? 'saved' : 'not set — save a sync token under BigBang keys first' }}). It answers in a few seconds and refuses to overlap itself.</small>
+                    </label>
+                    <label>Example
+                        <input value="* * * * * curl -fsS '{{ $tick['url'] }}?token=YOUR_SYNC_TOKEN' > /dev/null" readonly>
+                        <small>A crontab line for any machine that can reach the site, or the same URL in a hosted monitor such as cron-job.org.</small>
+                    </label>
+                </div>
                 <div class="configuration-form-section divided">
                     <h3>Schema updates</h3>
                     <p>Whether a deploy applies schema changes depends on this app's build command in the hosting dashboard, and it is not the same on both brands. This shows what is waiting and applies it without one.</p>

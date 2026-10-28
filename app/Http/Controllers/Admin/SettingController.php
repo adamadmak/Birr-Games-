@@ -38,6 +38,12 @@ class SettingController
             'goLiveReset' => $tab === 'system' ? $this->goLiveResetPreview() : null,
             'qtechIntegrationMode' => \App\Support\Qtech::integrationMode(),
             'winhouse' => $tab === 'system' ? $this->winhouseState($request) : null,
+            'tick' => $tab === 'system' ? [
+                'heartbeat' => \Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\SystemTickController::HEARTBEAT_KEY),
+                'last' => \Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\SystemTickController::LAST_TICK_KEY),
+                'url' => $request->getSchemeAndHttpHost().'/api/system/tick',
+                'token_set' => \App\Support\Qtech::syncToken() !== '',
+            ] : null,
             'bigbang' => $tab === 'system' ? [
                 'api_key_set' => \App\Support\BigBang::apiKey() !== '',
                 'callback_set' => \App\Support\BigBang::callbackToken() !== '',
