@@ -188,7 +188,7 @@ class TelegramWebhookController
                     [],
                     $telegram->mainMenuKeyboard()
                 );
-            } elseif (str_starts_with($command, '/start')) {
+            } elseif (str_starts_with($command, '/start') && ! $this->isPasswordStart($text)) {
                 $subscriber->update([
                     'active' => true,
                     'pending_action' => null,
@@ -240,7 +240,7 @@ class TelegramWebhookController
                         $telegram->mainMenuKeyboard()
                     );
                 }
-            } elseif (str_starts_with($command, '/password')) {
+            } elseif (str_starts_with($command, '/password') || $this->isPasswordStart($text)) {
                 $user = $players->ensurePlayer($subscriber);
                 $subscriber->refresh();
 
@@ -538,6 +538,12 @@ class TelegramWebhookController
                 'updated_at' => now(),
             ]);
         }
+    }
+
+    /** The website's "forgot password" page opens the bot with `?start=password`. */
+    private function isPasswordStart(string $text): bool
+    {
+        return (bool) preg_match('/^\/start(?:@\w+)?\s+password\s*$/i', trim($text));
     }
 
     private function isAction(string $text, array $actions): bool

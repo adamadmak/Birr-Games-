@@ -56,18 +56,9 @@ class AuthController
             }
         }
 
-        // Numbers are stored in several spellings (0912…, 251912…, +251 912…), so match
-        // every variant of the same phone number rather than the literal input only.
-        // Players sign in with a phone number or handle; administrators with their email.
-        $phoneCandidates = array_values(array_unique(array_merge([$loginInput], PhoneNumber::candidates($loginInput))));
-
-        $user = User::query()
-            ->where(fn ($query) => $query
-                ->whereIn('phone', $phoneCandidates)
-                ->orWhere('username', ltrim($loginInput, '@'))
-                ->orWhere('email', $loginInput))
-            ->orderBy('id')
-            ->first();
+        // Players sign in with a phone number (in any spelling) or handle;
+        // administrators with their email. User::findByLogin knows the rules.
+        $user = User::findByLogin($loginInput);
 
         if (! $user || ! Auth::attempt(['id' => $user->id, 'password' => $request->input('password'), 'active' => true], $request->boolean('remember'))) {
             // Same message whether the account exists or not: a sign-in form must

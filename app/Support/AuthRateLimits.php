@@ -47,6 +47,23 @@ final class AuthRateLimits
             return $limits;
         });
 
+        RateLimiter::for('recovery', function (Request $request) {
+            $ip = (string) $request->ip();
+            $account = strtolower(trim((string) $request->input('account', $request->input('email', ''))));
+
+            $limits = [
+                Limit::perMinute(5)->by('recovery:m:'.$ip)->response(fn (Request $r, array $h) => self::refuse($r, SecurityEvent::TYPE_PASSWORD_RESET, $h)),
+                Limit::perHour(15)->by('recovery:h:'.$ip)->response(fn (Request $r, array $h) => self::refuse($r, SecurityEvent::TYPE_PASSWORD_RESET, $h)),
+            ];
+
+            if ($account !== '') {
+                // Per account too, so one player's inbox cannot be flooded from many addresses.
+                $limits[] = Limit::perHour(5)->by('recovery:acct:'.sha1($account))->response(fn (Request $r, array $h) => self::refuse($r, SecurityEvent::TYPE_PASSWORD_RESET, $h));
+            }
+
+            return $limits;
+        });
+
         RateLimiter::for('verification', function (Request $request) {
             return Limit::perMinutes(10, 3)->by('verify:'.($request->user()?->getAuthIdentifier() ?: $request->ip()));
         });
@@ -63,12 +80,14 @@ final class AuthRateLimits
             'rate_limited',
             $request->ip(),
             $request->userAgent(),
-            (string) $request->input('phone', $request->input('email', $request->input('username', '')))
+            (string) $request->input('phone', $request->input('email', $request->input('username', $request->input('account', ''))))
         );
 
-        $message = $type === SecurityEvent::TYPE_LOGIN
-            ? "Too many sign-in attempts. Please wait {$wait} and try again."
-            : "Too many sign-up attempts from your connection. Please wait {$wait} and try again.";
+        $message = match ($type) {
+            SecurityEvent::TYPE_LOGIN => "Too many sign-in attempts. Please wait {$wait} and try again.",
+            SecurityEvent::TYPE_PASSWORD_RESET => "Too many password requests. Please wait {$wait} and try again.",
+            default => "Too many sign-up attempts from your connection. Please wait {$wait} and try again.",
+        };
 
         if ($request->expectsJson()) {
             return response()->json(['ok' => false, 'error' => $message], 429, $headers);
@@ -76,6 +95,10 @@ final class AuthRateLimits
 
         return redirect()->back()
             ->withInput($request->except(['password', 'password_confirmation', '_token', 'cf-turnstile-response']))
-            ->withErrors([$type === SecurityEvent::TYPE_LOGIN ? 'phone' : 'registration' => $message]);
+            ->withErrors([match ($type) {
+                SecurityEvent::TYPE_LOGIN => 'phone',
+                SecurityEvent::TYPE_PASSWORD_RESET => 'account',
+                default => 'registration',
+            } => $message]);
     }
 }

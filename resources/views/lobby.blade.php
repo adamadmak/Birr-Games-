@@ -141,7 +141,7 @@
 
         <div class="sidebar-responsible">
             <span>18+</span>
-            <p><strong>Stay in control.</strong><br>Pause when play stops being fun.</p>
+            <p><strong>{{ __('Stay in control.') }}</strong><br>{{ __('Pause when play stops being fun.') }}</p>
         </div>
     </aside>
 

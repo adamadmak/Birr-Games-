@@ -137,6 +137,30 @@ class User extends Authenticatable
         return $this->hasOne(TelegramSubscriber::class);
     }
 
+    /**
+     * The account behind whatever a player types to sign in: a phone number in
+     * any of its spellings (0912…, 251912…, +251 912…), a handle with or without
+     * the @, or — for administrators — an email address. Sign-in and password
+     * recovery must agree on this, so it lives here.
+     */
+    public static function findByLogin(string $login): ?self
+    {
+        $login = trim($login);
+        if ($login === '' || mb_strlen($login) > 190) {
+            return null;
+        }
+
+        $phones = array_values(array_unique(array_merge([$login], \App\Support\PhoneNumber::candidates($login))));
+
+        return static::query()
+            ->where(fn ($query) => $query
+                ->whereIn('phone', $phones)
+                ->orWhere('username', ltrim($login, '@'))
+                ->orWhere('email', $login))
+            ->orderBy('id')
+            ->first();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;

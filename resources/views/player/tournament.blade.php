@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daily Tournament - Vamoseone')
+@section('title', __('Daily Tournament').' - Vamoseone')
 
 @section('content')
 @php
@@ -13,7 +13,7 @@
     // The podium is drawn 2 - 1 - 3 so the winner stands in the middle and tallest.
     $podiumOrder = [2, 1, 3];
     $medal = [1 => 'gold', 2 => 'silver', 3 => 'bronze'];
-    $ordinal = [1 => '1st', 2 => '2nd', 3 => '3rd'];
+    $ordinal = [1 => __('1st prize'), 2 => __('2nd prize'), 3 => __('3rd prize')];
 @endphp
 
 <div class="player-account-page tn-page">
@@ -36,30 +36,30 @@
         </svg>
 
         <div class="tn-hero-main">
-            <span class="tn-live">{!! $isToday ? '<i></i> Live now' : 'Final board' !!}</span>
-            <h1>Daily Tournament</h1>
-            <p>Stake more than everyone else today and climb to the top. The board resets every midnight.</p>
+            <span class="tn-live">@if($isToday)<i></i> {{ __('Live now') }}@else{{ __('Final board') }}@endif</span>
+            <h1>{{ __('Daily Tournament') }}</h1>
+            <p>{{ __('Stake more than everyone else today and climb to the top. The board resets every midnight.') }}</p>
         </div>
 
         <div class="tn-hero-stats">
             <div class="tn-pool">
-                <small>Prize pool</small>
-                <strong>{{ $prizePool > 0 ? $money($prizePool) : 'Play to climb' }}</strong>
-                <span>Top {{ number_format($paidPlaces) }} players are paid</span>
+                <small>{{ __('Prize pool') }}</small>
+                <strong>{{ $prizePool > 0 ? $money($prizePool) : __('Play to climb') }}</strong>
+                <span>{{ __('Top :count players are paid', ['count' => number_format($paidPlaces)]) }}</span>
             </div>
 
             @if($isToday)
                 <div class="tn-clock" data-tournament-countdown data-resets-at="{{ $resetsAt->toIso8601String() }}">
-                    <small>Resets in</small>
+                    <small>{{ __('Resets in') }}</small>
                     <div>
-                        <span><b data-countdown-hours>--</b><i>Hours</i></span>
-                        <span><b data-countdown-minutes>--</b><i>Min</i></span>
-                        <span><b data-countdown-seconds>--</b><i>Sec</i></span>
+                        <span><b data-countdown-hours>--</b><i>{{ __('Hours') }}</i></span>
+                        <span><b data-countdown-minutes>--</b><i>{{ __('Min') }}</i></span>
+                        <span><b data-countdown-seconds>--</b><i>{{ __('Sec') }}</i></span>
                     </div>
                 </div>
             @else
                 <div class="tn-clock is-closed">
-                    <small>Board closed</small>
+                    <small>{{ __('Board closed') }}</small>
                     <div><span><b>{{ $day->format('M j') }}</b><i>{{ $day->format('l') }}</i></span></div>
                 </div>
             @endif
@@ -67,30 +67,30 @@
     </section>
 
     {{-- ===== Day picker ===== --}}
-    <nav class="tn-days" aria-label="Tournament day">
+    <nav class="tn-days" aria-label="{{ __('Tournament day') }}">
         @foreach($days as $tab)
             <a class="{{ $offset === $tab['offset'] ? 'active' : '' }}" href="{{ route('player.tournament', ['day' => $tab['offset']]) }}">
-                <strong>{{ $tab['label'] }}</strong>
+                <strong>{{ __($tab['label']) }}</strong>
                 <small>{{ $tab['date']->format('M j') }}</small>
             </a>
         @endforeach
     </nav>
 
     {{-- ===== Podium: the real top three, or the prizes waiting for whoever takes them ===== --}}
-    <section class="tn-podium {{ $board->isEmpty() ? 'is-open' : '' }}" aria-label="{{ $board->isEmpty() ? 'Prizes up for grabs' : 'Top three' }}">
+    <section class="tn-podium {{ $board->isEmpty() ? 'is-open' : '' }}" aria-label="{{ $board->isEmpty() ? __('Prizes up for grabs') : __('Top three') }}">
         @foreach($podiumOrder as $place)
             @php($row = $topThree->get($place))
             <article class="tn-pod tn-pod-{{ $medal[$place] }} place-{{ $place }} {{ $row ? '' : 'is-empty' }} {{ $row && $myRow && $row['user_id'] === $myRow['user_id'] ? 'is-me' : '' }}">
                 <div class="tn-pod-medal"><span>{{ $place }}</span></div>
                 <div class="tn-pod-avatar">{{ $row ? $initial($row['name']) : '?' }}</div>
-                <strong class="tn-pod-name">{{ $row ? $row['name'] : 'Open spot' }}</strong>
-                <small class="tn-pod-sub">{{ $row ? ($row['phone'] ?: 'Player') : ($isToday ? 'Be the one' : 'Nobody took it') }}</small>
+                <strong class="tn-pod-name">{{ $row ? $row['name'] : __('Open spot') }}</strong>
+                <small class="tn-pod-sub">{{ $row ? ($row['phone'] ?: __('Player')) : ($isToday ? __('Be the one') : __('Nobody took it')) }}</small>
                 <div class="tn-pod-prize">
-                    <small>{{ $ordinal[$place] }} prize</small>
+                    <small>{{ $ordinal[$place] }}</small>
                     <b>{{ $money($prizes[$place]) }}</b>
                 </div>
                 @if($row)
-                    <div class="tn-pod-stake">{{ number_format($row['staked']) }} <i>staked</i></div>
+                    <div class="tn-pod-stake">{{ number_format($row['staked']) }} <i>{{ __('staked') }}</i></div>
                 @endif
             </article>
         @endforeach
@@ -99,29 +99,29 @@
     @if($board->isEmpty())
         <section class="tn-empty">
             <div>
-                <h2>{{ $isToday ? 'Nobody has played yet today' : 'Nobody played on this day' }}</h2>
-                <p>{{ $isToday ? 'The board is empty, so every prize above is still up for grabs. Place a bet and your name goes straight to the top.' : 'There is no board for this day.' }}</p>
+                <h2>{{ $isToday ? __('Nobody has played yet today') : __('Nobody played on this day') }}</h2>
+                <p>{{ $isToday ? __('The board is empty, so every prize above is still up for grabs. Place a bet and your name goes straight to the top.') : __('There is no board for this day.') }}</p>
             </div>
-            @if($isToday)<a class="button button-primary" href="{{ route('home') }}">Start playing</a>@endif
+            @if($isToday)<a class="button button-primary" href="{{ route('home') }}">{{ __('Start playing') }}</a>@endif
         </section>
     @endif
 
     {{-- ===== Everyone else ===== --}}
     @if($rest->isNotEmpty())
-        <section class="tn-board" aria-label="Leaderboard">
-            <header><h2>The chasing pack</h2><span>Ranked by total stake</span></header>
+        <section class="tn-board" aria-label="{{ __('Leaderboard') }}">
+            <header><h2>{{ __('The chasing pack') }}</h2><span>{{ __('Ranked by total stake') }}</span></header>
             @foreach($rest as $row)
                 <article class="tn-row {{ $myRow && $row['user_id'] === $myRow['user_id'] ? 'is-me' : '' }}">
                     <span class="tn-row-rank">{{ $row['rank'] }}</span>
                     <span class="tn-row-avatar">{{ $initial($row['name']) }}</span>
                     <div class="tn-row-player">
-                        <strong>{{ $row['name'] }}@if($myRow && $row['user_id'] === $myRow['user_id']) <em>You</em>@endif</strong>
-                        <small>{{ $row['phone'] ?: 'Player' }}</small>
+                        <strong>{{ $row['name'] }}@if($myRow && $row['user_id'] === $myRow['user_id']) <em>{{ __('You') }}</em>@endif</strong>
+                        <small>{{ $row['phone'] ?: __('Player') }}</small>
                     </div>
                     <div class="tn-row-bar" aria-hidden="true">
                         <progress max="{{ $leaderStake }}" value="{{ $row['staked'] }}"></progress>
                     </div>
-                    <span class="tn-row-stake">{{ number_format($row['staked']) }}<i>staked</i></span>
+                    <span class="tn-row-stake">{{ number_format($row['staked']) }}<i>{{ __('staked') }}</i></span>
                     <span class="tn-row-prize {{ $row['prize'] > 0 ? 'is-paid' : '' }}">{{ $row['prize'] > 0 ? $money($row['prize']) : '—' }}</span>
                 </article>
             @endforeach
@@ -132,24 +132,24 @@
     @auth
         <section class="tn-you">
             @if($myRow)
-                <div class="tn-you-rank"><small>Your place</small><strong>#{{ $myRow['rank'] }}</strong></div>
-                <div><small>Staked {{ $isToday ? 'today' : 'that day' }}</small><strong>{{ number_format($myRow['staked']) }}</strong></div>
-                <div><small>Prize if the board holds</small><strong>{{ $myRow['prize'] > 0 ? $money($myRow['prize']) : '—' }}</strong></div>
+                <div class="tn-you-rank"><small>{{ __('Your place') }}</small><strong>#{{ $myRow['rank'] }}</strong></div>
+                <div><small>{{ $isToday ? __('Staked today') : __('Staked that day') }}</small><strong>{{ number_format($myRow['staked']) }}</strong></div>
+                <div><small>{{ __('Prize if the board holds') }}</small><strong>{{ $myRow['prize'] > 0 ? $money($myRow['prize']) : '—' }}</strong></div>
             @else
                 <div class="tn-you-empty">
-                    <strong>You are not on {{ $isToday ? "today's" : 'this' }} board yet</strong>
-                    <span>Top {{ number_format($paidPlaces) }} players by daily stake share the prize pool.</span>
+                    <strong>{{ $isToday ? __("You are not on today's board yet") : __('You are not on this board yet') }}</strong>
+                    <span>{{ __('Top :count players by daily stake share the prize pool.', ['count' => number_format($paidPlaces)]) }}</span>
                 </div>
-                @if($isToday)<a class="button button-primary" href="{{ route('home') }}">Play now</a>@endif
+                @if($isToday)<a class="button button-primary" href="{{ route('home') }}">{{ __('Play now') }}</a>@endif
             @endif
         </section>
     @endauth
 
     {{-- ===== How it works ===== --}}
     <section class="tn-how">
-        <article><span>1</span><div><strong>Play any game</strong><p>Every bet you place today counts toward your total stake.</p></div></article>
-        <article><span>2</span><div><strong>Climb the board</strong><p>The highest total stake takes first place. Ties go to whoever got there first.</p></div></article>
-        <article><span>3</span><div><strong>Get paid</strong><p>Prizes are paid by the Vamoseone team after the board closes at midnight.</p></div></article>
+        <article><span>1</span><div><strong>{{ __('Play any game') }}</strong><p>{{ __('Every bet you place today counts toward your total stake.') }}</p></div></article>
+        <article><span>2</span><div><strong>{{ __('Climb the board') }}</strong><p>{{ __('The highest total stake takes first place. Ties go to whoever got there first.') }}</p></div></article>
+        <article><span>3</span><div><strong>{{ __('Get paid') }}</strong><p>{{ __('Prizes are paid by the Vamoseone team after the board closes at midnight.') }}</p></div></article>
     </section>
 </div>
 

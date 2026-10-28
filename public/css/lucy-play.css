@@ -4137,3 +4137,17 @@ body.player-guest {
 /* The deposit-bonus call to action is a link until the first deposit lands. */
 a.bonus-claim-button { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .bonus-fineprint { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+
+/* ===== PASSWORD RECOVERY (28 Oct 2026) ===== */
+.form-success { margin: 14px 0; padding: 11px 14px; color: #b9f6d2; background: rgba(23,228,149,.1); border: 1px solid rgba(23,228,149,.3); border-radius: 12px; font-size: 12px; line-height: 1.5; }
+.auth-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.auth-row .check-row { margin: 0; }
+.auth-forgot { font-size: 12px; font-weight: 700; color: var(--lime); white-space: nowrap; }
+.recovery-option { margin-top: 18px; }
+.recovery-option.divided { margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); }
+.recovery-option h3 { margin: 0 0 6px; font-size: 15px; font-weight: 800; color: #fff; }
+.recovery-option p { margin: 0 0 12px; font-size: 13px; line-height: 1.55; color: var(--muted, #9aa6b2); }
+.recovery-option .stacked-form { margin-top: 8px; }
+.stacked-form label small { display: block; margin-top: 4px; font-size: 11px; color: var(--muted, #9aa6b2); }
+.prose-page .prose-note { margin-top: 24px; font-size: 12px; color: var(--muted, #9aa6b2); }
+.prose-page ul { padding-left: 20px; line-height: 1.6; }

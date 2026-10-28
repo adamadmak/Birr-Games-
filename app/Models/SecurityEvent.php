@@ -22,6 +22,7 @@ class SecurityEvent extends Model
     public const TYPE_REGISTRATION = 'registration';
     public const TYPE_LOGIN = 'login';
     public const TYPE_VERIFICATION = 'verification';
+    public const TYPE_PASSWORD_RESET = 'password_reset';
 
     public const OUTCOME_ALLOWED = 'allowed';
     public const OUTCOME_BLOCKED = 'blocked';

@@ -59,13 +59,7 @@ class TelegramPlayerService
      */
     private function endOtherSessions(User $user): void
     {
-        try {
-            if (config('session.driver') === 'database' && \Illuminate\Support\Facades\Schema::hasTable(config('session.table', 'sessions'))) {
-                DB::table(config('session.table', 'sessions'))->where('user_id', $user->id)->delete();
-            }
-        } catch (\Throwable $exception) {
-            report($exception);
-        }
+        \App\Support\PlayerSessions::endAll($user);
     }
 
     /**

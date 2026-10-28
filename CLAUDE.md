@@ -148,3 +148,30 @@ Bot messages that carry a password go through `sendSecret()` in the webhook, whi
 schedules their deletion from the chat. `/password` is limited to three an hour and
 ends the player's other browser sessions. Run the scratch checks by hand after
 touching either (the earlier smoke scripts were removed; see git history).
+
+## Password recovery has two doors, and both prove something
+
+`App\Http\Controllers\PasswordRecoveryController` (`/password/forgot`). Telegram
+for everyone: the page opens the bot with `?start=password`, which the webhook
+treats as `/password`, and the bot only answers a chat whose contact card
+carries the account's phone. Email only for an account whose address is
+confirmed, through Laravel's password broker. The request form answers the
+same way whether the account exists or not; keep it that way. Sign-in and
+recovery find the account through `User::findByLogin()`, so a new spelling of
+a phone number goes there, not in a controller. A changed password rotates
+the remember token and calls `App\Support\PlayerSessions::endAll()`.
+
+## Run the tests before pushing a money change
+
+```bash
+php vendor/bin/pest
+```
+
+Pest with an in-memory SQLite database (phpunit.xml); nothing touches the local
+database, cache or mail. The suite covers the bonus split rule and ledger, the
+deposit bonus grant, the WinHouse wallet callbacks (token, signature,
+idempotency, bonus-first stake), sign-in, password recovery, admin default-deny
+and the scheduler tick. A new wallet path gets a test next to
+`tests/Feature/WinhouseWalletTest.php` before it ships; `player()` in
+`tests/Pest.php` makes a player with a given wallet, and `$this->setting()` on
+the test case saves a platform setting the way the admin would.

@@ -102,6 +102,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
+
+    // Password recovery (PasswordRecoveryController): Telegram for everyone, an
+    // email link for accounts with a confirmed address. `recovery` is a named
+    // limiter in App\Support\AuthRateLimits.
+    Route::get('/password/forgot', [\App\Http\Controllers\PasswordRecoveryController::class, 'show'])->name('password.request');
+    Route::post('/password/email', [\App\Http\Controllers\PasswordRecoveryController::class, 'email'])->middleware('throttle:recovery')->name('password.email');
+    Route::get('/password/reset/{token}', [\App\Http\Controllers\PasswordRecoveryController::class, 'reset'])->name('password.reset');
+    Route::post('/password/reset', [\App\Http\Controllers\PasswordRecoveryController::class, 'update'])->middleware('throttle:recovery')->name('password.update');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

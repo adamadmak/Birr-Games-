@@ -2,7 +2,7 @@
 <html lang="{{ app()->getLocale() }}" data-locale="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#070d1c">
     <title>@yield('title', config('app.name'))</title>
@@ -322,10 +322,10 @@
                 @endauth
                 <main class="player-stage">@yield('content')</main>
                 <footer class="site-footer player-footer">
-                    <div><a class="brand footer-brand" href="{{ url('/') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a><p>Original local games with an Ethiopian Birr-denominated wallet.</p></div>
+                    <div><a class="brand footer-brand" href="{{ url('/') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a><p>{{ __('Sports betting and casino games with an Ethiopian Birr wallet.') }}</p></div>
                     <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ auth()->check() ? route('player.wallet') : route('login') }}">{{ __('Birr wallet') }}</a></div>
-                    <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a href="{{ route('about') }}">{{ __('About Vamoseone') }}</a><span>18+ interface concept</span></div>
-                    <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
+                    <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a href="{{ route('about') }}">{{ __('About Vamoseone') }}</a><span>{{ __('18+ only') }}</span></div>
+                    <div class="footer-note"><span class="status-dot"></span><p>{{ __('Play responsibly') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
                 </footer>
             </div>
 
@@ -388,8 +388,8 @@
         <footer class="site-footer">
             <div><a class="brand footer-brand" href="{{ url('/') }}"><img class="brand-logo" src="{{ asset('logo.png') }}" alt="Vamoseone logo" width="816" height="306" fetchpriority="high" decoding="async"></a><p>Original entertainment built for Ethiopia with Birr-denominated play.</p></div>
             <div><h3>{{ __('Explore') }}</h3><a href="{{ route('home') }}">{{ __('Game lobby') }}</a><a href="{{ route('promotions') }}">{{ __('Promotions') }}</a><a href="{{ route('about') }}">{{ __('About Vamoseone') }}</a></div>
-            <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a class="footer-telegram" href="{{ \App\Models\PlatformSetting::telegramSupportUrl() }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 240 240" width="18" height="18" aria-hidden="true"><circle cx="120" cy="120" r="120" fill="#29a9eb"></circle><path fill="#fff" d="m53 122 130-50c6-2 11 1 9 10l-22 104c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 4-8 4l3-40 73-66c3-3-1-4-4-2l-90 57-39-12c-8-3-8-9 2-12z"></path></svg><span>{{ __('Chat with support') }}</span></a><span>Play-money experience</span><span>18+ interface concept</span></div>
-            <div class="footer-note"><span class="status-dot"></span><p>{{ __('All systems local') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
+            <div><h3>{{ __('Player care') }}</h3><a href="{{ route('responsible') }}">{{ __('Responsible play') }}</a><a class="footer-telegram" href="{{ \App\Models\PlatformSetting::telegramSupportUrl() }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 240 240" width="18" height="18" aria-hidden="true"><circle cx="120" cy="120" r="120" fill="#29a9eb"></circle><path fill="#fff" d="m53 122 130-50c6-2 11 1 9 10l-22 104c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 4-8 4l3-40 73-66c3-3-1-4-4-2l-90 57-39-12c-8-3-8-9 2-12z"></path></svg><span>{{ __('Chat with support') }}</span></a><span>{{ __('18+ only') }}</span></div>
+            <div class="footer-note"><span class="status-dot"></span><p>{{ __('Play responsibly') }}</p><small>&copy; {{ date('Y') }} Vamoseone</small></div>
         </footer>
 
         <nav class="player-mobile-nav" aria-label="Mobile navigation">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -132,22 +132,22 @@
     <div class="game-layout">
         <!-- Top Bar safely positioned between Telegram WebApp header overlays -->
         <header class="game-bar" id="gameBar">
-            <a class="bar-back" href="{{ route('home') }}" target="_top" aria-label="Back to Lobby">
+            <a class="bar-back" href="{{ route('home') }}" target="_top" aria-label="{{ __('Back to Lobby') }}">
                 <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                <span>Back</span>
+                <span>{{ __('Back') }}</span>
             </a>
 
             <div class="bar-actions">
-                <button type="button" class="bar-icon-btn" id="favBtn" aria-label="Favorite game">
+                <button type="button" class="bar-icon-btn" id="favBtn" aria-label="{{ __('Favorite game') }}">
                     <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 </button>
-                <button type="button" class="bar-icon-btn" data-provider-reload aria-label="Reload game">
+                <button type="button" class="bar-icon-btn" data-provider-reload aria-label="{{ __('Reload game') }}">
                     <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 </button>
-                <button type="button" class="bar-icon-btn" data-provider-fullscreen aria-label="Enter fullscreen">
+                <button type="button" class="bar-icon-btn" data-provider-fullscreen aria-label="{{ __('Enter fullscreen') }}">
                     <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                 </button>
-                <a class="bar-deposit" href="{{ route('player.wallet', ['tab' => 'deposit']) }}" target="_top">Deposit</a>
+                <a class="bar-deposit" href="{{ route('player.wallet', ['tab' => 'deposit']) }}" target="_top">{{ __('Deposit') }}</a>
             </div>
         </header>
 
@@ -156,7 +156,7 @@
             <iframe
                 data-provider-frame
                 src="{{ $launchUrl }}"
-                title="Play {{ $game->title }}"
+                title="{{ __('Play :game', ['game' => $game->title]) }}"
                 allow="autoplay; fullscreen; gamepad"
                 allowfullscreen
                 loading="eager"
