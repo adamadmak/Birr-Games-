@@ -143,6 +143,12 @@ Route::prefix('agent')->name('agent.')->group(function () {
         Route::get('/deposit-order/{order}/proof', [\App\Http\Controllers\DepositProofController::class, 'forAgent'])->name('deposit-orders.proof');
         // Bet tickets the agent prints for the players they serve (AgentTicketController).
         Route::get('/tickets', [\App\Http\Controllers\AgentTicketController::class, 'index'])->name('tickets');
+        // The counter: walk-in betting through the agent (App\Services\AgentShop).
+        Route::get('/counter', [\App\Http\Controllers\AgentShopController::class, 'show'])->name('counter');
+        Route::post('/counter/top-up', [\App\Http\Controllers\AgentShopController::class, 'topUp'])->middleware('throttle:20,1,agent-counter')->name('counter.top-up');
+        Route::post('/counter/give-back', [\App\Http\Controllers\AgentShopController::class, 'giveBack'])->middleware('throttle:20,1,agent-counter')->name('counter.give-back');
+        Route::post('/counter/open', [\App\Http\Controllers\AgentShopController::class, 'open'])->name('counter.open');
+        Route::post('/tickets/{ticket}/pay-out', [\App\Http\Controllers\AgentShopController::class, 'payOut'])->where('ticket', '[A-Za-z0-9_.:\-]{1,80}')->middleware('throttle:30,1,agent-counter')->name('tickets.pay-out');
         Route::get('/tickets/{ticket}/print', [\App\Http\Controllers\AgentTicketController::class, 'print'])->where('ticket', '[A-Za-z0-9_.:\-]{1,80}')->name('tickets.print');
         Route::redirect('/deposit-orders', '/agent/deposit-order');
         Route::get('/customers', [AgentPortalController::class, 'customers'])->name('customers');

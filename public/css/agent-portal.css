@@ -519,3 +519,14 @@ body { font-family: "Source Sans 3", "Source Sans Pro", Inter, system-ui, sans-s
 .agent-ticket-pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .agent-ticket-pager > span:not(.agent-button) { color: var(--agent-muted); font-size: 13px; }
 .agent-ticket-pager .agent-button[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+
+/* ===== Counter (walk-in betting) ===== */
+.agent-counter-steps { margin: 0; padding: 4px 18px 6px 34px; display: grid; gap: 6px; line-height: 1.5; }
+.agent-counter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.agent-counter-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 14px; }
+.agent-counter-balances div { display: grid; gap: 4px; }
+.agent-counter-balances strong { font-size: 22px; }
+.agent-counter-balances span, .agent-counter-balances small { font-size: 12px; opacity: .75; }
+.agent-counter-grid .agent-form + .agent-form { margin-top: 12px; }
+.agent-counter-grid .agent-panel > :not(.agent-panel-head) { margin: 18px 22px; }
+.agent-counter-steps { padding: 16px 22px 18px 42px; }

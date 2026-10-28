@@ -225,3 +225,14 @@ reference for the player site. What it means here:
 - Any link that leaves the site (bot buttons, agent alerts, reset emails) is
   built with `App\Support\SiteUrl`, which uses the public address saved on
   Configuration → System.
+
+## The counter: walk-in bets through an agent
+
+`App\Services\AgentShop` gives each agent one counter account (a player with
+`member_type` `shop`, username `shop_agent_<id>`, no phone). Float moves into it
+and back with ledger rows on both sides, and a top-up obeys the float floor.
+The agent opens the sportsbook as the counter from the portal; nothing else
+signs into it, and deposits and withdrawals refuse it. A winning counter ticket
+is paid in cash from Bet Tickets once (`shop_payouts`, unique ticket id), for
+the amount our WinHouse ledger credited, not what the provider API reports.
+Agent tools that find players by phone cannot reach a counter; keep it so.

@@ -32,6 +32,9 @@ class PlayerWithdrawalController
                 : 'Please add and confirm an email address before requesting a withdrawal. Contact support to add one.']);
         }
 
+        if (\App\Services\AgentShop::isCounter($request->user())) {
+            throw ValidationException::withMessages(['amount' => 'The counter account moves money only through the agent portal.']);
+        }
         $rules ??= app(FinancialRuleService::class);
         $minWithdraw = (float) \App\Models\PlatformSetting::valueFor('min_withdraw_amount', 30);
         $maxWithdraw = (float) \App\Models\PlatformSetting::valueFor('max_withdraw_amount', 30000);

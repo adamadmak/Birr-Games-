@@ -21,6 +21,9 @@ class PlayerDepositController
     {
         $rules ??= app(FinancialRuleService::class);
         $telegram ??= app(TelegramBotService::class);
+        if (\App\Services\AgentShop::isCounter($request->user())) {
+            throw ValidationException::withMessages(['amount' => 'The counter account moves money only through the agent portal.']);
+        }
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:1000000000'],
             'agent_bank_account_id' => ['required', 'integer', Rule::exists('agent_bank_accounts', 'id')],

@@ -111,6 +111,16 @@
                         </td>
                         <td><span class="agent-badge {{ $badge($shown) }}">{{ ucfirst(str_replace('_', ' ', $shown)) }}</span></td>
                         <td>
+                            @if($counterId && (int) ($ticket['player_id'] ?? 0) === (int) $counterId && $paid > 0)
+                                @if(isset($paidOut[(string) $ticket['id']]))
+                                    <span class="agent-badge success">Paid out</span>
+                                @else
+                                    <form method="POST" action="{{ route('agent.tickets.pay-out', $ticket['id']) }}" data-confirm="Pay this customer {{ \App\Support\Money::format($paid, 2) }} in cash? A ticket can be paid only once.">
+                                        @csrf
+                                        <button class="agent-button" type="submit">Pay out</button>
+                                    </form>
+                                @endif
+                            @endif
                             @if(preg_match(\App\Http\Controllers\AgentTicketController::PRINTABLE_ID, (string) $ticket['id']))
                                 <a class="agent-button teal agent-ticket-print" href="{{ route('agent.tickets.print', ['ticket' => $ticket['id'], 'auto' => 1]) }}" target="_blank" rel="noopener" title="Print receipt for ticket {{ $ticket['id'] }}"><svg class="ag-nav-ico" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg> Print</a>
                             @else

@@ -164,6 +164,8 @@ class AgentTicketController
             'total' => $total,
             'lastPage' => max(1, (int) ceil($total / self::PER_PAGE)),
             'sifted' => $sifted,
+            'counterId' => User::query()->where('username', \App\Services\AgentShop::username($agent))->value('id'),
+            'paidOut' => \App\Services\AgentShop::paidOut($tickets->pluck('id')->map(fn ($id) => (string) $id)->all()),
         ]);
     }
 
@@ -205,10 +207,13 @@ class AgentTicketController
     {
         return User::query()
             ->where('users.role', User::ROLE_PLAYER)
-            ->whereExists(fn ($query) => $query->select(DB::raw(1))
-                ->from('agent_orders')
-                ->whereColumn('agent_orders.user_id', 'users.id')
-                ->where('agent_orders.agent_id', $agent->id));
+            ->where(fn ($mine) => $mine
+                ->whereExists(fn ($query) => $query->select(DB::raw(1))
+                    ->from('agent_orders')
+                    ->whereColumn('agent_orders.user_id', 'users.id')
+                    ->where('agent_orders.agent_id', $agent->id))
+                // The agent's own counter account (walk-in bets).
+                ->orWhere('users.username', \App\Services\AgentShop::username($agent)));
     }
 
     /**
