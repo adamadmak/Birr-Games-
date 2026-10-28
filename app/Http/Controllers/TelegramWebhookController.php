@@ -184,7 +184,8 @@ class TelegramWebhookController
                         .'Reference: '.e($order->reference)."\n"
                         .'Amount: '.$this->birr($order->amount)."\n"
                         .'Agent: '.e($order->agent?->nickname ?: 'Assigned agent')."\n\n"
-                        .'Your wallet will be credited after the agent verifies and approves the payment.',
+                        .'Your wallet will be credited after the agent confirms the payment, usually within '
+                        .app(\App\Services\FinancialRuleService::class)->depositReviewMinutes().' minutes.',
                     [],
                     $telegram->mainMenuKeyboard()
                 );

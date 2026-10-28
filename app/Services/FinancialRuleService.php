@@ -236,6 +236,22 @@ final class FinancialRuleService
         }
     }
 
+    /**
+     * What a player is told a deposit usually takes an agent to confirm, in
+     * minutes. A stated time is a promise the operator sets on Configuration →
+     * System, not a guess the page makes.
+     */
+    public function depositReviewMinutes(): int
+    {
+        return max(1, (int) PlatformSetting::valueFor('deposit_review_minutes', 15));
+    }
+
+    /** What a player is told a withdrawal usually takes an agent to pay, in hours. */
+    public function withdrawalReviewHours(): int
+    {
+        return max(1, (int) PlatformSetting::valueFor('withdrawal_review_hours', 24));
+    }
+
     private function number(string $key, float $default): float
     {
         return (float) PlatformSetting::valueFor($key, $default);

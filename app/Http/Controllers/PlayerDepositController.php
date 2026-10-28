@@ -72,7 +72,8 @@ class PlayerDepositController
         });
 
         return redirect()->route('player.wallet', ['tab' => 'deposit'])
-            ->with('status', 'Deposit submitted. Your assigned agent will verify the payment before your wallet is credited.');
+            ->with('deposit_submitted', true)
+            ->with('status', __('Deposit submitted. Your agent will confirm the transfer, usually within :minutes minutes, and your wallet is credited then.', ['minutes' => $rules->depositReviewMinutes()]));
     }
 
     public function cancel(Request $request, AgentOrder $order): RedirectResponse

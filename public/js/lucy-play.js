@@ -350,8 +350,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    /*
+     * Copy buttons. The account number and the amount are the two things a
+     * player has to carry into their bank app; a button beats retyping them.
+     */
+    const copyFallback = (text, done) => {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { if (document.execCommand('copy')) done(); } catch (e) { /* nothing to do */ }
+        area.remove();
+    };
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button) return;
+        const text = button.dataset.copy || '';
+        const label = button.textContent;
+        const done = () => {
+            button.classList.add('is-copied');
+            button.textContent = button.dataset.copiedLabel || 'Copied';
+            setTimeout(() => { button.classList.remove('is-copied'); button.textContent = label; }, 1500);
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done, () => copyFallback(text, done));
+        } else {
+            copyFallback(text, done);
+        }
+    });
+
+    /*
+     * The deposit dialog.
+     *
+     * The player picks an amount and an agent account, leaves to pay, and
+     * comes back to enter the bank reference. Until 28 Oct 2026 everything
+     * lived in the dialog, so a reload, an accidental close or a Telegram
+     * restart dropped the account they were paying into. The flow is now a
+     * draft in localStorage: closing the dialog keeps it, the page offers to
+     * resume it, a submitted deposit clears it, and a refused one reopens at
+     * the last step with the server's message.
+     */
     const depositDialog = document.querySelector('[data-deposit-dialog]');
     if (depositDialog) {
+        const DRAFT_KEY = 'vamoseone-deposit-draft';
+        const DRAFT_LIFETIME = 24 * 60 * 60 * 1000;
         const form = depositDialog.querySelector('[data-deposit-form]');
         const steps = [...depositDialog.querySelectorAll('[data-deposit-step]')];
         const amountInput = depositDialog.querySelector('[data-deposit-amount]');
@@ -360,55 +405,111 @@ document.addEventListener('DOMContentLoaded', () => {
         const methodLabel = depositDialog.querySelector('[data-deposit-method-label]');
         const amountLabel = depositDialog.querySelector('[data-deposit-amount-label]');
         const nextReference = depositDialog.querySelector('[data-deposit-next-reference]');
+        const formError = depositDialog.querySelector('[data-deposit-form-error]');
+        const resume = document.querySelector('[data-deposit-resume]');
         let gatewayId = '';
         let gatewayName = '';
         let selectedAgent = null;
 
+        const money = (value) => `ETB ${Number(value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const readDraft = () => {
+            try {
+                const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+                return draft && draft.at && Date.now() - draft.at < DRAFT_LIFETIME ? draft : null;
+            } catch (e) { return null; }
+        };
+        const saveDraft = (step) => {
+            try {
+                localStorage.setItem(DRAFT_KEY, JSON.stringify({ gatewayId, gatewayName, accountId: accountInput.value, amount: amountInput.value, step, at: Date.now() }));
+            } catch (e) { /* private mode */ }
+        };
+        const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ } };
+
         const showStep = (name) => {
             steps.forEach((step) => step.classList.toggle('active', step.dataset.depositStep === name));
+            if (name !== 'amount') saveDraft(name);
         };
+        const showError = (message) => {
+            if (!formError) return;
+            formError.textContent = message || '';
+            formError.hidden = !message;
+        };
+        const pickMethod = (id, name) => {
+            gatewayId = id;
+            gatewayName = name;
+            methodName.textContent = name;
+            methodLabel.textContent = name;
+            depositDialog.querySelectorAll('[data-deposit-agent]').forEach((card) => {
+                card.hidden = card.dataset.gatewayId !== id;
+            });
+        };
+        const pickAgent = (card) => {
+            selectedAgent = card;
+            accountInput.value = card.dataset.accountId;
+            depositDialog.querySelectorAll('[data-deposit-agent]').forEach((candidate) => candidate.classList.toggle('selected', candidate === card));
+            nextReference.disabled = false;
+        };
+        const fillConfirmation = () => {
+            if (!selectedAgent) return;
+            depositDialog.querySelector('[data-confirm-amount]').textContent = money(amountInput.value);
+            depositDialog.querySelector('[data-confirm-bank]').textContent = selectedAgent.dataset.bankName;
+            depositDialog.querySelector('[data-confirm-number]').textContent = selectedAgent.dataset.accountNumber;
+            depositDialog.querySelector('[data-confirm-name]').textContent = selectedAgent.dataset.accountName;
+            depositDialog.querySelector('[data-confirm-agent]').textContent = selectedAgent.dataset.agentName;
+            const copyAmount = depositDialog.querySelector('[data-copy-amount]');
+            if (copyAmount) copyAmount.dataset.copy = Number(amountInput.value || 0).toFixed(2);
+            const copyNumber = depositDialog.querySelector('[data-copy-number]');
+            if (copyNumber) copyNumber.dataset.copy = selectedAgent.dataset.accountNumber;
+        };
+        // Clears the form, never the draft: an accidental close is the case the draft exists for.
         const resetFlow = () => {
             form.reset();
             accountInput.value = '';
             selectedAgent = null;
             nextReference.disabled = true;
             depositDialog.querySelectorAll('[data-deposit-agent]').forEach((card) => card.classList.remove('selected'));
-            showStep('amount');
+            showError('');
+            steps.forEach((step) => step.classList.toggle('active', step.dataset.depositStep === 'amount'));
+        };
+        const openDraft = (draft, error, reference) => {
+            const card = draft.accountId ? depositDialog.querySelector(`[data-deposit-agent][data-account-id="${draft.accountId}"]`) : null;
+            const id = draft.gatewayId || (card ? card.dataset.gatewayId : '');
+            const method = document.querySelector(`[data-deposit-method][data-gateway-id="${id}"]`);
+            if (!method) { clearDraft(); return false; }
+            resetFlow();
+            pickMethod(id, method.dataset.gatewayName);
+            amountInput.value = draft.amount || '';
+            amountLabel.textContent = money(amountInput.value);
+            if (card) { pickAgent(card); fillConfirmation(); }
+            const step = card && draft.step === 'reference' ? 'reference' : 'agent';
+            if (step === 'reference') {
+                const input = form.querySelector('input[name="reference"]');
+                if (input && reference) input.value = reference;
+                showError(error);
+            }
+            showStep(step);
+            depositDialog.showModal();
+            return true;
         };
 
         document.querySelectorAll('[data-deposit-method]').forEach((button) => button.addEventListener('click', () => {
             resetFlow();
-            gatewayId = button.dataset.gatewayId;
-            gatewayName = button.dataset.gatewayName;
-            methodName.textContent = gatewayName;
-            methodLabel.textContent = gatewayName;
-            depositDialog.querySelectorAll('[data-deposit-agent]').forEach((card) => {
-                card.hidden = card.dataset.gatewayId !== gatewayId;
-            });
+            pickMethod(button.dataset.gatewayId, button.dataset.gatewayName);
             depositDialog.showModal();
             setTimeout(() => amountInput.focus(), 50);
         }));
 
         depositDialog.querySelector('[data-deposit-next-agent]')?.addEventListener('click', () => {
             if (!amountInput.reportValidity()) return;
-            amountLabel.textContent = `ETB ${Number(amountInput.value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            amountLabel.textContent = money(amountInput.value);
             showStep('agent');
         });
 
-        depositDialog.querySelectorAll('[data-deposit-agent]').forEach((card) => card.addEventListener('click', () => {
-            selectedAgent = card;
-            accountInput.value = card.dataset.accountId;
-            depositDialog.querySelectorAll('[data-deposit-agent]').forEach((candidate) => candidate.classList.toggle('selected', candidate === card));
-            nextReference.disabled = false;
-        }));
+        depositDialog.querySelectorAll('[data-deposit-agent]').forEach((card) => card.addEventListener('click', () => pickAgent(card)));
 
         nextReference?.addEventListener('click', () => {
             if (!selectedAgent || !accountInput.value) return;
-            depositDialog.querySelector('[data-confirm-amount]').textContent = `ETB ${Number(amountInput.value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            depositDialog.querySelector('[data-confirm-bank]').textContent = selectedAgent.dataset.bankName;
-            depositDialog.querySelector('[data-confirm-number]').textContent = selectedAgent.dataset.accountNumber;
-            depositDialog.querySelector('[data-confirm-name]').textContent = selectedAgent.dataset.accountName;
-            depositDialog.querySelector('[data-confirm-agent]').textContent = selectedAgent.dataset.agentName;
+            fillConfirmation();
             showStep('reference');
         });
 
@@ -419,6 +520,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target === depositDialog) depositDialog.close();
         });
         depositDialog.addEventListener('close', resetFlow);
+
+        // What the page knows from the last request wins over the draft.
+        if (depositDialog.dataset.depositSubmitted) {
+            clearDraft();
+        } else if (depositDialog.dataset.depositError) {
+            openDraft({
+                accountId: depositDialog.dataset.oldAccount,
+                amount: depositDialog.dataset.oldAmount,
+                step: 'reference',
+            }, depositDialog.dataset.depositError, depositDialog.dataset.oldReference);
+        } else if (resume) {
+            const draft = readDraft();
+            const card = draft && draft.accountId ? depositDialog.querySelector(`[data-deposit-agent][data-account-id="${draft.accountId}"]`) : null;
+            const method = draft ? document.querySelector(`[data-deposit-method][data-gateway-id="${draft.gatewayId || (card ? card.dataset.gatewayId : '')}"]`) : null;
+            if (draft && method && draft.amount) {
+                resume.querySelector('[data-resume-amount]').textContent = money(draft.amount);
+                resume.querySelector('[data-resume-bank]').textContent = method.dataset.gatewayName;
+                resume.querySelector('[data-resume-agent]').textContent = card ? card.dataset.agentName : '…';
+                resume.hidden = false;
+                resume.querySelector('[data-deposit-resume-continue]')?.addEventListener('click', () => { resume.hidden = true; openDraft(draft); });
+                resume.querySelector('[data-deposit-resume-discard]')?.addEventListener('click', () => { clearDraft(); resume.hidden = true; });
+            } else if (draft) {
+                clearDraft();
+            }
+        }
     }
 
     const stakeInput = document.querySelector('input[name="stake"]');

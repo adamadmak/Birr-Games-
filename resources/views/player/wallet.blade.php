@@ -131,7 +131,7 @@
 
                     <div class="wd-info-note">
                         <span class="wd-info-icon">&#9432;</span>
-                        <p>{{ __('Administrator review required. The amount is reserved immediately and restored automatically if rejected or cancelled.') }}</p>
+                        <p>{{ __('Paid by one of our agents to the account above, usually within :hours hours. The amount is reserved now and returned to your balance if the request is rejected or you cancel it.', ['hours' => $reviewTimes['withdrawal_hours']]) }}</p>
                     </div>
 
                     <div class="wd-actions">
@@ -179,6 +179,34 @@
             @if($withdrawalOrders->hasPages())<div class="wallet-pagination">@if($withdrawalOrders->onFirstPage())<span>{{ __('Previous') }}</span>@else<a href="{{ $withdrawalOrders->previousPageUrl() }}">{{ __('Previous') }}</a>@endif<strong>{{ __('Page :current of :last', ['current' => $withdrawalOrders->currentPage(), 'last' => $withdrawalOrders->lastPage()]) }}</strong>@if($withdrawalOrders->hasMorePages())<a href="{{ $withdrawalOrders->nextPageUrl() }}">{{ __('Next') }}</a>@else<span>{{ __('Next') }}</span>@endif</div>@endif
         </section>
     @else
+        @if($openDeposits->isNotEmpty())
+            <section class="deposit-open-orders">
+                @foreach($openDeposits as $order)
+                    <article class="deposit-open-card">
+                        <header>
+                            <div><small>{{ __('Being confirmed') }}</small><h2>{{ __(':amount to :bank', ['amount' => \App\Support\Money::format($order->amount), 'bank' => $order->gateway?->name ?: __('Agent bank')]) }}</h2></div>
+                            <span class="withdrawal-status pending">{{ __('Pending') }}</span>
+                        </header>
+                        <div class="deposit-instructions">
+                            <span>{{ __('Account Number') }}<strong>{{ $order->account_number }}</strong><button type="button" class="copy-button" data-copy="{{ $order->account_number }}" data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
+                            <span>{{ __('Account Name') }}<strong>{{ $order->account_name }}</strong></span>
+                            <span>{{ __('Amount') }}<strong>{{ \App\Support\Money::exact($order->amount) }}</strong><button type="button" class="copy-button" data-copy="{{ number_format((float) $order->amount, 2, '.', '') }}" data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
+                            <span>{{ __('Agent') }}<strong>{{ $order->agent?->nickname ?: __('Assigned agent') }}</strong></span>
+                            <span>{{ __('Your reference') }}<strong>{{ $order->reference }}</strong></span>
+                        </div>
+                        <footer>
+                            <p>{{ __('Submitted :when. Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. If you have not sent the money yet, the details above are where it goes.', ['when' => $order->created_at->diffForHumans(), 'minutes' => $reviewTimes['deposit_minutes']]) }}</p>
+                            <form method="POST" action="{{ route('player.deposits.cancel', $order) }}">@csrf @method('PATCH')<button class="withdrawal-cancel-button" type="submit">{{ __('Cancel') }}</button></form>
+                        </footer>
+                    </article>
+                @endforeach
+            </section>
+        @endif
+        <div class="wallet-alert deposit-resume" data-deposit-resume hidden>
+            <strong>{{ __('You have an unfinished deposit') }}</strong>
+            <span>{!! __(':amount to :bank via :agent. Continue to see the account details again and enter your bank reference.', ['amount' => '<b data-resume-amount></b>', 'bank' => '<b data-resume-bank></b>', 'agent' => '<b data-resume-agent></b>']) !!}</span>
+            <div class="deposit-resume-actions"><button type="button" data-deposit-resume-continue>{{ __('Continue') }}</button><button type="button" data-deposit-resume-discard>{{ __('Discard') }}</button></div>
+        </div>
         @if($bonusInfo['offer'])
             @php($offer = $bonusInfo['offer'])
             <aside class="deposit-bonus-offer" data-deposit-bonus-offer data-percent="{{ $offer['percent'] }}" data-max="{{ $offer['max_amount'] }}" data-min="{{ $offer['min_deposit'] }}">
@@ -242,7 +270,9 @@
             @if($depositOrders->hasPages())<div class="wallet-pagination">{{ $depositOrders->links() }}</div>@endif
         </section>
 
-        <dialog class="deposit-flow-dialog" data-deposit-dialog>
+        <dialog class="deposit-flow-dialog" data-deposit-dialog
+            @if(session('deposit_submitted')) data-deposit-submitted="1" @endif
+            @if($errors->any() && old('agent_bank_account_id')) data-deposit-error="{{ $errors->first() }}" data-old-account="{{ old('agent_bank_account_id') }}" data-old-amount="{{ old('amount') }}" data-old-reference="{{ old('reference') }}" @endif>
             <form method="POST" action="{{ route('player.deposits.store') }}" data-deposit-form>
                 @csrf
                 <input type="hidden" name="agent_bank_account_id" data-deposit-account-id>
@@ -298,15 +328,16 @@
                 <section class="deposit-flow-step" data-deposit-step="reference">
                     <header><div><small>{{ __('Final step') }}</small><h2>{{ __('Send Payment') }}</h2><p>{{ __('Transfer the exact amount, then enter the bank reference.') }}</p></div><button type="button" data-deposit-close aria-label="{{ __('Close') }}">&times;</button></header>
                     <div class="deposit-instructions">
-                        <span>{{ __('Amount') }}<strong data-confirm-amount></strong></span>
+                        <span>{{ __('Amount') }}<strong data-confirm-amount></strong><button type="button" class="copy-button" data-copy="" data-copy-amount data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
                         <span>{{ __('Bank') }}<strong data-confirm-bank></strong></span>
-                        <span>{{ __('Account Number') }}<strong data-confirm-number></strong></span>
+                        <span>{{ __('Account Number') }}<strong data-confirm-number></strong><button type="button" class="copy-button" data-copy="" data-copy-number data-copied-label="{{ __('Copied') }}">{{ __('Copy') }}</button></span>
                         <span>{{ __('Account Name') }}<strong data-confirm-name></strong></span>
                         <span>{{ __('Agent') }}<strong data-confirm-agent></strong></span>
                     </div>
-                    <label>{{ __('Bank reference or confirmation message') }}<input name="reference" minlength="3" maxlength="100" placeholder="{{ __('Enter payment reference') }}" required></label>
+                    <p class="deposit-flow-error" data-deposit-form-error hidden></p>
+                    <label>{{ __('Bank reference or confirmation message') }}<input name="reference" value="{{ old('reference') }}" minlength="3" maxlength="100" placeholder="{{ __('Enter payment reference') }}" required></label>
                     <footer><button type="button" class="deposit-flow-secondary" data-deposit-back-agent>{{ __('Back') }}</button><button type="submit" class="deposit-flow-primary">{{ __('Submit For Approval') }}</button></footer>
-                    <p class="deposit-flow-hint">{{ __('Your balance changes only after the assigned agent verifies the payment.') }}</p>
+                    <p class="deposit-flow-hint">{{ __('Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. These details stay on your wallet page until it is confirmed.', ['minutes' => $reviewTimes['deposit_minutes']]) }}</p>
                 </section>
             </form>
         </dialog>

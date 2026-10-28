@@ -97,6 +97,14 @@ class PlayerController
             // One band, worked out by the service that also validates the
             // request, so the form cannot offer what the server refuses.
             'withdrawalRange' => app(FinancialRuleService::class)->withdrawalRange($request->user()),
+            // Deposits the agent has not confirmed yet, with the account they were
+            // sent to: the details must survive a reload, a closed dialog and a
+            // Telegram restart, so they come from the order, not the dialog.
+            'openDeposits' => $request->user()->depositOrders()->where('status', 'pending')->with(['agent', 'gateway'])->latest()->limit(3)->get(),
+            'reviewTimes' => [
+                'deposit_minutes' => app(FinancialRuleService::class)->depositReviewMinutes(),
+                'withdrawal_hours' => app(FinancialRuleService::class)->withdrawalReviewHours(),
+            ],
             'depositIdempotencyKey' => (string) Str::uuid(),
             'withdrawalIdempotencyKey' => (string) Str::uuid(),
             'withdrawalOrders' => $withdrawalOrders,

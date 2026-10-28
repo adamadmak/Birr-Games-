@@ -4151,3 +4151,23 @@ a.bonus-claim-button { display: inline-flex; align-items: center; justify-conten
 .stacked-form label small { display: block; margin-top: 4px; font-size: 11px; color: var(--muted, #9aa6b2); }
 .prose-page .prose-note { margin-top: 24px; font-size: 12px; color: var(--muted, #9aa6b2); }
 .prose-page ul { padding-left: 20px; line-height: 1.6; }
+/* ===== DEPOSIT FLOW: pending card, resume banner, copy buttons (28 Oct 2026) ===== */
+.copy-button{justify-self:start;margin-top:2px;padding:4px 10px;border:1px solid rgba(47,123,255,.4);border-radius:8px;color:#9cc2ff;background:rgba(47,123,255,.12);font:inherit;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.copy-button.is-copied{color:#0b1a3a;background:#52fbbb;border-color:#52fbbb}
+.deposit-open-orders{display:grid;gap:14px;margin:0 0 20px}
+.deposit-open-card{padding:18px;display:grid;gap:14px;border:1px solid rgba(255,184,48,.35);border-radius:18px;background:rgba(255,184,48,.06)}
+.deposit-open-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.deposit-open-card header small{color:#ffb830;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.deposit-open-card header h2{margin:4px 0 0;font-size:18px;line-height:1.2;color:#fff}
+.deposit-open-card .deposit-instructions{padding:0}
+.deposit-open-card footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.deposit-open-card footer p{margin:0;flex:1 1 240px;color:var(--muted);font-size:12px;line-height:1.5}
+.deposit-resume{border-color:rgba(47,123,255,.45);background:rgba(47,123,255,.1);color:#dbe7ff}
+.deposit-resume[hidden]{display:none}
+.deposit-resume span{font-size:12px;line-height:1.5}
+.deposit-resume-actions{display:flex;gap:8px;margin-top:8px}
+.deposit-resume-actions button{padding:8px 14px;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;background:transparent;font:inherit;font-weight:800;cursor:pointer}
+.deposit-resume-actions button[data-deposit-resume-continue]{border:0;background:#2f7bff}
+.deposit-flow-error{margin:-8px 0 0;padding:10px 12px;border:1px solid rgba(255,108,123,.25);border-radius:10px;color:#ff99a3;background:rgba(255,108,123,.09);font-size:12px}
+.deposit-flow-error[hidden]{display:none}
+@media(max-width:650px){.deposit-open-card{padding:14px}.deposit-open-card header h2{font-size:16px}}

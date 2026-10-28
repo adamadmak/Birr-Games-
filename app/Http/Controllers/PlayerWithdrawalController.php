@@ -125,7 +125,7 @@ class PlayerWithdrawalController
             ]);
         });
 
-        return redirect()->route('player.wallet', ['tab' => 'withdraw'])->with('status', 'Your withdrawal request was submitted for agent payout review.');
+        return redirect()->route('player.wallet', ['tab' => 'withdraw'])->with('status', __('Withdrawal requested. An agent will pay it to your account, usually within :hours hours.', ['hours' => $rules->withdrawalReviewHours()]));
     }
 
     public function cancel(Request $request, AgentOrder $order): RedirectResponse

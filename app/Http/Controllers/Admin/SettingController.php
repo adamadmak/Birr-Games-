@@ -523,6 +523,8 @@ class SettingController
                 'daily_max_withdraw' => ['required', 'numeric', 'min:0'],
                 'daily_max_transfer' => ['required', 'numeric', 'min:0'],
                 'daily_max_deposit' => ['required', 'numeric', 'min:0'],
+                'deposit_review_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
+                'withdrawal_review_hours' => ['required', 'integer', 'min:1', 'max:168'],
             ],
             'frontend' => [
                 'site_title' => ['required', 'string', 'max:80'],

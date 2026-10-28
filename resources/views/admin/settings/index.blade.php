@@ -171,6 +171,8 @@
                     <label>Daily Max Withdraw<input type="number" step="0.01" min="0" name="daily_max_withdraw" value="{{ $value('daily_max_withdraw', 100000) }}" required><small class="unit">ETB</small></label>
                     <label>Daily Max Transfer<input type="number" step="0.01" min="0" name="daily_max_transfer" value="{{ $value('daily_max_transfer', 100000) }}" required><small class="unit">ETB</small></label>
                     <label>Daily Max Deposit<input type="number" step="0.01" min="0" name="daily_max_deposit" value="{{ $value('daily_max_deposit', 250000) }}" required><small class="unit">ETB</small></label>
+                    <label>Deposit review time<input type="number" step="1" min="1" max="1440" name="deposit_review_minutes" value="{{ $value('deposit_review_minutes', 15) }}" required><small>Minutes. Shown to players as the usual time for an agent to confirm a deposit.</small></label>
+                    <label>Withdrawal payout time<input type="number" step="1" min="1" max="168" name="withdrawal_review_hours" value="{{ $value('withdrawal_review_hours', 24) }}" required><small>Hours. Shown to players as the usual time for an agent to pay a withdrawal.</small></label>
                 </div>
 
                 {{-- QTech, in two directions. Placed after the Birr limits

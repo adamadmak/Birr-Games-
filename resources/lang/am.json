@@ -471,5 +471,18 @@
     "You rated :score out of 5": "ከ5 :score ሰጥተዋል",
     "Rate agent": "ወኪሉን ይገምግሙ",
     "{1}:count star|[2,*]:count stars": "{1}:count ኮከብ|[2,*]:count ኮከቦች",
-    "Send": "ላክ"
+    "Send": "ላክ",
+    "Paid by one of our agents to the account above, usually within :hours hours. The amount is reserved now and returned to your balance if the request is rejected or you cancel it.": "ከወኪሎቻችን አንዱ ከላይ ወዳለው ሂሳብ ይከፍላል፣ አብዛኛውን ጊዜ በ:hours ሰዓት ውስጥ። መጠኑ አሁን ተይዟል፤ ጥያቄው ውድቅ ከተደረገ ወይም እርስዎ ከሰረዙት ወደ ቀሪ ሂሳብዎ ይመለሳል።",
+    "Being confirmed": "በማረጋገጥ ላይ",
+    ":amount to :bank": ":amount ወደ :bank",
+    "Copied": "ተቀድቷል",
+    "Copy": "ቅዳ",
+    "Your reference": "የእርስዎ ማጣቀሻ",
+    "Submitted :when. Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. If you have not sent the money yet, the details above are where it goes.": "የቀረበው :when። ወኪልዎ ዝውውሩን ያረጋግጣል፣ አብዛኛውን ጊዜ በ:minutes ደቂቃ ውስጥ፣ ከዚያ ቦርሳዎ ይሞላል። ገንዘቡን ገና ካልላኩ፣ ከላይ ያሉት ዝርዝሮች የሚላክበት ቦታ ናቸው።",
+    "You have an unfinished deposit": "ያልተጠናቀቀ ተቀማጭ አለዎት",
+    ":amount to :bank via :agent. Continue to see the account details again and enter your bank reference.": ":amount ወደ :bank በ:agent በኩል። የሂሳብ ዝርዝሮቹን እንደገና ለማየት እና የባንክ ማጣቀሻዎን ለማስገባት ይቀጥሉ።",
+    "Discard": "አስወግድ",
+    "Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. These details stay on your wallet page until it is confirmed.": "ወኪልዎ ዝውውሩን ያረጋግጣል፣ አብዛኛውን ጊዜ በ:minutes ደቂቃ ውስጥ፣ ከዚያ ቦርሳዎ ይሞላል። እነዚህ ዝርዝሮች እስኪረጋገጥ ድረስ በቦርሳ ገጽዎ ላይ ይቆያሉ።",
+    "Deposit submitted. Your agent will confirm the transfer, usually within :minutes minutes, and your wallet is credited then.": "ተቀማጩ ቀርቧል። ወኪልዎ ዝውውሩን ያረጋግጣል፣ አብዛኛውን ጊዜ በ:minutes ደቂቃ ውስጥ፣ ከዚያ ቦርሳዎ ይሞላል።",
+    "Withdrawal requested. An agent will pay it to your account, usually within :hours hours.": "የማውጣት ጥያቄ ቀርቧል። ወኪል ወደ ሂሳብዎ ይከፍላል፣ አብዛኛውን ጊዜ በ:hours ሰዓት ውስጥ።"
 }
