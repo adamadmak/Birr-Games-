@@ -13,7 +13,7 @@ return [
 
     'telegram' => [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
-        'bot_username' => env('TELEGRAM_BOT_USERNAME', 'lucygames_bot'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
         'app_url' => env('TELEGRAM_APP_URL'),
         'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
         'timeout' => (int) env('TELEGRAM_TIMEOUT', 20),

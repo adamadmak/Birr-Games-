@@ -16,6 +16,27 @@ class TelegramBotService
     private const STORED_TOKEN_KEY = 'telegram_bot_token_encrypted';
     private const STORED_USERNAME_KEY = 'telegram_bot_username';
 
+    /*
+     * What each value must look like before it is used, wherever it came from.
+     *
+     * On 28 Oct 2026 the host's environment for this app held the bot TOKEN
+     * under TELEGRAM_BOT_USERNAME, "3000" under TELEGRAM_BOT_TOKEN, and a
+     * twelve-letter word under TELEGRAM_WEBHOOK_SECRET. None of them should
+     * reach the app on that host, but the code read all three as a fallback
+     * and trusted whatever it found: a token would have been printed in public
+     * t.me links, and a short guessable word would have been accepted as the
+     * webhook's secret, which lets anyone post updates as the bot's users.
+     * A value that does not have the right shape is now ignored.
+     */
+    /** Telegram usernames: 5 to 32 letters, digits or underscores, starting with a letter. */
+    public const USERNAME_PATTERN = '/^[A-Za-z][A-Za-z0-9_]{4,31}$/';
+
+    /** A BotFather token: the bot id, a colon, and the secret part. */
+    public const TOKEN_PATTERN = '/^\d{6,}:[A-Za-z0-9_-]{20,}$/';
+
+    /** What Telegram accepts as a webhook secret_token, and so all it can ever send back. */
+    public const WEBHOOK_SECRET_PATTERN = '/^[A-Za-z0-9_-]{16,256}$/';
+
     public function configured(): bool
     {
         return $this->botToken() !== '';
@@ -24,23 +45,39 @@ class TelegramBotService
     public function configurationSources(): array
     {
         return [
-            'config' => trim((string) config('services.telegram.bot_token')) !== '',
-            'server' => trim((string) ($_SERVER['TELEGRAM_BOT_TOKEN'] ?? '')) !== '',
-            'environment' => trim((string) ($_ENV['TELEGRAM_BOT_TOKEN'] ?? '')) !== '',
-            'process' => trim((string) (getenv('TELEGRAM_BOT_TOKEN') ?: '')) !== '',
+            'config' => self::isToken((string) config('services.telegram.bot_token')),
+            'server' => self::isToken((string) ($_SERVER['TELEGRAM_BOT_TOKEN'] ?? '')),
+            'environment' => self::isToken((string) ($_ENV['TELEGRAM_BOT_TOKEN'] ?? '')),
+            'process' => self::isToken((string) (getenv('TELEGRAM_BOT_TOKEN') ?: '')),
             'database' => trim((string) PlatformSetting::valueFor(self::STORED_TOKEN_KEY, '')) !== '',
         ];
     }
 
+    /**
+     * The bot's public @username, or '' when none is known. Callers show a
+     * t.me link only when this is not empty. The one saved when the admin
+     * entered the token (Telegram's own answer to getMe) comes first; there is
+     * no default, because the old one was another brand's bot.
+     */
     public function botUsername(): string
     {
-        return ltrim(
-            trim((string) PlatformSetting::valueFor(self::STORED_USERNAME_KEY, ''))
-                ?: trim((string) config('services.telegram.bot_username'))
-                ?: $this->runtimeEnvironment('TELEGRAM_BOT_USERNAME')
-                ?: 'lucygames_bot',
-            '@'
-        );
+        foreach ([
+            PlatformSetting::valueFor(self::STORED_USERNAME_KEY, ''),
+            config('services.telegram.bot_username'),
+            $this->runtimeEnvironment('TELEGRAM_BOT_USERNAME'),
+        ] as $candidate) {
+            $candidate = ltrim(trim((string) $candidate), '@');
+            if (preg_match(self::USERNAME_PATTERN, $candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
+    }
+
+    public static function isToken(string $value): bool
+    {
+        return (bool) preg_match(self::TOKEN_PATTERN, trim($value));
     }
 
     public function configureToken(string $token): array
@@ -122,9 +159,24 @@ class TelegramBotService
 
     public function webhookSecret(): string
     {
-        return trim((string) config('services.telegram.webhook_secret'))
-            ?: $this->runtimeEnvironment('TELEGRAM_WEBHOOK_SECRET')
-            ?: $this->derivedWebhookSecret();
+        return $this->configuredWebhookSecret() ?: $this->derivedWebhookSecret();
+    }
+
+    /**
+     * An operator-chosen secret, if one is set AND has the shape Telegram
+     * accepts. A shorter one could never have been registered with Telegram,
+     * so honouring it would only widen what the endpoint lets in.
+     */
+    private function configuredWebhookSecret(): string
+    {
+        foreach ([config('services.telegram.webhook_secret'), $this->runtimeEnvironment('TELEGRAM_WEBHOOK_SECRET')] as $candidate) {
+            $candidate = trim((string) $candidate);
+            if (preg_match(self::WEBHOOK_SECRET_PATTERN, $candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
     }
 
     public function validWebhookSecret(string $provided): bool
@@ -133,8 +185,11 @@ class TelegramBotService
             return false;
         }
 
-        $configured = trim((string) config('services.telegram.webhook_secret'))
-            ?: $this->runtimeEnvironment('TELEGRAM_WEBHOOK_SECRET');
+        if (! preg_match(self::WEBHOOK_SECRET_PATTERN, $provided)) {
+            return false;
+        }
+
+        $configured = $this->configuredWebhookSecret();
         $token = $this->botToken();
         $candidates = array_filter([
             $configured,
@@ -415,11 +470,26 @@ class TelegramBotService
         return $this->botToken();
     }
 
+    /**
+     * Config, then the token saved from the admin, then the environment: the
+     * same order as App\Support\RuntimeEnv, so the admin field wins over a
+     * stray environment variable. Anything that is not shaped like a token is
+     * skipped rather than sent to Telegram (or used to verify a sign-in).
+     */
     private function botToken(): string
     {
-        return trim((string) config('services.telegram.bot_token'))
-            ?: $this->runtimeEnvironment('TELEGRAM_BOT_TOKEN')
-            ?: $this->storedToken();
+        foreach ([
+            fn () => (string) config('services.telegram.bot_token'),
+            fn () => $this->storedToken(),
+            fn () => $this->runtimeEnvironment('TELEGRAM_BOT_TOKEN'),
+        ] as $source) {
+            $candidate = trim($source());
+            if (self::isToken($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
     }
 
     private function storedToken(): string

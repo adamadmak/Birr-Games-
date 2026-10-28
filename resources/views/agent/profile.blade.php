@@ -17,7 +17,7 @@
     <div class="agent-profile-bank-grid">@forelse($accounts as $account)<article><div class="agent-provider-icon">{{ strtoupper(substr($account->gateway?->name ?: 'B',0,1)) }}</div><div><h3>{{ $account->gateway?->name ?: 'Bank account' }}</h3><p>{{ $account->account_name }}</p><strong>{{ $account->account_number }}</strong></div><span class="agent-badge {{ $account->active ? 'success' : 'cancelled' }}">{{ $account->active ? 'Active' : 'Inactive' }}</span></article>@empty<div class="agent-empty">No bank accounts linked yet.</div>@endforelse</div>
 </section>
 
-<section class="agent-panel agent-telegram-card"><div class="agent-provider-icon telegram">➤</div><div><h2>Telegram Integration</h2><p>Connect your agent account with Telegram for faster notifications and access.</p></div><div><span class="agent-badge cancelled">Not connected</span><a class="agent-button teal" href="https://t.me/{{ $telegramUsername }}" target="_blank" rel="noopener">Connect Telegram</a></div></section>
+<section class="agent-panel agent-telegram-card"><div class="agent-provider-icon telegram">➤</div><div><h2>Telegram Integration</h2><p>Connect your agent account with Telegram for faster notifications and access.</p></div><div><span class="agent-badge cancelled">Not connected</span>@if ($telegramUsername !== '')<a class="agent-button teal" href="https://t.me/{{ $telegramUsername }}" target="_blank" rel="noopener">Connect Telegram</a>@endif</div></section>
 
 <div class="agent-modal" id="profile-edit" aria-hidden="true"><div class="agent-modal-card">
     <div class="agent-modal-head"><div><h2>Edit Profile</h2><p>Update your identity, phone number, or password.</p></div><button type="button" data-modal-close>×</button></div>

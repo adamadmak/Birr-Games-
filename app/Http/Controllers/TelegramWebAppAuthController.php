@@ -37,7 +37,7 @@ class TelegramWebAppAuthController
         if (! $subscriber || ! $subscriber->hasSharedPhone()) {
             return response()->json([
                 'ok' => false,
-                'error' => 'Open @'.$telegram->botUsername().' and tap "Share My Phone Number" to activate your account.',
+                'error' => ($telegram->botUsername() !== '' ? 'Open @'.$telegram->botUsername() : 'Open our bot').' and tap "Share My Phone Number" to activate your account.',
                 'phone_required' => true,
             ]);
         }

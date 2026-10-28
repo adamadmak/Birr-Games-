@@ -5,7 +5,9 @@
 <div class="admin-page-heading telegram-heading">
     <div><p>Telegram</p><h1>Broadcast Bot</h1><span>Create reusable campaigns and follow real delivery results.</span></div>
     <div class="telegram-heading-actions">
-        <a href="https://t.me/{{ $botUsername }}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> &#64;{{ $botUsername }}</a>
+        @if ($botUsername !== '')
+            <a href="https://t.me/{{ $botUsername }}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> &#64;{{ $botUsername }}</a>
+        @endif
     </div>
 </div>
 
