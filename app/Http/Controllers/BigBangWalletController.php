@@ -7,9 +7,10 @@ use App\Models\BigBangTransaction;
 use App\Models\Game;
 use App\Models\GameRound;
 use App\Models\User;
-use App\Models\WalletTransaction;
 use App\Services\BigBangCasinoClient;
-use App\Services\WageringService;
+use App\Services\Wallet\InsufficientFunds;
+use App\Services\Wallet\LedgerEntry;
+use App\Services\Wallet\PlayerWallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ use Throwable;
 class BigBangWalletController
 {
     public function __construct(
-        private readonly WageringService $wagering,
+        private readonly PlayerWallet $wallet,
         private readonly BigBangCasinoClient $client,
     ) {
     }
@@ -96,7 +97,7 @@ class BigBangWalletController
 
     private function applyBalanceChange(User $user, array $payload): JsonResponse
     {
-        $user = User::query()->lockForUpdate()->findOrFail($user->id);
+        $user = $this->wallet->lock($user);
         $transactionId = trim((string) ($payload['transaction_id'] ?? ''));
         if ($transactionId === '') {
             throw new \InvalidArgumentException('Transaction ID is required.');
@@ -140,10 +141,6 @@ class BigBangWalletController
 
             return response()->json(['status' => 'error', 'error' => 'The provider session is invalid or expired.'], 403);
         }
-        if ($action === 'bet' && (float) $user->credits < $amount) {
-            return response()->json(['status' => 'error', 'error' => 'Insufficient balance.'], 422);
-        }
-
         // Every provider stake and settlement is written to game_rounds as well, so a
         // deduction can always be traced to a round in the member profile, the casino
         // report and the player accountability report. Written before the balance moves
@@ -151,22 +148,28 @@ class BigBangWalletController
         $round = $this->recordRound($user, $game, $session, $action, $amount, $transactionId);
         $roundRef = $round ? 'r'.$round->id : '';
 
-        $withdrawableDebit = 0.0;
-        $bonusKept = 0.0;
-        if ($action === 'bet') {
-            $lockedCredits = max(0, (float) $user->credits - (float) $user->withdrawable_balance);
-            $withdrawableDebit = max(0, $amount - $lockedCredits);
-            $user->credits = (float) $user->credits - $amount;
-            $user->withdrawable_balance = max(0, (float) $user->withdrawable_balance - $withdrawableDebit);
-            // Remember how much of the stake was bonus; its payout returns that part to
-            // the bonus wallet instead of making it cash.
-            \App\Services\BonusPlay::stake($user, 'bigbang', $roundRef, $amount, $withdrawableDebit);
-        } else {
-            $bonusKept = \App\Services\BonusPlay::payout($user, 'bigbang', $roundRef, $amount);
-            $user->credits = (float) $user->credits + $amount;
-            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount - $bonusKept;
+        $entry = new LedgerEntry(
+            method: 'bigbang',
+            reason: ($game?->title ? $game->title.' ' : 'BigBang ').($action === 'win' ? 'payout' : 'stake'),
+            key: 'bigbang-'.$action.'-'.$transactionId,
+            sourceType: 'bigbang_session',
+            sourceId: $session->id,
+            metadata: [
+                'provider_transaction_id' => $transactionId,
+                'game_round_id' => $round?->id,
+                'game' => $game?->slug,
+            ],
+        );
+
+        // Bonus credit first on a stake, the bonus part back as bonus on a win,
+        // the ledger row and the wagering credit: PlayerWallet, like every path.
+        try {
+            $move = $action === 'bet'
+                ? $this->wallet->stake($user, $amount, 'bigbang', $roundRef, $entry)
+                : $this->wallet->payout($user, $amount, 'bigbang', $roundRef, $entry);
+        } catch (InsufficientFunds) {
+            return response()->json(['status' => 'error', 'error' => 'Insufficient balance.'], 422);
         }
-        $user->save();
 
         BigBangTransaction::create([
             'provider_transaction_id' => $transactionId,
@@ -181,33 +184,12 @@ class BigBangWalletController
             'payload_hash' => $payloadHash,
             'metadata' => [
                 'callback' => $payload,
-                'withdrawable_debit' => $withdrawableDebit,
-                'bonus_kept' => $bonusKept,
+                'withdrawable_debit' => $move->withdrawableDebit,
+                'bonus_kept' => $move->bonusKept,
                 'game_category' => $payload['game_category'] ?? null,
             ],
         ]);
 
-        WalletTransaction::create([
-            'ledger_key' => 'bigbang-'.$action.'-'.$transactionId,
-            'user_id' => $user->id,
-            'type' => $action === 'win' ? 'payout' : 'bet',
-            'amount' => $delta,
-            'status' => 'success',
-            'method' => 'bigbang',
-            'reason' => ($game?->title ? $game->title.' ' : 'BigBang ').($action === 'win' ? 'payout' : 'stake'),
-            'currency' => 'ETB',
-            'source_type' => 'bigbang_session',
-            'source_id' => $session->id,
-            'metadata' => [
-                'provider_transaction_id' => $transactionId,
-                'game_round_id' => $round?->id,
-                'game' => $game?->slug,
-            ],
-        ]);
-
-        if ($action === 'bet') {
-            $this->wagering->recordStake($user, $amount);
-        }
         $session->update(['last_activity_at' => now()]);
 
         return response()->json(['status' => 'ok', 'balance' => $this->formatAmount((float) $user->credits)]);

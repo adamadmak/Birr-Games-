@@ -115,14 +115,20 @@ player can cash out. The difference is play-only credit: deposit bonus, the
 welcome balance, anything an administrator locked. A stake is paid from
 play-only credit first.
 
-**Every new path that takes a stake or pays out must go through
-`App\Services\BonusPlay`.** It remembers how much of a round was bonus, so when
-the round pays, the bonus part goes back to play-only and only the winnings
-become withdrawable. A path that credits a payout straight to
-`withdrawable_balance` lets a 1.01x bet turn any bonus into cash. The four
-existing paths (QTech, BigBang, WinHouse, the built-in games) show the shape:
-`stake()` after taking the stake, `payout()` before crediting the win, and a
-provider rollback calls `unstake()`.
+**Every path that takes a stake or pays out goes through
+`App\Services\Wallet\PlayerWallet`.** Inside the caller's transaction:
+`lock()` the player, then `stake()`, `payout()`, `refund()` (a provider
+rollback), `reward()` (a prize outside any round) or `playRound()` (a built-in
+game, staked and settled in one step). The service spends play-only credit
+first, keeps the bonus part of a stake play-only when the round pays (through
+`App\Services\BonusPlay`, which remembers how much of a round was bonus),
+rounds once, writes the ledger row from the `LedgerEntry` you describe, and
+counts a real stake toward wagering. A path that moves `credits` or
+`withdrawable_balance` by hand lets a 1.01x bet turn any bonus into cash and
+will drift from the others, which is how the four paths got out of step before
+28 Oct 2026. The controllers keep only their own protocol: authentication,
+the idempotency row, the round mirror and the response. Add a test beside
+`tests/Feature/PlayerWalletTest.php` for any new rule.
 
 The deposit bonus itself is `App\Services\DepositBonusService`: it adds to
 `credits` only, never to `withdrawable_balance`, and is paid once per approved

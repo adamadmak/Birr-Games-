@@ -7,8 +7,8 @@ use App\Models\Game;
 use App\Models\PlatformSetting;
 use App\Models\GameRound;
 use App\Models\User;
-use App\Models\WalletTransaction;
-use App\Services\WageringService;
+use App\Services\Wallet\LedgerEntry;
+use App\Services\Wallet\PlayerWallet;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +39,7 @@ class GameController
         ]);
     }
 
-    public function play(Request $request, Game $game, GameAgentManager $agents, WageringService $wagering): RedirectResponse
+    public function play(Request $request, Game $game, GameAgentManager $agents, PlayerWallet $wallet): RedirectResponse
     {
         $agent = $agents->for($game->agent);
         abort_unless($game->isAvailable() && $game->playable && $agent, 404);
@@ -59,12 +59,11 @@ class GameController
             return back()->withInput()->withErrors(['choice' => $exception->getMessage()]);
         }
 
-        $round = DB::transaction(function () use ($request, $game, $validated, $result, $wagering) {
-            /** @var User $user */
-            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
-            $stake = (int) $validated['stake'];
+        $round = DB::transaction(function () use ($request, $game, $validated, $result, $wallet) {
+            $user = $wallet->lock($request->user());
+            $stake = (float) $validated['stake'];
 
-            if ($user->credits < $stake) {
+            if (! $wallet->covers($user, $stake)) {
                 return null;
             }
 
@@ -76,28 +75,15 @@ class GameController
                 'result' => $result,
             ]);
 
-            $lockedCredits = max(0, $user->credits - $user->withdrawable_balance);
-            $withdrawableStake = max(0, $stake - $lockedCredits);
-            // The bonus part of the stake returns to the bonus wallet; only the rest of
-            // the payout becomes withdrawable (see App\Services\BonusPlay).
-            $bonusKept = \App\Services\BonusPlay::immediate((float) $stake, (float) $withdrawableStake, (float) $result['payout']);
-            $user->update([
-                'credits' => $user->credits - $stake + $result['payout'],
-                'withdrawable_balance' => max(0, $user->withdrawable_balance - $withdrawableStake + (int) $result['payout'] - $bonusKept),
-            ]);
-            WalletTransaction::create([
-                'user_id' => $user->id, 'type' => 'bet', 'amount' => -$stake,
-                'status' => 'success', 'method' => 'game', 'reason' => $game->title.' stake',
-                'currency' => 'ETB', 'source_type' => 'game_round', 'source_id' => $round->id,
-            ]);
-            if ($result['payout'] > 0) {
-                WalletTransaction::create([
-                    'user_id' => $user->id, 'type' => 'payout', 'amount' => (int) $result['payout'],
-                    'status' => 'success', 'method' => 'game', 'reason' => $game->title.' payout',
-                    'currency' => 'ETB', 'source_type' => 'game_round', 'source_id' => $round->id,
-                ]);
-            }
-            $wagering->recordStake($user, $stake);
+            // Stake and payout in one step: bonus credit first, the bonus part
+            // of the stake back as bonus, two ledger rows, the wagering credit.
+            $wallet->playRound(
+                $user,
+                $stake,
+                (float) $result['payout'],
+                new LedgerEntry(method: 'game', reason: $game->title.' stake', sourceType: 'game_round', sourceId: $round->id),
+                new LedgerEntry(method: 'game', reason: $game->title.' payout', sourceType: 'game_round', sourceId: $round->id),
+            );
 
             return $round;
         });

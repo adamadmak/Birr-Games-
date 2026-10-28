@@ -7,8 +7,9 @@ use App\Models\GameRound;
 use App\Models\QtechSession;
 use App\Models\QtechTransaction;
 use App\Models\User;
-use App\Models\WalletTransaction;
-use App\Services\WageringService;
+use App\Services\Wallet\InsufficientFunds;
+use App\Services\Wallet\LedgerEntry;
+use App\Services\Wallet\PlayerWallet;
 use App\Support\Qtech;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class QtechWalletController
     /** gameId -> local slug, for this request only. */
     private static array $slugCache = [];
 
-    public function __construct(private readonly WageringService $wagering)
+    public function __construct(private readonly PlayerWallet $wallet)
     {
     }
 
@@ -172,40 +173,23 @@ class QtechWalletController
 
         try {
             return DB::transaction(function () use ($user, $amount, $txnId, $payload, $session) {
-                $locked = User::query()->lockForUpdate()->findOrFail($user->id);
+                $locked = $this->wallet->lock($user);
 
-                // Re-checked inside the lock: two bets racing for the last of a
-                // balance must not both read it as available.
-                if ($amount > 0 && (float) $locked->credits < $amount) {
+                // Inside the lock: two bets racing for the last of a balance
+                // must not both read it as available. The split (bonus credit
+                // first), the ledger row and the wagering credit are
+                // PlayerWallet's. A 0-amount debit is QT's free-round marker:
+                // it opens a round without charging and moves nothing.
+                try {
+                    $move = $this->wallet->stake($locked, $amount, 'qtech', $this->roundRef($payload), $this->entry(QtechTransaction::TYPE_DEBIT, $txnId, $payload, 'QTech bet'));
+                } catch (InsufficientFunds) {
                     return $this->fail('INSUFFICIENT_FUNDS', 'Not enough funds for the debit operation.', 400);
                 }
 
-                $withdrawableDebit = 0.0;
-                if ($amount > 0) {
-                    // Mirror the other integrations: spend locked bonus credit
-                    // before money the player could have withdrawn, so placing
-                    // a bet never quietly converts one into the other.
-                    $lockedCredits = max(0, (float) $locked->credits - (float) $locked->withdrawable_balance);
-                    $withdrawableDebit = max(0, $amount - $lockedCredits);
-                    $locked->credits = round((float) $locked->credits - $amount, 2);
-                    $locked->withdrawable_balance = round(max(0, (float) $locked->withdrawable_balance - $withdrawableDebit), 2);
-                    $locked->save();
-                }
-
                 $row = $this->record(QtechTransaction::TYPE_DEBIT, $txnId, $locked, $amount, $payload, [
-                    'withdrawable_debit' => $withdrawableDebit,
+                    'withdrawable_debit' => $move->withdrawableDebit,
                 ]);
-
-                // Only a real movement reaches the money ledger. A 0-amount
-                // debit is QT's free-round marker: it opens a round without
-                // charging, and qtech_transactions already records that.
-                if ($amount > 0) {
-                    // Remember how much of this stake was bonus, so the round's payout
-                    // returns that part to the bonus wallet instead of making it cash.
-                    \App\Services\BonusPlay::stake($locked, 'qtech', (string) $row->round_id, $amount, $withdrawableDebit);
-                    $this->ledger($locked, $row, 'bet', -$amount, 'QTech bet');
-                    $this->wagering->recordStake($locked, $amount);
-                }
+                $move->ledger?->update(['source_id' => $row->getKey()]);
 
                 $session->forceFill(['last_activity_at' => now()])->save();
 
@@ -246,24 +230,14 @@ class QtechWalletController
 
         try {
             return DB::transaction(function () use ($user, $amount, $txnId, $payload) {
-                $locked = User::query()->lockForUpdate()->findOrFail($user->id);
+                $locked = $this->wallet->lock($user);
 
-                $bonusKept = 0.0;
-                if ($amount > 0) {
-                    // Winnings are real money the moment they land, so they raise the
-                    // withdrawable balance. The part of the payout that is only the
-                    // bonus stake coming back stays play-only: bonus is never cash.
-                    $bonusKept = \App\Services\BonusPlay::payout($locked, 'qtech', trim((string) ($payload['roundId'] ?? '')), $amount);
-                    $locked->credits = round((float) $locked->credits + $amount, 2);
-                    $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $amount - $bonusKept, 2);
-                    $locked->save();
-                }
+                // Winnings are real money the moment they land; the part that is
+                // only the bonus stake coming back stays play-only (PlayerWallet).
+                $move = $this->wallet->payout($locked, $amount, 'qtech', $this->roundRef($payload), $this->entry(QtechTransaction::TYPE_CREDIT, $txnId, $payload, 'QTech win'));
 
-                $row = $this->record(QtechTransaction::TYPE_CREDIT, $txnId, $locked, $amount, $payload, $bonusKept > 0 ? ['bonus_kept' => $bonusKept] : []);
-
-                if ($amount > 0) {
-                    $this->ledger($locked, $row, 'payout', $amount, 'QTech win');
-                }
+                $row = $this->record(QtechTransaction::TYPE_CREDIT, $txnId, $locked, $amount, $payload, $move->bonusKept > 0 ? ['bonus_kept' => $move->bonusKept] : []);
+                $move->ledger?->update(['source_id' => $row->getKey()]);
 
                 return $this->settled($row, 201);
             });
@@ -311,7 +285,7 @@ class QtechWalletController
 
         try {
             return DB::transaction(function () use ($user, $txnId, $betId, $payload) {
-                $locked = User::query()->lockForUpdate()->findOrFail($user->id);
+                $locked = $this->wallet->lock($user);
 
                 $bet = $betId === '' ? null : QtechTransaction::query()
                     ->where('type', QtechTransaction::TYPE_DEBIT)
@@ -328,26 +302,23 @@ class QtechWalletController
                 }
 
                 $amount = (float) $bet->amount;
-                if ($amount > 0) {
-                    $meta = $bet->metadata ?? [];
-                    // Put the money back the way it came out, so a bet paid
-                    // for with bonus credit is refunded as bonus credit.
-                    $withdrawable = (float) ($meta['withdrawable_debit'] ?? 0);
-                    $locked->credits = round((float) $locked->credits + $amount, 2);
-                    $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $withdrawable, 2);
-                    $locked->save();
-                    \App\Services\BonusPlay::unstake($locked, 'qtech', (string) $bet->round_id, $amount, $withdrawable);
-                }
+                // Put the money back the way it came out, so a bet paid for
+                // with bonus credit is refunded as bonus credit.
+                $move = $this->wallet->refund(
+                    $locked,
+                    $amount,
+                    (float) (($bet->metadata ?? [])['withdrawable_debit'] ?? 0),
+                    'qtech',
+                    trim((string) $bet->round_id),
+                    $this->entry(QtechTransaction::TYPE_ROLLBACK, $txnId, $payload, 'QTech rollback'),
+                );
 
                 $bet->forceFill(['rolled_back' => true])->save();
 
                 $row = $this->record(QtechTransaction::TYPE_ROLLBACK, $txnId, $locked, $amount, $payload, [
                     'rolled_back_bet_id' => $bet->txn_id,
                 ]);
-
-                if ($amount > 0) {
-                    $this->ledger($locked, $row, 'refund', $amount, 'QTech rollback');
-                }
+                $move->ledger?->update(['source_id' => $row->getKey()]);
 
                 return $this->settled($row, 200);
             });
@@ -393,19 +364,12 @@ class QtechWalletController
 
         try {
             return DB::transaction(function () use ($user, $amount, $txnId, $payload, $rewardType) {
-                $locked = User::query()->lockForUpdate()->findOrFail($user->id);
+                $locked = $this->wallet->lock($user);
 
-                if ($amount > 0) {
-                    $locked->credits = round((float) $locked->credits + $amount, 2);
-                    $locked->withdrawable_balance = round((float) $locked->withdrawable_balance + $amount, 2);
-                    $locked->save();
-                }
+                $move = $this->wallet->reward($locked, $amount, $this->entry(QtechTransaction::TYPE_REWARD, $txnId, $payload, 'QTech '.$rewardType));
 
                 $row = $this->record(QtechTransaction::TYPE_REWARD, $txnId, $locked, $amount, $payload);
-
-                if ($amount > 0) {
-                    $this->ledger($locked, $row, 'payout', $amount, 'QTech '.$rewardType);
-                }
+                $move->ledger?->update(['source_id' => $row->getKey()]);
 
                 return $this->settled($row, 201);
             });
@@ -624,26 +588,30 @@ class QtechWalletController
         ]);
     }
 
-    /** Mirror the movement into the operator's own ledger, for reconciliation. */
-    private function ledger(User $user, QtechTransaction $row, string $type, float $delta, string $reason): void
+    /**
+     * How this movement reads in the operator's ledger. The qtech_transactions
+     * row it settles does not exist until after the money has moved, so the
+     * caller fills in source_id once it does.
+     */
+    private function entry(string $type, string $txnId, array $payload, string $reason): LedgerEntry
     {
-        WalletTransaction::create([
-            'ledger_key' => 'qtech-'.strtolower($row->type).'-'.$row->txn_id,
-            'user_id' => $user->id,
-            'type' => $type,
-            'amount' => $delta,
-            'status' => 'success',
-            'method' => 'qtech',
-            'reason' => $reason,
-            'currency' => Qtech::currency(),
-            'source_type' => 'qtech_transaction',
-            'source_id' => $row->getKey(),
-            'metadata' => [
-                'txn_id' => $row->txn_id,
-                'round_id' => $row->round_id,
-                'bet_id' => $row->bet_id,
+        return new LedgerEntry(
+            method: 'qtech',
+            reason: $reason,
+            key: 'qtech-'.strtolower($type).'-'.$txnId,
+            sourceType: 'qtech_transaction',
+            metadata: [
+                'txn_id' => $txnId,
+                'round_id' => $payload['roundId'] ?? null,
+                'bet_id' => $payload['betId'] ?? null,
             ],
-        ]);
+        );
+    }
+
+    /** The round a stake and its settlement share, as QT name it on every call. */
+    private function roundRef(array $payload): string
+    {
+        return trim((string) ($payload['roundId'] ?? ''));
     }
 
     private function settled(QtechTransaction $row, int $status): JsonResponse

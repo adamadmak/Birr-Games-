@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\WalletTransaction;
 use App\Models\WinhouseSession;
 use App\Models\WinhouseTransaction;
-use App\Services\WageringService;
+use App\Services\Wallet\InsufficientFunds;
+use App\Services\Wallet\LedgerEntry;
+use App\Services\Wallet\PlayerWallet;
 use App\Support\Winhouse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ use Throwable;
 class WinhouseWalletController
 {
     public function __construct(
-        private readonly WageringService $wagering,
+        private readonly PlayerWallet $wallet,
     ) {
     }
 
@@ -141,7 +142,7 @@ class WinhouseWalletController
     {
         // Lock the row for the whole transaction: two concurrent settlements on
         // the same player must not read the same starting balance.
-        $user = User::query()->lockForUpdate()->findOrFail($user->id);
+        $user = $this->wallet->lock($user);
 
         $transactionId = trim((string) ($payload['transaction_id'] ?? ''));
         if ($transactionId === '') {
@@ -182,34 +183,35 @@ class WinhouseWalletController
             return response()->json(['status' => 'error', 'error' => 'The book session is invalid or expired.'], 403);
         }
 
-        if ($delta < 0 && (float) $user->credits < abs($delta)) {
-            return response()->json(['status' => 'error', 'error' => 'Insufficient balance.'], 422);
-        }
-
         $amount = abs($delta);
-        $withdrawableDebit = 0.0;
-        $bonusKept = 0.0;
         // A sportsbook ticket is the round: its bet, win and void all name it.
         $ticketRef = trim((string) ($payload['ticket_id'] ?? ''));
         $roundRef = $ticketRef !== '' ? 'ticket:'.$ticketRef : '';
-        if ($delta < 0) {
-            // Mirror the casino split: spend locked (bonus) credit first so a
-            // stake does not quietly convert bonus funds into withdrawable ones.
-            $lockedCredits = max(0, (float) $user->credits - (float) $user->withdrawable_balance);
-            $withdrawableDebit = max(0, $amount - $lockedCredits);
-            $user->credits = (float) $user->credits - $amount;
-            $user->withdrawable_balance = max(0, (float) $user->withdrawable_balance - $withdrawableDebit);
-            \App\Services\BonusPlay::stake($user, 'winhouse', $roundRef, $amount, $withdrawableDebit);
-        } else {
-            // A win and a void both come back here. A void refunds the stake, so it is
-            // measured the same way: the bonus part of the stake returns as bonus.
-            $bonusKept = \App\Services\BonusPlay::payout($user, 'winhouse', $roundRef, $amount);
-            $user->credits = (float) $user->credits + $amount;
-            $user->withdrawable_balance = (float) $user->withdrawable_balance + $amount - $bonusKept;
-        }
-        $user->save();
-
         $currency = Winhouse::currency();
+        $entry = new LedgerEntry(
+            method: 'winhouse',
+            reason: 'Sportsbook '.$action,
+            key: 'winhouse-'.$action.'-'.$transactionId,
+            sourceType: 'winhouse_session',
+            sourceId: $session->id,
+            metadata: [
+                'provider_transaction_id' => $transactionId,
+                'ticket_id' => $payload['ticket_id'] ?? null,
+            ],
+        );
+
+        // The wallet rules — bonus credit spent first, a win raising the cash
+        // balance by everything but the bonus stake coming back, the ledger
+        // row, the wagering credit — live in PlayerWallet. A void comes back
+        // as a positive amount and is measured like a win: the bonus part of
+        // the stake returns as bonus.
+        try {
+            $move = $delta < 0
+                ? $this->wallet->stake($user, $amount, 'winhouse', $roundRef, $entry)
+                : $this->wallet->payout($user, $amount, 'winhouse', $roundRef, $entry);
+        } catch (InsufficientFunds) {
+            return response()->json(['status' => 'error', 'error' => 'Insufficient balance.'], 422);
+        }
 
         WinhouseTransaction::create([
             'provider_transaction_id' => $transactionId,
@@ -223,33 +225,10 @@ class WinhouseWalletController
             'payload_hash' => $payloadHash,
             'metadata' => [
                 'callback' => $payload,
-                'withdrawable_debit' => $withdrawableDebit,
-                'bonus_kept' => $bonusKept,
+                'withdrawable_debit' => $move->withdrawableDebit,
+                'bonus_kept' => $move->bonusKept,
             ],
         ]);
-
-        WalletTransaction::create([
-            'ledger_key' => 'winhouse-'.$action.'-'.$transactionId,
-            'user_id' => $user->id,
-            'type' => $delta < 0 ? 'bet' : 'payout',
-            'amount' => $delta,
-            'status' => 'success',
-            'method' => 'winhouse',
-            'reason' => 'Sportsbook '.$action,
-            'currency' => $currency,
-            'source_type' => 'winhouse_session',
-            'source_id' => $session->id,
-            'metadata' => [
-                'provider_transaction_id' => $transactionId,
-                'ticket_id' => $payload['ticket_id'] ?? null,
-            ],
-        ]);
-
-        // Only a real stake counts toward wagering — a void is a reversal, and
-        // counting it would let a bet-then-void loop clear a bonus for free.
-        if ($action === 'bet') {
-            $this->wagering->recordStake($user, $amount);
-        }
 
         $session->update(['last_activity_at' => now()]);
 
