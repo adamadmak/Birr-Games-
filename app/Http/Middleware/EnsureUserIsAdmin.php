@@ -24,6 +24,8 @@ class EnsureUserIsAdmin
             str_starts_with($routeName, 'admin.operations.') => 'operations.view',
             str_starts_with($routeName, 'admin.administrators.') => 'administrators.manage',
             $routeName === 'admin.members.deposit' => 'members.deposit',
+            // Imports can create members with balances: a super-administrator's job.
+            $routeName === 'admin.members.import' => 'members.import',
             $routeName === 'admin.members.password' => 'members.credentials',
             in_array($routeName, ['admin.members.destroy', 'admin.members.restore', 'admin.members.purge'], true) => 'members.delete',
             str_starts_with($routeName, 'admin.members.') => 'members.manage',
@@ -45,7 +47,14 @@ class EnsureUserIsAdmin
             str_starts_with($routeName, 'admin.shamo.'),
             str_starts_with($routeName, 'admin.module') => 'promotions.manage',
             str_starts_with($routeName, 'admin.telegram.') => 'telegram.manage',
-            default => 'dashboard.view',
+            str_starts_with($routeName, 'admin.predictions.') => 'promotions.manage',
+            str_starts_with($routeName, 'admin.sports.') => 'transactions.view',
+            in_array($routeName, ['admin.dashboard', 'admin.quick-search'], true) => 'dashboard.view',
+            // Anything not named above is closed to every delegated role. Until
+            // 28 Oct 2026 the default was dashboard.view, which every role holds, so
+            // a new admin route was open to marketing and support until someone
+            // remembered to map it. Super-administrators hold '*' and still pass.
+            default => 'admin.unmapped',
         };
 
         abort_unless($user->hasAdminPermission($permission), 403, 'Your administrator role does not permit this action.');

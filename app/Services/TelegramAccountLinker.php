@@ -116,7 +116,7 @@ class TelegramAccountLinker
         $subscribers = TelegramSubscriber::query()->where('user_id', $user->id)->get();
         foreach ($subscribers as $subscriber) {
             $subscriber->forceFill(['user_id' => null, 'pending_action' => null, 'pending_payload' => null])->save();
-            \App\Models\TelegramLoginToken::query()->where('telegram_subscriber_id', $subscriber->id)->whereNull('used_at')->update(['used_at' => now()]);
+            \App\Models\TelegramLoginToken::query()->where('telegram_subscriber_id', $subscriber->id)->where('expires_at', '>', now())->update(['used_at' => now(), 'expires_at' => now()]);
         }
 
         if ($subscribers->isNotEmpty()) {

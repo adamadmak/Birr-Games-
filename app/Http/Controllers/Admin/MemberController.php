@@ -311,7 +311,7 @@ class MemberController
             // Break every route back into the account: the bot link, live login links and
             // the wallet toggle.
             TelegramSubscriber::query()->where('user_id', $locked->id)->update(['user_id' => null]);
-            TelegramLoginToken::query()->where('user_id', $locked->id)->whereNull('used_at')->update(['used_at' => now()]);
+            TelegramLoginToken::query()->where('user_id', $locked->id)->where('expires_at', '>', now())->update(['used_at' => now(), 'expires_at' => now()]);
             $locked->forceFill(['active' => false])->save();
             $locked->delete();
         });

@@ -252,10 +252,11 @@ class TelegramPlayerService
         $plainToken = Str::random(64);
 
         DB::transaction(function () use ($subscriber, $user, $plainToken, $destination): void {
+            // Older links die with the new one's birth: expires_at is what the login checks.
             TelegramLoginToken::query()
                 ->where('telegram_subscriber_id', $subscriber->id)
-                ->whereNull('used_at')
-                ->update(['used_at' => now()]);
+                ->where('expires_at', '>', now())
+                ->update(['used_at' => now(), 'expires_at' => now()]);
 
             TelegramLoginToken::create([
                 'user_id' => $user->id,

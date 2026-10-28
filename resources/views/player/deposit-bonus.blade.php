@@ -15,9 +15,12 @@
         <div class="bonus-copy">
             <span class="bonus-label">One-time local reward</span>
             <h2>Power up your first session.</h2>
-            <p>Claim <strong>{{ \App\Support\Money::format($bonusCredits) }}</strong> for exploring Vamoseone. No payment is required.</p>
+            <p>Claim <strong>{{ \App\Support\Money::format($bonusCredits) }}</strong> on top of your first deposit. It is play credit: use it on any game, keep what it wins.</p>
             @if($claim)
                 <div class="bonus-claimed-state"><span>&#10003;</span><div><strong>Bonus claimed</strong><small>{{ \App\Support\Money::format($claim->credits) }} added {{ $claim->claimed_at->diffForHumans() }}</small></div></div>
+            @elseif (! $hasDeposit)
+                <a class="bonus-claim-button" href="{{ route('player.wallet', ['tab' => 'deposit']) }}">Make your first deposit</a>
+                <p class="bonus-fineprint">The bonus unlocks once an agent has confirmed a deposit on this account.</p>
             @else
                 <form method="POST" action="{{ route('deposit-bonus.claim') }}">@csrf<button class="bonus-claim-button" type="submit">Claim {{ \App\Support\Money::format($bonusCredits) }}</button></form>
             @endif

@@ -189,7 +189,10 @@ final class MemberCsvImporter
                     [
                         'import_source_id', 'name', 'first_name', 'last_name', 'member_type',
                         'affiliate_id', 'affiliate_provider', 'hashed_username', 'deposit_setting',
-                        'withdraw_setting', 'credits', 'withdrawable_balance', 'withdrawal_cap',
+                        // Balances are set when a member is CREATED by the import and never
+                        // touched on an existing one: a spreadsheet is not a ledger, and an
+                        // import that could rewrite credits was a way to mint money.
+                        'withdraw_setting', 'withdrawal_cap',
                         'transfer_cap', 'deposit_cap', 'contact_confirmed', 'active', 'updated_at',
                         'imported_at',
                     ]

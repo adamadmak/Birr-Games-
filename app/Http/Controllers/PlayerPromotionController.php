@@ -24,19 +24,37 @@ class PlayerPromotionController
                 ->where('bonus_type', BonusClaim::FIRST_DEMO_TOP_UP)
                 ->first(),
             'bonusCredits' => $this->depositBonusAmount(),
+            'hasDeposit' => $this->hasApprovedDeposit($request->user()),
         ]);
+    }
+
+    /** One approved (agent-settled) deposit is the price of the bonus. */
+    private function hasApprovedDeposit(User $user): bool
+    {
+        return $user->depositOrders()->where('status', 'success')->exists();
     }
 
     public function claimDepositBonus(Request $request, WageringService $wagering): RedirectResponse
     {
         $bonusAmount = $this->depositBonusAmount();
 
+        if ($bonusAmount < 1) {
+            return back()->with('error', 'The deposit bonus is not available right now.');
+        }
+
         $claimed = DB::transaction(function () use ($request, $bonusAmount, $wagering) {
             /** @var User $user */
             $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
 
             if ($user->bonusClaims()->where('bonus_type', BonusClaim::FIRST_DEMO_TOP_UP)->exists()) {
-                return false;
+                return 'already';
+            }
+
+            // Until 28 Oct 2026 this was a free 2,500 ETB for every account, and with an
+            // even-odds coin flip in the lobby it was withdrawable within minutes. It is
+            // a deposit bonus: no settled deposit, no bonus.
+            if (! $this->hasApprovedDeposit($user)) {
+                return 'no_deposit';
             }
 
             $user->increment('credits', $bonusAmount);
@@ -52,12 +70,14 @@ class PlayerPromotionController
             ]);
             $wagering->awardForClaim($user, $claim);
 
-            return true;
+            return 'claimed';
         });
 
-        return back()->with('status', $claimed
-            ? Money::format($bonusAmount).' was added to your wallet.'
-            : 'This one-time demo bonus has already been claimed.');
+        return match ($claimed) {
+            'claimed' => back()->with('status', Money::format($bonusAmount).' was added to your wallet.'),
+            'no_deposit' => back()->with('error', 'Make your first deposit, then come back for the bonus.'),
+            default => back()->with('status', 'This one-time bonus has already been claimed.'),
+        };
     }
 
     public function shamo(Request $request): View

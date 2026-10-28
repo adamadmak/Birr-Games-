@@ -123,7 +123,7 @@ Route::prefix('agent')->name('agent.')->group(function () {
 
     // Presence is recorded for every authenticated agent request, so a player
     // choosing who to deposit with can see who is actually at their desk.
-    Route::middleware(['auth:agent', \App\Http\Middleware\TrackAgentPresence::class])->group(function () {
+    Route::middleware(['auth:agent', \App\Http\Middleware\EnsureAgentIsActive::class, \App\Http\Middleware\TrackAgentPresence::class])->group(function () {
         Route::get('/', [AgentPortalController::class, 'dashboard'])->name('dashboard');
         Route::post('/telegram/generate-code', [AgentPortalController::class, 'generateTelegramLinkCode'])->name('telegram.generate-code');
         Route::delete('/telegram', [AgentPortalController::class, 'unlinkTelegram'])->name('telegram.unlink');
@@ -184,7 +184,7 @@ Route::get('/predictions/{pool}/crest/{side}', [\App\Http\Controllers\Prediction
 
 Route::middleware('auth')->group(function () {
     Route::get('/deposit-bonus', [PlayerPromotionController::class, 'depositBonus'])->name('deposit-bonus');
-    Route::post('/deposit-bonus/claim', [PlayerPromotionController::class, 'claimDepositBonus'])->name('deposit-bonus.claim');
+    Route::post('/deposit-bonus/claim', [PlayerPromotionController::class, 'claimDepositBonus'])->middleware('throttle:5,1')->name('deposit-bonus.claim');
     Route::get('/shamo', [PlayerPromotionController::class, 'shamo'])->name('shamo');
     Route::post('/shamo/{campaign}/join', [PlayerPromotionController::class, 'joinShamo'])->name('shamo.join');
     Route::post('/predictions/{pool}/join', [\App\Http\Controllers\PredictionController::class, 'join'])

@@ -71,6 +71,11 @@ class AgentController
     public function toggle(Agent $agent): RedirectResponse
     {
         $agent->update(['active' => !$agent->active]);
+        // A disabled agent's remember-me cookies on other devices die with the flag;
+        // EnsureAgentIsActive ends the live sessions on their next request.
+        if (! $agent->active) {
+            $agent->forceFill(['remember_token' => \Illuminate\Support\Str::random(60)])->save();
+        }
         return back()->with('admin_status', 'Agent status updated.');
     }
 

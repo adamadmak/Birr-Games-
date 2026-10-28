@@ -4133,3 +4133,7 @@ body.player-guest {
 .sports-hero h1 { text-shadow: 0 2px 22px rgba(0, 0, 0, .45); }
 .sports-hero p { text-shadow: 0 1px 10px rgba(0, 0, 0, .4); }
 .sports-hero-perks li { background: rgba(5, 16, 50, .62); }
+
+/* The deposit-bonus call to action is a link until the first deposit lands. */
+a.bonus-claim-button { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.bonus-fineprint { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
