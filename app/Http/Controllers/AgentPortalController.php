@@ -433,14 +433,30 @@ class AgentPortalController
     {
         $agent = $this->agent($request);
         $validated = $request->validate([
-            'payment_gateway_id' => ['required', Rule::exists('payment_gateways', 'id')],
+            'payment_gateway_id' => ['required', Rule::exists('payment_gateways', 'id')->where('active', true)],
             'account_name' => ['required', 'string', 'max:120'],
             'account_number' => ['required', 'string', 'max:80'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
-        $validated['agent_id'] = $agent->id;
-        $validated['active'] = true;
-        AgentBankAccount::create($validated);
+        $validated['account_number'] = preg_replace('/\s+/', '', trim($validated['account_number']));
+
+        // One row per agent, method and number (agent_bank_acct_unique): adding
+        // it again would be a database error, so say so, or switch it back on.
+        $existing = AgentBankAccount::query()
+            ->where('agent_id', $agent->id)
+            ->where('payment_gateway_id', $validated['payment_gateway_id'])
+            ->where('account_number', $validated['account_number'])
+            ->first();
+        if ($existing) {
+            if ($existing->active) {
+                throw ValidationException::withMessages(['account_number' => 'You already have this account number for this payment method.']);
+            }
+            $existing->update(['active' => true, 'account_name' => $validated['account_name'], 'notes' => $validated['notes'] ?? $existing->notes]);
+
+            return back()->with('agent_status', 'That account was switched off; it is active again.');
+        }
+
+        AgentBankAccount::create([...$validated, 'agent_id' => $agent->id, 'active' => true]);
 
         return back()->with('agent_status', 'Bank account added.');
     }

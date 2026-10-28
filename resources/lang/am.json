@@ -500,5 +500,10 @@
     "That picture is larger than 10 MB. Take a screenshot instead of a photo.": "ያ ምስል ከ10 ሜባ በላይ ነው። ፎቶ ሳይሆን ቅጽበታዊ ገጽ እይታ ይውሰዱ።",
     "The deposit was submitted, but the screenshot could not be saved. Add it again from your wallet.": "ተቀማጩ ቀርቧል፣ ነገር ግን ቅጽበታዊ ገጽ እይታው ሊቀመጥ አልቻለም። ከቦርሳዎ እንደገና ያያይዙት።",
     "This deposit has already been handled, so it no longer takes a screenshot.": "ይህ ተቀማጭ አስቀድሞ ተስተናግዷል፣ ስለዚህ ቅጽበታዊ ገጽ እይታ ከእንግዲህ አይቀበልም።",
-    "Upload the screenshot as a JPG, PNG or WEBP picture.": "ቅጽበታዊ ገጽ እይታውን በJPG፣ PNG ወይም WEBP ምስል ይስቀሉ።"
+    "Upload the screenshot as a JPG, PNG or WEBP picture.": "ቅጽበታዊ ገጽ እይታውን በJPG፣ PNG ወይም WEBP ምስል ይስቀሉ።",
+    "Betting at an agent shop?": "በወኪል ሱቅ ነው የሚወራረዱት?",
+    "Get a booking code": "የቦኪንግ ኮድ ያግኙ",
+    "Add your picks to the bet slip and set the stake. Do not press Place Bet.": "ምርጫዎችዎን ወደ ቤት ስሊፕ ያክሉ እና የውርርድ መጠኑን ያስገቡ። Place Bet አይጫኑ።",
+    "Under Place Bet, open Save or Load Bet Slip and tap Get booking code.": "ከ Place Bet በታች Save or Load Bet Slip ይክፈቱ እና Get booking code ይጫኑ።",
+    "Show the 7-character code to the agent and pay them. They place the bet and print your ticket.": "ባለ 7 ፊደሉን ኮድ ለወኪሉ ያሳዩ እና ይክፈሉ። ወኪሉ ውርርዱን አስቀምጦ ትኬትዎን ያትማል።"
 }

@@ -43,6 +43,15 @@
         <a role="tab" aria-selected="false" href="{{ route('promotions') }}">{{ __('Promos') }}</a>
     </div>
 
+    <details class="sports-booking-hint">
+        <summary><span>{{ __('Betting at an agent shop?') }}</span> <strong>{{ __('Get a booking code') }}</strong></summary>
+        <ol>
+            <li>{{ __('Add your picks to the bet slip and set the stake. Do not press Place Bet.') }}</li>
+            <li>{{ __('Under Place Bet, open Save or Load Bet Slip and tap Get booking code.') }}</li>
+            <li>{{ __('Show the 7-character code to the agent and pay them. They place the bet and print your ticket.') }}</li>
+        </ol>
+    </details>
+
     <section class="sports-book" id="sportsbook" aria-label="{{ __('Sportsbook') }}">
         <iframe
             src="{{ $bookSrc }}"
