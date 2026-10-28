@@ -154,26 +154,28 @@ Route::middleware('auth')->prefix('player')->name('player.')->group(function () 
     // by WinHouse, so the page that is open has no idea the wallet moved — without
     // this the pill keeps showing the pre-bet figure until the next full reload,
     // which reads as "my bet was not taken".
+    // Each throttle below carries its own name: without one Laravel keys them all
+    // on the user, and the balance poll was emptying the deposit bucket.
     Route::get('/balance', [PlayerController::class, 'balance'])
-        ->middleware('throttle:120,1')
+        ->middleware('throttle:120,1,balance')
         ->name('balance');
     Route::get('/wallet', [PlayerController::class, 'wallet'])->name('wallet');
     Route::get('/tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
-    Route::post('/wallet/deposits', [PlayerDepositController::class, 'store'])->middleware('throttle:10,1')->name('deposits.store');
+    Route::post('/wallet/deposits', [PlayerDepositController::class, 'store'])->middleware('throttle:10,1,deposit')->name('deposits.store');
     Route::patch('/wallet/deposits/{order}/cancel', [PlayerDepositController::class, 'cancel'])->name('deposits.cancel');
-    Route::post('/wallet/withdrawals', [PlayerWithdrawalController::class, 'store'])->middleware('throttle:10,1')->name('withdrawals.store');
+    Route::post('/wallet/withdrawals', [PlayerWithdrawalController::class, 'store'])->middleware('throttle:10,1,withdraw')->name('withdrawals.store');
     Route::patch('/wallet/withdrawals/{order}/cancel', [PlayerWithdrawalController::class, 'cancel'])->name('withdrawals.cancel');
     // Rating the agent who settled an order. Rate-limited: it writes a row, and a
     // held-down button should not be able to hammer the uniqueness constraint.
     Route::post('/orders/{order}/rating', [\App\Http\Controllers\AgentRatingController::class, 'store'])
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:20,1,rating')
         ->name('orders.rate');
     Route::get('/profile', [PlayerController::class, 'profile'])->name('profile');
     // Connect the account to the Telegram bot. Status is polled while the player is in Telegram;
     // disconnecting asks for the password again.
-    Route::get('/telegram', [\App\Http\Controllers\TelegramConnectController::class, 'show'])->middleware('throttle:30,1')->name('telegram.show');
-    Route::get('/telegram/status', [\App\Http\Controllers\TelegramConnectController::class, 'status'])->middleware('throttle:90,1')->name('telegram.status');
-    Route::post('/telegram/unlink', [\App\Http\Controllers\TelegramConnectController::class, 'unlink'])->middleware('throttle:5,1')->name('telegram.unlink');
+    Route::get('/telegram', [\App\Http\Controllers\TelegramConnectController::class, 'show'])->middleware('throttle:30,1,tg-show')->name('telegram.show');
+    Route::get('/telegram/status', [\App\Http\Controllers\TelegramConnectController::class, 'status'])->middleware('throttle:90,1,tg-status')->name('telegram.status');
+    Route::post('/telegram/unlink', [\App\Http\Controllers\TelegramConnectController::class, 'unlink'])->middleware('throttle:5,1,tg-unlink')->name('telegram.unlink');
 });
 
 // Public, and deliberately outside the auth group: a signed-out visitor sees the
@@ -184,11 +186,11 @@ Route::get('/predictions/{pool}/crest/{side}', [\App\Http\Controllers\Prediction
 
 Route::middleware('auth')->group(function () {
     Route::get('/deposit-bonus', [PlayerPromotionController::class, 'depositBonus'])->name('deposit-bonus');
-    Route::post('/deposit-bonus/claim', [PlayerPromotionController::class, 'claimDepositBonus'])->middleware('throttle:5,1')->name('deposit-bonus.claim');
+    Route::post('/deposit-bonus/claim', [PlayerPromotionController::class, 'claimDepositBonus'])->middleware('throttle:5,1,bonus')->name('deposit-bonus.claim');
     Route::get('/shamo', [PlayerPromotionController::class, 'shamo'])->name('shamo');
     Route::post('/shamo/{campaign}/join', [PlayerPromotionController::class, 'joinShamo'])->name('shamo.join');
     Route::post('/predictions/{pool}/join', [\App\Http\Controllers\PredictionController::class, 'join'])
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:20,1,prediction')
         ->name('predictions.join');
     Route::post('/shamo/participations/{participation}/claim', [PlayerPromotionController::class, 'claimShamo'])->name('shamo.claim');
 });

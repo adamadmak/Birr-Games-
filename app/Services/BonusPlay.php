@@ -194,11 +194,52 @@ final class BonusPlay
             ->lockForUpdate()->first();
     }
 
+    /**
+     * Whether a failure inside bonus bookkeeping must stop the wallet movement
+     * around it.
+     *
+     * The guards here exist so that a brand whose deploy has not created the
+     * bonus tables still takes bets and pays deposits. They were catching
+     * everything, and that included the one failure that must not be hidden: a
+     * deadlock or lock wait inside a money transaction. MySQL has already rolled
+     * that whole transaction back when it raises it; carrying on then wrote the
+     * ledger and wagering rows on their own, the final commit failed, the
+     * provider retried, and a debit that never happened left duplicate rows
+     * behind. So: a missing table is swallowed, a concurrency failure is thrown,
+     * and any other database error inside an outer transaction is thrown too,
+     * because that transaction's state is gone with it.
+     */
+    public static function propagates(\Throwable $exception): bool
+    {
+        if ($exception instanceof \Illuminate\Database\DeadlockException) {
+            return true;
+        }
+
+        if (! $exception instanceof \Illuminate\Database\QueryException) {
+            return false;
+        }
+
+        $message = $exception->getMessage();
+
+        if (preg_match('/no such table|Base table or view not found|42S02|Unknown column|no such column|42S22/i', $message)) {
+            return false;   // the schema is behind; the old behaviour, by design
+        }
+
+        if (preg_match('/Deadlock found|Lock wait timeout|\b1213\b|\b1205\b|database is locked/i', $message)) {
+            return true;
+        }
+
+        return DB::transactionLevel() > 0;
+    }
+
     private static function guarded(string $what, mixed $fallback, \Closure $work): mixed
     {
         try {
             return DB::transaction($work);
         } catch (\Throwable $exception) {
+            if (self::propagates($exception)) {
+                throw $exception;
+            }
             report($exception);
             Log::warning('Bonus play bookkeeping failed; the wallet movement carried on without it.', [
                 'step' => $what,

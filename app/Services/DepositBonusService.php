@@ -224,6 +224,11 @@ class DepositBonusService
                 return $grant;
             });
         } catch (\Throwable $exception) {
+            // A dead transaction is not "the bonus could not be paid": the deposit
+            // around it is gone too. See BonusPlay::propagates().
+            if (BonusPlay::propagates($exception)) {
+                throw $exception;
+            }
             report($exception);
             Log::warning('The deposit bonus could not be paid; the deposit itself was credited.', [
                 'order_id' => $order->id,
