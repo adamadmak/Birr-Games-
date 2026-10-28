@@ -183,3 +183,28 @@ and the scheduler tick. A new wallet path gets a test next to
 `tests/Feature/WinhouseWalletTest.php` before it ships; `player()` in
 `tests/Pest.php` makes a player with a given wallet, and `$this->setting()` on
 the test case saves a platform setting the way the admin would.
+
+## Player interface follows the apple-design skill
+
+`.claude/skills/apple-design/` (Emil Kowalski's distillation of Apple's WWDC
+design talks, MIT, copied unchanged; see `SOURCE.md` there) is the design
+reference for the player site. What it means here:
+
+- Press feedback comes from `scale` on `:active` (the press-feedback list at
+  the end of `public/css/lucy-play.css`), never `transform`, so a control that
+  is positioned with translate() does not jump. Add a new tappable control to
+  that list.
+- Anything a finger drags uses the spring in `public/js/fluid.js`
+  (`window.VamoseoneFluid`): motion starts from the live on-screen value,
+  inherits the release velocity, decides by projected momentum, and resists
+  past a boundary. The phone drawer and the hero slider use it; a new gesture
+  should too, not a fixed-duration CSS transition.
+- Nothing loops forever unless it reports something live. Everything that
+  moves has a `prefers-reduced-motion` equivalent (a cross-fade), blur has a
+  `prefers-reduced-transparency` solid fallback, and `prefers-contrast: more`
+  firms up text and edges.
+- No text below 10px. Display headings track no tighter than about -0.035em,
+  and Amharic (`:lang(am)`) gets normal tracking and at least 1.25 leading.
+- Haptics only inside Telegram, only for results (success, error, a snap).
+- The two phone bars stay solid blue: that is the owner's choice and
+  overrides the skill's translucent-chrome advice.

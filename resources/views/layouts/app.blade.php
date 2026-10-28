@@ -478,8 +478,11 @@
             function refresh() {
                 if (inFlight || document.hidden) return;
                 inFlight = true;
+                // X-Requested-With marks the poll as background traffic, so Laravel does
+                // not record it as the "previous page" that back() (the language switch)
+                // returns to; without it a player switching language landed on raw JSON.
                 fetch('{{ route('player.balance') }}', {
-                    headers: { 'Accept': 'application/json' },
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                     credentials: 'same-origin'
                 })
                     .then(function (r) { return r.ok ? r.json() : null; })
@@ -503,6 +506,8 @@
     </script>
     @endauth
 
+    {{-- Springs, drag and haptics (the apple-design skill). First: lobby-hero.js uses it. --}}
+    <script src="/js/fluid.js?v={{ @filemtime(public_path('js/fluid.js')) ?: time() }}" defer></script>
     <script src="/js/lucy-play.js?v={{ @filemtime(public_path('js/lucy-play.js')) ?: time() }}" defer></script>
     <script src="/js/lobby-rails.js?v={{ @filemtime(public_path('js/lobby-rails.js')) ?: time() }}" defer></script>
     <script src="/js/lobby-fx.js?v={{ @filemtime(public_path('js/lobby-fx.js')) ?: time() }}" defer></script>

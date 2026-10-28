@@ -44,4 +44,5 @@ credentials.json
 
 # Local development database and editor/session tooling
 /database/database.sqlite
-/.claude/
+/.claude/*
+!/.claude/skills/
