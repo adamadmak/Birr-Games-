@@ -530,3 +530,16 @@ body { font-family: "Source Sans 3", "Source Sans Pro", Inter, system-ui, sans-s
 .agent-counter-grid .agent-form + .agent-form { margin-top: 12px; }
 .agent-counter-grid .agent-panel > :not(.agent-panel-head) { margin: 18px 22px; }
 .agent-counter-steps { padding: 16px 22px 18px 42px; }
+
+/* ===== Booking codes on the counter ===== */
+.agent-booking { margin-bottom: 16px; }
+.agent-booking > :not(.agent-panel-head):not(.agent-table-wrap) { margin: 16px 22px; }
+.agent-booking-search { display: flex; gap: 10px; flex-wrap: wrap; }
+.agent-booking-search input { flex: 1 1 180px; max-width: 260px; border: 1px solid #d9dee3; border-radius: 8px; padding: 12px 13px; font-size: 18px; letter-spacing: .18em; text-transform: uppercase; background: var(--agent-panel); color: var(--agent-text); }
+.agent-booking-summary { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.agent-booking-summary span { display: grid; gap: 3px; }
+.agent-booking-summary small { font-size: 11px; opacity: .7; }
+.agent-booking-table { min-width: 640px; }
+.agent-booking-table tr.is-dropped td { opacity: .6; }
+.agent-booking-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.agent-booking-actions p { margin: 0; flex: 1 1 260px; font-size: 12px; opacity: .8; line-height: 1.5; }

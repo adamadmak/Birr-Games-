@@ -132,6 +132,90 @@ final class WinhouseTicketsClient
         return null;
     }
 
+    /**
+     * A booking code: a slip someone saved in the book, read at current odds
+     * (docs/agent.md 4.8, GET /tenant/api/bookings/<code>). An expired code
+     * answers 410 with the booked selections still listed.
+     *
+     * @return array{ok: bool, status: int, error: ?string, booking: ?array<string, mixed>}
+     */
+    public function booking(string $code): array
+    {
+        $code = self::bookingCode($code);
+        if ($code === null) {
+            return ['ok' => false, 'status' => 400, 'error' => 'A booking code is 7 letters and digits, like K7M4QZT.', 'booking' => null];
+        }
+        if (! $this->configured()) {
+            return ['ok' => false, 'status' => 0, 'error' => 'The WinHouse keys are not set.', 'booking' => null];
+        }
+
+        try {
+            $response = $this->request()->get('/tenant/api/bookings/'.$code, $this->params([]));
+        } catch (Throwable) {
+            return ['ok' => false, 'status' => 0, 'error' => 'WinHouse cannot be reached right now. Try again in a minute.', 'booking' => null];
+        }
+
+        $payload = is_array($response->json()) ? $response->json() : [];
+        $booking = is_array($payload['booking'] ?? null) ? $this->normalizeBooking($payload['booking']) : null;
+
+        return match (true) {
+            $response->successful() && $booking !== null => ['ok' => true, 'status' => 200, 'error' => null, 'booking' => $booking],
+            $response->status() === 410 => ['ok' => false, 'status' => 410, 'error' => 'This code has expired: its first match has started or it is older than 72 hours.', 'booking' => $booking],
+            in_array($response->status(), [400, 404], true) => ['ok' => false, 'status' => 404, 'error' => 'No booking with that code on this sportsbook.', 'booking' => null],
+            $response->status() === 503 => ['ok' => false, 'status' => 503, 'error' => 'WinHouse could not look up the odds just now. Try again in a minute.', 'booking' => null],
+            default => ['ok' => false, 'status' => $response->status(), 'error' => $this->errorMessage($response), 'booking' => null],
+        };
+    }
+
+    /** The code in its canonical form, or null: 7 of A-Z and 2-9 without 0 O 1 I L, any case. */
+    public static function bookingCode(mixed $code): ?string
+    {
+        if (! is_string($code)) {
+            return null;
+        }
+        $code = strtoupper((string) preg_replace('/[\s-]+/', '', $code));
+
+        return preg_match('/^[A-HJKMNP-Z2-9]{7}$/', $code) ? $code : null;
+    }
+
+    /** @return array<string, mixed> */
+    private function normalizeBooking(array $b): array
+    {
+        $selections = [];
+        foreach ((array) ($b['selections'] ?? []) as $s) {
+            if (! is_array($s)) {
+                continue;
+            }
+            $home = (string) ($s['home'] ?? '');
+            $away = (string) ($s['away'] ?? '');
+            $name = trim((string) ($s['event_name'] ?? ''));
+            $selections[] = [
+                'match' => $name !== '' ? $name : trim($home.' v '.$away, ' v'),
+                'league' => implode(' · ', array_filter([(string) ($s['country'] ?? ''), (string) ($s['league'] ?? '')])),
+                'kickoff' => $this->date($s['kickoff'] ?? null),
+                'market' => (string) ($s['market'] ?? ''),
+                'outcome' => $this->pickLabel((string) ($s['outcome'] ?? ''), $home, $away),
+                'odds_at_booking' => is_numeric($s['odds_at_booking'] ?? null) ? (float) $s['odds_at_booking'] : null,
+                'current_odds' => is_numeric($s['current_odds'] ?? null) ? (float) $s['current_odds'] : null,
+                'available' => (bool) ($s['available'] ?? false),
+                'reason' => str_replace('_', ' ', (string) ($s['unavailable_reason'] ?? '')),
+            ];
+        }
+
+        return [
+            'code' => (string) ($b['code'] ?? ''),
+            'state' => strtolower((string) ($b['state'] ?? '')),
+            'created_at' => $this->date($b['created_at'] ?? null),
+            'expires_at' => $this->date($b['expires_at'] ?? null),
+            'stake' => is_numeric($b['stake'] ?? null) ? (float) $b['stake'] : 0.0,
+            'mode' => strtolower((string) ($b['mode'] ?? '')),
+            'system_size' => $b['system_size'] ?? null,
+            'available_count' => (int) ($b['available_count'] ?? count(array_filter($selections, fn ($s) => $s['available']))),
+            'odds_changed' => (bool) ($b['odds_changed'] ?? false),
+            'selections' => $selections,
+        ];
+    }
+
     /* ------------------------------------------------------------------ */
 
     /**

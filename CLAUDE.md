@@ -236,3 +236,9 @@ signs into it, and deposits and withdrawals refuse it. A winning counter ticket
 is paid in cash from Bet Tickets once (`shop_payouts`, unique ticket id), for
 the amount our WinHouse ledger credited, not what the provider API reports.
 Agent tools that find players by phone cannot reach a counter; keep it so.
+
+Booking codes (WinHouse docs/agent.md 4.8) are read with
+`WinhouseTicketsClient::booking()`; `bookingCode()` is the only gate for a code
+and must run before a code reaches a URL. The Counter page looks a code up and
+opens it in the book as the counter (`/?booking=CODE`), where WinHouse lets the
+agent change the stake and picks before placing. Our site never edits a slip.

@@ -18,14 +18,18 @@ class AgentShopController
     {
     }
 
-    public function show(): View
+    public function show(Request $request, \App\Services\WinhouseTicketsClient $client): View
     {
         $agent = $this->agent();
+        $typed = trim((string) $request->query('code', ''));
+        $lookup = $typed !== '' ? $client->booking($typed) : null;
 
         return view('agent.counter', [
             'agent' => $agent,
             'counter' => $this->shop->account($agent),
             'floatMinimum' => app(FinancialRuleService::class)->agentMinimumFloat(),
+            'typedCode' => $typed,
+            'lookup' => $lookup,
         ]);
     }
 
@@ -58,7 +62,11 @@ class AgentShopController
         $counter = $this->shop->account($this->agent());
         Auth::guard('web')->login($counter);
 
-        return redirect('/');
+        // With a customer's booking code the book opens with that slip loaded,
+        // where the stake and picks can still be changed before placing.
+        $booking = \App\Services\WinhouseTicketsClient::bookingCode($request->input('booking'));
+
+        return redirect($booking ? '/?booking='.$booking.'#sportsbook' : '/');
     }
 
     public function payOut(string $ticket): RedirectResponse

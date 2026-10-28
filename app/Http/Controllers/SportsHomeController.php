@@ -51,6 +51,10 @@ class SportsHomeController
     {
         $key = Winhouse::iframeKey();
         $src = 'https://iframe.winhouse.bet/book?key='.$key.'&embed=1';
+        // A booking code on our address opens that slip in the book (docs/agent.md 4.8).
+        if ($booking = \App\Services\WinhouseTicketsClient::bookingCode($request->query('booking'))) {
+            $src .= '&booking='.$booking;
+        }
         $secret = Winhouse::apiKey();
 
         $player = $request->user();
