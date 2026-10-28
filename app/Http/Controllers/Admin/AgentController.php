@@ -361,6 +361,9 @@ class AgentController
         return back()->with('admin_status', 'Withdrawal assigned to the selected agent.');
     }
 
+    /** An agent whose float a deposit approval just took below the warning level; told after the commit. */
+    private ?Agent $floatRanLow = null;
+
     public function updateOrderStatus(
         Request $request,
         AgentOrder $order,
@@ -389,6 +392,10 @@ class AgentController
                 'status' => 'Withdrawals are completed or rejected directly by the assigned agent.',
             ]);
         });
+
+        if ($this->floatRanLow) {
+            app(\App\Services\AgentNotifier::class)->lowFloat($this->floatRanLow->fresh(), app(FinancialRuleService::class)->agentMinimumFloat());
+        }
 
         return back()->with('admin_status', 'Order status updated with settlement controls.');
     }
@@ -460,7 +467,7 @@ class AgentController
             'search' => $search,
             'stale' => $stale,
             'agents' => Agent::query()->where('active', true)->orderBy('nickname')->get(['id', 'nickname', 'balance']),
-            'orders' => AgentOrder::query()
+            'orders' => $orders = AgentOrder::query()
                 ->where('type', $type)
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->when($stale, fn ($query) => $query->where('status', 'pending')->where('created_at', '<=', now()->subMinutes((int) config('operations.stale_order_minutes', 30))))
@@ -472,6 +479,7 @@ class AgentController
                 ->latest()
                 ->paginate(20)
                 ->withQueryString(),
+            'proofOrderIds' => $type === 'deposit' ? \App\Models\DepositProof::idsFor($orders->items()) : [],
         ]);
     }
 
@@ -685,8 +693,11 @@ class AgentController
                 throw ValidationException::withMessages(['status' => 'This deposit already has a ledger settlement.']);
             }
             $amount = (float) $order->amount;
-            if ((float) $agent->balance < $amount) {
-                throw ValidationException::withMessages(['status' => 'The assigned agent does not have enough credit.']);
+            if ($refusal = app(FinancialRuleService::class)->agentFloatRefusal($agent, $amount)) {
+                throw ValidationException::withMessages(['status' => $refusal]);
+            }
+            if (app(FinancialRuleService::class)->agentFloatJustRanLow((float) $agent->balance, (float) $agent->balance - $amount)) {
+                $this->floatRanLow = $agent;
             }
             $commission = app(FinancialRuleService::class)->agentCommissionFor($agent, $amount);
             $agent->decrement('balance', $amount);

@@ -116,12 +116,15 @@ class SportsTicketController
         $playerId = $data['player_id'] ?? $local?->user?->id;
         $player = $playerId ? User::query()->find($playerId, ['id', 'name', 'phone']) : null;
 
-        return view('admin.sports.ticket-print', [
+        // Shared with the agent portal (AgentTicketController::print()).
+        return view('sports.ticket-print', [
             'ticketId' => $ticket,
             'data' => $data,
             'local' => $local,
             'player' => $player,
             'auto' => $request->boolean('auto'),
+            'backUrl' => route('admin.sports.tickets'),
+            'printedBy' => $request->user()?->name,
         ]);
     }
 

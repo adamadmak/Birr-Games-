@@ -678,3 +678,76 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 })();
+
+/*
+ * Wallet helpers (28 Oct 2026).
+ *  - Withdrawal: only the agents who pay out with the chosen method are offered;
+ *    the others are disabled so they neither show nor submit.
+ *  - Deposit dialog: a preview of the payment screenshot before it is sent.
+ *  - Pending deposit card: a screenshot uploads as soon as it is picked.
+ */
+(function () {
+    'use strict';
+
+    function bindWithdrawAgents() {
+        const box = document.querySelector('[data-withdraw-agents]');
+        if (!box) return;
+        const options = [...box.querySelectorAll('.wd-agent-option')];
+        const empty = box.querySelector('[data-withdraw-agents-empty]');
+        const methods = [...document.querySelectorAll('input[name="payment_gateway_id"]')];
+        const sync = () => {
+            const chosen = methods.find((input) => input.checked);
+            const gatewayId = chosen ? chosen.value : '';
+            let visible = 0;
+            options.forEach((option) => {
+                const match = option.dataset.gatewayId === gatewayId;
+                const input = option.querySelector('input');
+                option.hidden = !match;
+                input.disabled = !match;
+                if (!match) input.checked = false;
+                if (match) visible++;
+            });
+            if (empty) empty.hidden = visible > 0;
+        };
+        methods.forEach((input) => input.addEventListener('change', sync));
+        sync();
+    }
+
+    function bindProofPreview() {
+        const input = document.querySelector('[data-deposit-proof]');
+        const preview = document.querySelector('[data-deposit-proof-preview]');
+        if (!input || !preview) return;
+        let url = '';
+        const clear = () => {
+            if (url) URL.revokeObjectURL(url);
+            url = '';
+            preview.hidden = true;
+            preview.removeAttribute('src');
+        };
+        input.addEventListener('change', () => {
+            clear();
+            const file = input.files && input.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+            url = URL.createObjectURL(file);
+            preview.src = url;
+            preview.hidden = false;
+        });
+        input.form?.addEventListener('reset', clear);
+    }
+
+    function bindProofAutosubmit() {
+        document.querySelectorAll('[data-proof-autosubmit]').forEach((input) => {
+            const form = input.form;
+            const send = form?.querySelector('.deposit-proof-send');
+            if (send) send.hidden = true;   // with script, picking the picture is the upload
+            input.addEventListener('change', () => {
+                if (!input.files || !input.files.length) return;
+                form.classList.add('is-uploading');
+                form.submit();
+            });
+        });
+    }
+
+    const boot = () => { bindWithdrawAgents(); bindProofPreview(); bindProofAutosubmit(); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();

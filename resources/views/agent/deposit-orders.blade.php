@@ -32,7 +32,7 @@
                 <tbody>
                 @forelse($orders as $order)
                     <tr>
-                        <td><code>{{ $order->reference ?: 'Awaiting reference' }}</code></td>
+                        <td><code>{{ $order->reference ?: 'Awaiting reference' }}</code>@if(isset($proofOrderIds[$order->id]))<br><small><a href="{{ route('agent.deposit-orders.proof', $order) }}" target="_blank" rel="noopener">&#128206; View payment screenshot</a></small>@endif</td>
                         <td><strong>{{ $order->user?->name ?: 'Member' }}</strong><br><small>{{ $order->user?->phone ?: ($order->user?->username ? '@'.$order->user->username : '—') }}</small></td>
                         <td><strong>{{ \App\Support\Money::format($order->amount,2) }}</strong></td>
                         <td>{{ $order->gateway?->name ?: 'Agent bank' }}</td>

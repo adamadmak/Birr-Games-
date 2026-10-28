@@ -41,13 +41,14 @@ class PlayerWithdrawalController
             'account_name' => ['required', 'string', 'max:120'],
             'account_number' => ['required', 'string', 'max:80'],
             'idempotency_key' => ['nullable', 'uuid'],
+            'agent_id' => ['nullable', 'integer'],
         ]);
         $validated['idempotency_key'] ??= (string) Str::uuid();
 
-        DB::transaction(function () use ($request, $validated, $rules): void {
+        $order = DB::transaction(function () use ($request, $validated, $rules): ?AgentOrder {
             $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
             if (AgentOrder::query()->where('user_id', $user->id)->where('type', 'withdrawal')->where('idempotency_key', $validated['idempotency_key'])->exists()) {
-                return;
+                return null;
             }
             $gateway = PaymentGateway::query()->whereKey($validated['payment_gateway_id'])->where('active', true)->where('supports_withdrawal', true)->first();
 
@@ -71,15 +72,31 @@ class PlayerWithdrawalController
                 $bonuses->forfeit($user, $unusedBonus, 'withdrawal');
             }
 
-            $agent = Agent::query()
-                ->where('active', true)
-                ->whereHas('bankAccounts', fn ($query) => $query
-                    ->where('payment_gateway_id', $gateway->id)
-                    ->where('active', true))
-                ->withCount(['orders as pending_orders_count' => fn ($query) => $query->where('status', 'pending')])
-                ->orderBy('pending_orders_count')
-                ->orderBy('id')
-                ->first() ?? Agent::query()->where('active', true)->orderBy('id')->first();
+            // The player chooses who pays them, as they do for a deposit. Only an
+            // active agent with an active account on this method can be chosen.
+            // Without a choice (an older page, the bot) the least-busy agent on
+            // the method is assigned, as before.
+            $chosen = filled($validated['agent_id'] ?? null);
+            $agent = $chosen
+                ? Agent::query()
+                    ->whereKey($validated['agent_id'])
+                    ->where('active', true)
+                    ->whereHas('bankAccounts', fn ($query) => $query
+                        ->where('payment_gateway_id', $gateway->id)
+                        ->where('active', true))
+                    ->first()
+                : Agent::query()
+                    ->where('active', true)
+                    ->whereHas('bankAccounts', fn ($query) => $query
+                        ->where('payment_gateway_id', $gateway->id)
+                        ->where('active', true))
+                    ->withCount(['orders as pending_orders_count' => fn ($query) => $query->where('status', 'pending')])
+                    ->orderBy('pending_orders_count')
+                    ->orderBy('id')
+                    ->first() ?? Agent::query()->where('active', true)->orderBy('id')->first();
+            if ($chosen && ! $agent) {
+                throw ValidationException::withMessages(['agent_id' => __('That agent cannot pay out with this method. Choose another agent.')]);
+            }
 
             $order = AgentOrder::create([
                 'user_id' => $user->id,
@@ -94,7 +111,7 @@ class PlayerWithdrawalController
                 'account_number' => trim($validated['account_number']),
                 'status' => 'pending',
                 'notes' => $agent
-                    ? 'Player withdrawal request assigned to '.$agent->nickname.' for payout.'
+                    ? ($chosen ? 'Player chose '.$agent->nickname.' to pay this withdrawal.' : 'Player withdrawal request assigned to '.$agent->nickname.' for payout.')
                     : 'Player withdrawal request awaiting agent assignment.',
             ]);
             AgentOrderEvent::record($order, $agent ? 'submitted_and_assigned' : 'submitted', $user, null, 'pending', $order->notes, [
@@ -123,7 +140,13 @@ class PlayerWithdrawalController
                     'assigned_agent_id' => $agent?->id,
                 ],
             ]);
+
+            return $order;
         });
+
+        if ($order && $order->agent_id) {
+            app(\App\Services\AgentNotifier::class)->withdrawalRequested($order->load(['agent', 'user', 'gateway']));
+        }
 
         return redirect()->route('player.wallet', ['tab' => 'withdraw'])->with('status', __('Withdrawal requested. An agent will pay it to your account, usually within :hours hours.', ['hours' => $rules->withdrawalReviewHours()]));
     }

@@ -173,6 +173,7 @@
                     <label>Daily Max Deposit<input type="number" step="0.01" min="0" name="daily_max_deposit" value="{{ $value('daily_max_deposit', 250000) }}" required><small class="unit">ETB</small></label>
                     <label>Deposit review time<input type="number" step="1" min="1" max="1440" name="deposit_review_minutes" value="{{ $value('deposit_review_minutes', 15) }}" required><small>Minutes. Shown to players as the usual time for an agent to confirm a deposit.</small></label>
                     <label>Withdrawal payout time<input type="number" step="1" min="1" max="168" name="withdrawal_review_hours" value="{{ $value('withdrawal_review_hours', 24) }}" required><small>Hours. Shown to players as the usual time for an agent to pay a withdrawal.</small></label>
+                    <label>Public site address<input type="url" name="public_site_url" value="{{ $value('public_site_url', '') }}" maxlength="190" placeholder="https://vamosonebet.com"><small>The address players and agents reach the site at. Telegram buttons, agent alerts and password-reset emails link here. Leave empty to use whatever address the request arrived on.</small></label>
                 </div>
 
                 {{-- QTech, in two directions. Placed after the Birr limits
@@ -529,6 +530,8 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                     <label>Settlement Period<input type="number" min="0" max="90" name="agent_settlement_days" value="{{ $value('agent_settlement_days', 7) }}" required><small class="unit">Days</small></label>
                     <label>Minimum Agent Order<input type="number" step="0.01" min="0" name="min_agent_order" value="{{ $value('min_agent_order', 100) }}" required><small class="unit">ETB</small></label>
                     <label>Maximum Agent Order<input type="number" step="0.01" min="0" name="max_agent_order" value="{{ $value('max_agent_order', 100000) }}" required><small class="unit">ETB</small></label>
+                    <label>Minimum Agent Float<input type="number" step="0.01" min="0" name="agent_min_float" value="{{ $value('agent_min_float', 1000) }}" required><small>ETB an agent must keep. A deposit approval, direct deposit or credit transfer that would leave less is refused until the float is topped up. 0 turns the floor off.</small></label>
+                    <label>Low Float Warning<input type="number" step="0.01" min="0" name="agent_low_float_warning" value="{{ $value('agent_low_float_warning', 2500) }}" required><small>ETB. At or below this the agent sees a warning in the portal and gets one Telegram message to top up.</small></label>
                 </div>
                 <div class="configuration-form-actions"><button type="submit"><i class="fa-solid fa-check"></i> Save Agent Config</button></div>
             </form>

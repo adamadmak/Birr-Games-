@@ -523,6 +523,7 @@ class SettingController
                 'daily_max_withdraw' => ['required', 'numeric', 'min:0'],
                 'daily_max_transfer' => ['required', 'numeric', 'min:0'],
                 'daily_max_deposit' => ['required', 'numeric', 'min:0'],
+                'public_site_url' => ['nullable', 'string', 'max:190', 'regex:#^https?://[A-Za-z0-9.-]+(:\d{2,5})?/?$#'],
                 'deposit_review_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
                 'withdrawal_review_hours' => ['required', 'integer', 'min:1', 'max:168'],
             ],
@@ -579,6 +580,8 @@ class SettingController
                 'min_agent_order' => ['required', 'numeric', 'min:0'],
                 'max_agent_order' => ['required', 'numeric', 'gte:min_agent_order'],
                 'agent_settlement_days' => ['required', 'integer', 'min:0', 'max:90'],
+                'agent_min_float' => ['required', 'numeric', 'min:0', 'max:100000000'],
+                'agent_low_float_warning' => ['required', 'numeric', 'min:0', 'max:100000000'],
             ],
         };
     }

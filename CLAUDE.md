@@ -208,3 +208,20 @@ reference for the player site. What it means here:
 - Haptics only inside Telegram, only for results (success, error, a snap).
 - The two phone bars stay solid blue: that is the owner's choice and
   overrides the skill's translucent-chrome advice.
+
+## Agents: float floor, alerts, screenshots
+
+- Every path that takes money out of an agent's float (deposit approval by the
+  agent or an admin, direct deposit, credit sent to another agent) asks
+  `FinancialRuleService::agentFloatRefusal()` first. The floor and the warning
+  level are `agent_min_float` and `agent_low_float_warning` (Configuration →
+  Agent). A new debit path must use the same check.
+- Agents hear about work on Telegram through `App\Services\AgentNotifier`,
+  sent after the commit with `TelegramBotService::notify()` (one attempt, five
+  seconds). Never send Telegram inside a money transaction.
+- Payment screenshots live in `deposit_proofs` (database, not disk: the
+  container is replaced on deploy), re-encoded by `DepositProofStore`, and are
+  served only to the player, the assigned agent and an admin.
+- Any link that leaves the site (bot buttons, agent alerts, reset emails) is
+  built with `App\Support\SiteUrl`, which uses the public address saved on
+  Configuration → System.

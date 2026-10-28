@@ -35,7 +35,7 @@ class EnsureUserIsAdmin
             str_starts_with($routeName, 'admin.players.') => 'transactions.view',
             in_array($routeName, [
                 'admin.agents.balance', 'admin.agents.orders', 'admin.agents.orders.status',
-                'admin.agents.orders.assign', 'admin.agents.orders.payout-proof',
+                'admin.agents.orders.assign', 'admin.agents.orders.payout-proof', 'admin.agents.orders.deposit-proof',
                 'admin.agents.withdrawals', 'admin.agents.reports', 'admin.agents.reports.export',
             ], true) => 'agents.finance',
             str_starts_with($routeName, 'admin.agents.') => 'agents.manage',

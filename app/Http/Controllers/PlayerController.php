@@ -75,6 +75,29 @@ class PlayerController
             ->values();
 
         $bonuses = app(\App\Services\DepositBonusService::class);
+        $openDeposits = $request->user()->depositOrders()->where('status', 'pending')->with(['agent', 'gateway'])->latest()->limit(3)->get();
+
+        /*
+         * Who can pay a withdrawal, per method: an active agent with an active
+         * account on it. The player picks one, the way they pick who to
+         * deposit with, and sees the same presence and rating.
+         */
+        $withdrawAgents = AgentBankAccount::query()
+            ->where('active', true)
+            ->whereHas('agent', fn ($query) => $query->where('active', true))
+            ->whereHas('gateway', fn ($query) => $query->where('active', true)->where('supports_withdrawal', true))
+            ->with(['agent' => fn ($query) => $query->withAvg('ratings', 'score')->withCount('ratings')])
+            ->get()
+            ->unique(fn ($account) => $account->agent_id.'-'.$account->payment_gateway_id)
+            ->map(fn ($account) => [
+                'agent_id' => $account->agent_id,
+                'gateway_id' => $account->payment_gateway_id,
+                'nickname' => $account->agent->nickname,
+                'online' => isset($onlineAgentIds[$account->agent_id]),
+                'rating' => $account->agent->ratings_count > 0 ? round((float) $account->agent->ratings_avg_score, 1) : null,
+            ])
+            ->sortBy(fn ($row) => sprintf('%010d%d%s', $row['gateway_id'], $row['online'] ? 0 : 1, $row['nickname']))
+            ->values();
 
         return view('player.wallet', [
             'tab' => $tab,
@@ -100,7 +123,9 @@ class PlayerController
             // Deposits the agent has not confirmed yet, with the account they were
             // sent to: the details must survive a reload, a closed dialog and a
             // Telegram restart, so they come from the order, not the dialog.
-            'openDeposits' => $request->user()->depositOrders()->where('status', 'pending')->with(['agent', 'gateway'])->latest()->limit(3)->get(),
+            'openDeposits' => $openDeposits,
+            'openProofIds' => \App\Models\DepositProof::idsFor($openDeposits),
+            'withdrawAgents' => $withdrawAgents,
             'reviewTimes' => [
                 'deposit_minutes' => app(FinancialRuleService::class)->depositReviewMinutes(),
                 'withdrawal_hours' => app(FinancialRuleService::class)->withdrawalReviewHours(),

@@ -86,10 +86,38 @@
             window.location.href = @json(route('login'));
         }
     });
+    /*
+     * Keep the book's bet slip in view on phones. WinHouse pins its bet-slip
+     * button and sheet to the bottom of its own frame (docs §2.1), and our frame
+     * starts below the hero, the ticker and the tabs, so its bottom edge sat
+     * under the fold: a player could pick selections and never see the slip
+     * holding them. A finger scrolling inside the book scrolls the book, not
+     * this page, so the page brings the whole book into view itself the moment
+     * the player starts using it (the frame takes focus). It then fits exactly
+     * between the top bar and the bottom bar.
+     */
+    var book = root.querySelector('.sports-book');
+    var frame = book && book.querySelector('iframe');
+    var phone = window.matchMedia('(max-width: 980px)');
+    function revealBook() {
+        if (!book || !phone.matches || root.getAttribute('data-view') === 'casino') return;
+        var rect = book.getBoundingClientRect();
+        var bottomBar = document.querySelector('.player-mobile-nav');
+        var visibleBottom = window.innerHeight - (bottomBar ? bottomBar.getBoundingClientRect().height : 0);
+        if (rect.top > 80 || rect.bottom > visibleBottom + 2) {
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            book.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        }
+    }
+    window.addEventListener('blur', function () {
+        // Focus moving into the book's frame is the only sign this page gets of a tap inside it.
+        setTimeout(function () { if (document.activeElement === frame) revealBook(); }, 0);
+    });
     var tabs = root.querySelectorAll('[data-home-view]');
     Array.prototype.forEach.call(tabs, function (tab) {
         tab.addEventListener('click', function () {
             root.setAttribute('data-view', tab.getAttribute('data-home-view'));
+            if (tab.getAttribute('data-home-view') === 'sports') setTimeout(revealBook, 0);
             Array.prototype.forEach.call(tabs, function (t) { t.setAttribute('aria-selected', t === tab ? 'true' : 'false'); });
         });
     });

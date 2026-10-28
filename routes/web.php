@@ -140,6 +140,10 @@ Route::prefix('agent')->name('agent.')->group(function () {
         Route::patch('/bank-info/{account}/toggle', [AgentPortalController::class, 'toggleBankAccount'])->name('bank-info.toggle');
         Route::get('/deposit-order', [AgentPortalController::class, 'depositOrders'])->name('deposit-orders');
         Route::patch('/deposit-order/{order}', [AgentPortalController::class, 'processDeposit'])->name('deposit-orders.process');
+        Route::get('/deposit-order/{order}/proof', [\App\Http\Controllers\DepositProofController::class, 'forAgent'])->name('deposit-orders.proof');
+        // Bet tickets the agent prints for the players they serve (AgentTicketController).
+        Route::get('/tickets', [\App\Http\Controllers\AgentTicketController::class, 'index'])->name('tickets');
+        Route::get('/tickets/{ticket}/print', [\App\Http\Controllers\AgentTicketController::class, 'print'])->where('ticket', '[A-Za-z0-9_.:\-]{1,80}')->name('tickets.print');
         Route::redirect('/deposit-orders', '/agent/deposit-order');
         Route::get('/customers', [AgentPortalController::class, 'customers'])->name('customers');
         Route::get('/reports', [AgentPortalController::class, 'reports'])->name('reports');
@@ -171,6 +175,8 @@ Route::middleware('auth')->prefix('player')->name('player.')->group(function () 
     Route::get('/tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
     Route::post('/wallet/deposits', [PlayerDepositController::class, 'store'])->middleware('throttle:10,1,deposit')->name('deposits.store');
     Route::patch('/wallet/deposits/{order}/cancel', [PlayerDepositController::class, 'cancel'])->name('deposits.cancel');
+    Route::post('/wallet/deposits/{order}/proof', [\App\Http\Controllers\DepositProofController::class, 'attach'])->middleware('throttle:10,1,deposit-proof')->name('deposits.proof');
+    Route::get('/wallet/deposits/{order}/proof', [\App\Http\Controllers\DepositProofController::class, 'forPlayer'])->name('deposits.proof.show');
     Route::post('/wallet/withdrawals', [PlayerWithdrawalController::class, 'store'])->middleware('throttle:10,1,withdraw')->name('withdrawals.store');
     Route::patch('/wallet/withdrawals/{order}/cancel', [PlayerWithdrawalController::class, 'cancel'])->name('withdrawals.cancel');
     // Rating the agent who settled an order. Rate-limited: it writes a row, and a
@@ -279,6 +285,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin', 'audit.admi
     Route::patch('/agent-orders/{order}/status', [AdminAgentController::class, 'updateOrderStatus'])->name('agents.orders.status');
     Route::patch('/agent-orders/{order}/assign', [AdminAgentController::class, 'assignOrder'])->name('agents.orders.assign');
     Route::get('/agent-orders/{order}/payout-proof', [AdminAgentController::class, 'payoutProof'])->name('agents.orders.payout-proof');
+    Route::get('/agent-orders/{order}/deposit-proof', [\App\Http\Controllers\DepositProofController::class, 'forAdmin'])->name('agents.orders.deposit-proof');
     Route::get('/game-engine', [AdminGameEngineController::class, 'index'])->name('game-engine.index');
     Route::post('/game-engine/sync', [AdminGameEngineController::class, 'sync'])->name('game-engine.sync');
     Route::post('/game-engine/sync-qtech', [AdminGameEngineController::class, 'syncQtech'])->name('game-engine.sync-qtech');

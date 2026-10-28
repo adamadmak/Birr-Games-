@@ -3,7 +3,13 @@
      * A sportsbook receipt, laid out for an 80 mm roll but readable on A4.
      * Standalone on purpose: the admin shell, its fonts and its dark theme
      * have no place on a slip of thermal paper. ?auto=1 opens the print dialog.
+     *
+     * Shared by the back office (Admin\SportsTicketController) and the agent
+     * portal (AgentTicketController), so the page never names a route or a
+     * guard itself: each controller passes $backUrl and $printedBy.
      */
+    $backUrl = $backUrl ?? null;
+    $printedBy = $printedBy ?? null;
     $status = $data['status'] ?? $local->status ?? 'open';
     if ($status === 'open' && $local) {
         $status = $local->status;
@@ -70,7 +76,7 @@
 <body>
     <div class="toolbar">
         <button class="primary" type="button" onclick="window.print()">🖨 Print</button>
-        <a href="{{ route('admin.sports.tickets') }}">Back to tickets</a>
+        @if($backUrl)<a href="{{ $backUrl }}">Back to tickets</a>@endif
     </div>
 
     <article class="slip">
@@ -134,7 +140,7 @@
 
         <footer class="foot">
             <p>Winnings are paid to the player's Vamoseone wallet.</p>
-            <p>Keep this ticket. Printed {{ now()->format('d/m/Y H:i') }}@auth by {{ auth()->user()->name }}@endauth.</p>
+            <p>Keep this ticket. Printed {{ now()->format('d/m/Y H:i') }}@if(filled($printedBy)) by {{ $printedBy }}@endif.</p>
             <p>{{ parse_url(config('app.url'), PHP_URL_HOST) ?: 'vamoseone' }} · 18+ · Play responsibly</p>
         </footer>
     </article>

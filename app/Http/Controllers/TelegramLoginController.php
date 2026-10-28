@@ -43,7 +43,7 @@ class TelegramLoginController
             }
 
             return $record->destination === 'deposit'
-                ? redirect('/wallet?tab=deposit')
+                ? redirect()->route('player.wallet', ['tab' => 'deposit'])
                 : redirect('/');
         }
 

@@ -237,6 +237,53 @@ final class FinancialRuleService
     }
 
     /**
+     * The least an agent's float may hold after funding a deposit, sending
+     * credit or any other debit. An agent registered with 10,000 ETB used to be
+     * able to approve deposits right down to zero, and then could not serve
+     * anyone until the administrator noticed. Below this the debit is refused
+     * and the agent is told to top up. 0 switches the floor off.
+     */
+    public function agentMinimumFloat(): float
+    {
+        return max(0.0, $this->number('agent_min_float', 1000));
+    }
+
+    /** At or below this the agent is warned (portal banner, a Telegram notice). Never below the minimum. */
+    public function agentLowFloatWarning(): float
+    {
+        return max($this->agentMinimumFloat(), $this->number('agent_low_float_warning', 2500));
+    }
+
+    /**
+     * Why an agent cannot pay this much out of their float, or null when they can.
+     * Used by every path that debits an agent: deposit approval (agent and
+     * admin), direct deposit, and credit sent to another agent.
+     */
+    public function agentFloatRefusal(\App\Models\Agent $agent, float $amount): ?string
+    {
+        $balance = (float) $agent->balance;
+        $minimum = $this->agentMinimumFloat();
+
+        if ($balance < $amount) {
+            return 'The agent float of '.number_format($balance, 2).' ETB does not cover '.number_format($amount, 2).' ETB.';
+        }
+        if ($minimum > 0 && $balance - $amount < $minimum) {
+            return 'This would leave the agent float at '.number_format($balance - $amount, 2).' ETB, below the minimum of '
+                .number_format($minimum, 2).' ETB. Ask the administrator to top up the float first.';
+        }
+
+        return null;
+    }
+
+    /** Whether a debit just took the float from above the warning level to at or below it. */
+    public function agentFloatJustRanLow(float $before, float $after): bool
+    {
+        $warning = $this->agentLowFloatWarning();
+
+        return $warning > 0 && $before > $warning && $after <= $warning;
+    }
+
+    /**
      * What a player is told a deposit usually takes an agent to confirm, in
      * minutes. A stated time is a promise the operator sets on Configuration →
      * System, not a guess the page makes.

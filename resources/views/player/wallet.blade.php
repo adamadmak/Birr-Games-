@@ -113,6 +113,32 @@
                         </div>
                     </div>
 
+                    @if($withdrawAgents->isNotEmpty())
+                        {{-- The player picks who pays them, the same way they pick who to deposit with.
+                             Agents are filtered to the chosen method by lucy-play.js. --}}
+                        <div class="wd-form-section" data-withdraw-agents>
+                            <label class="wd-section-label">{{ __('Choose Agent') }}</label>
+                            <p class="wd-section-hint">{{ __('The agent you choose pays the money to your account and is notified straight away.') }}</p>
+                            <div class="wd-bank-grid wd-agent-grid">
+                                @foreach($withdrawAgents as $payer)
+                                    <label class="wd-bank-option wd-agent-option" data-gateway-id="{{ $payer['gateway_id'] }}">
+                                        <input type="radio" name="agent_id" value="{{ $payer['agent_id'] }}" required @checked(old('agent_id') == $payer['agent_id'])>
+                                        <span class="wd-bank-logo">{{ strtoupper(substr($payer['nickname'], 0, 1)) }}</span>
+                                        <span class="wd-bank-info">
+                                            <strong>{{ $payer['nickname'] }}</strong>
+                                            <small>
+                                                <em class="agent-presence {{ $payer['online'] ? 'is-online' : 'is-offline' }}"><i></i>{{ $payer['online'] ? __('Online now') : __('Offline') }}</em>
+                                                @if($payer['rating'] !== null)<em class="agent-score">&#9733; {{ number_format($payer['rating'], 1) }}</em>@endif
+                                            </small>
+                                        </span>
+                                        <i class="wd-bank-check">&#10003;</i>
+                                    </label>
+                                @endforeach
+                            </div>
+                            <p class="wd-agent-empty" data-withdraw-agents-empty hidden>{{ __('No agent pays out with this method right now. Choose another method.') }}</p>
+                        </div>
+                    @endif
+
                     <div class="wd-form-section">
                         <label class="wd-section-label">{{ __('Account Name') }}</label>
                         <div class="wd-input-wrap">
@@ -194,6 +220,17 @@
                             <span>{{ __('Agent') }}<strong>{{ $order->agent?->nickname ?: __('Assigned agent') }}</strong></span>
                             <span>{{ __('Your reference') }}<strong>{{ $order->reference }}</strong></span>
                         </div>
+                        <div class="deposit-proof-row">
+                            @if(isset($openProofIds[$order->id]))
+                                <a class="deposit-proof-thumb" href="{{ route('player.deposits.proof.show', $order) }}" target="_blank" rel="noopener"><img src="{{ route('player.deposits.proof.show', $order) }}" alt="{{ __('Your payment screenshot') }}" loading="lazy"></a>
+                                <p><strong>{{ __('Screenshot attached') }}</strong><span>{{ __('Your agent checks it against the transfer.') }}</span></p>
+                            @endif
+                            <form class="deposit-proof-form" method="POST" action="{{ route('player.deposits.proof', $order) }}" enctype="multipart/form-data">
+                                @csrf
+                                <label class="deposit-proof-pick">{{ isset($openProofIds[$order->id]) ? __('Replace screenshot') : __('Add payment screenshot') }}<input type="file" name="proof" accept="image/png,image/jpeg,image/webp" required data-proof-autosubmit></label>
+                                <button type="submit" class="deposit-proof-send">{{ __('Upload') }}</button>
+                            </form>
+                        </div>
                         <footer>
                             <p>{{ __('Submitted :when. Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. If you have not sent the money yet, the details above are where it goes.', ['when' => $order->created_at->diffForHumans(), 'minutes' => $reviewTimes['deposit_minutes']]) }}</p>
                             <form method="POST" action="{{ route('player.deposits.cancel', $order) }}">@csrf @method('PATCH')<button class="withdrawal-cancel-button" type="submit">{{ __('Cancel') }}</button></form>
@@ -273,7 +310,7 @@
         <dialog class="deposit-flow-dialog" data-deposit-dialog
             @if(session('deposit_submitted')) data-deposit-submitted="1" @endif
             @if($errors->any() && old('agent_bank_account_id')) data-deposit-error="{{ $errors->first() }}" data-old-account="{{ old('agent_bank_account_id') }}" data-old-amount="{{ old('amount') }}" data-old-reference="{{ old('reference') }}" @endif>
-            <form method="POST" action="{{ route('player.deposits.store') }}" data-deposit-form>
+            <form method="POST" action="{{ route('player.deposits.store') }}" enctype="multipart/form-data" data-deposit-form>
                 @csrf
                 <input type="hidden" name="agent_bank_account_id" data-deposit-account-id>
                 <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', $depositIdempotencyKey) }}">
@@ -336,6 +373,9 @@
                     </div>
                     <p class="deposit-flow-error" data-deposit-form-error hidden></p>
                     <label>{{ __('Bank reference or confirmation message') }}<input name="reference" value="{{ old('reference') }}" minlength="3" maxlength="100" placeholder="{{ __('Enter payment reference') }}" required></label>
+
+                    <label class="deposit-proof-field">{{ __('Payment screenshot') }} <span>{{ __('Optional. A screenshot of the transfer helps your agent confirm faster.') }}</span><input type="file" name="proof" accept="image/png,image/jpeg,image/webp" data-deposit-proof></label>
+                    <img class="deposit-proof-preview" data-deposit-proof-preview alt="{{ __('Your payment screenshot') }}" hidden>
                     <footer><button type="button" class="deposit-flow-secondary" data-deposit-back-agent>{{ __('Back') }}</button><button type="submit" class="deposit-flow-primary">{{ __('Submit For Approval') }}</button></footer>
                     <p class="deposit-flow-hint">{{ __('Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. These details stay on your wallet page until it is confirmed.', ['minutes' => $reviewTimes['deposit_minutes']]) }}</p>
                 </section>

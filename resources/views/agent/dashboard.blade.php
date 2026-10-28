@@ -14,6 +14,17 @@
 @endphp
 
 <div class="agent-page-head"><div><p>Overview</p><h1>Statistics</h1><span>{{ $periodLabel }} &middot; your Birr operations.</span></div><div class="agent-head-actions"><a class="agent-button teal" href="{{ route('agent.withdrawals') }}">Process withdrawals</a></div></div>
+@if($floatWarning > 0 && (float) $agent->balance <= $floatWarning)
+    {{-- Not waiting for zero: below the minimum, deposits cannot be approved until the float is topped up. --}}
+    <div class="agent-alert error">
+        <strong>Your float is low: {{ \App\Support\Money::exact((float) $agent->balance) }}.</strong>
+        @if($floatMinimum > 0 && (float) $agent->balance <= $floatMinimum)
+            That is at or below the minimum of {{ \App\Support\Money::exact($floatMinimum) }}, so new deposits cannot be approved until the administrator tops up your float.
+        @else
+            Deposits that would take it below {{ \App\Support\Money::exact($floatMinimum) }} will be refused. Ask the administrator to top up your float now.
+        @endif
+    </div>
+@endif
 
 {{-- Every figure below used to be lifetime-only, which stops telling an agent
      anything after the first month. --}}

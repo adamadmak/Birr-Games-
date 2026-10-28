@@ -132,7 +132,9 @@ class PasswordRecoveryController
     {
         try {
             $token = Password::broker()->createToken($user);
-            $url = route('password.reset', ['token' => $token, 'email' => $user->email]);
+            // The public address, not the Host header of whoever asked: a reset link
+            // must never point anywhere but the site.
+            $url = \App\Support\SiteUrl::route('password.reset', ['token' => $token, 'email' => $user->email]);
 
             Mailer::prepare();
             Mail::to($user->email)->send(new ResetPasswordLink($user, $url));

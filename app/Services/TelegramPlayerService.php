@@ -261,15 +261,10 @@ class TelegramPlayerService
             ]);
         });
 
-        $baseUrl = rtrim(
-            trim((string) config('services.telegram.app_url'))
-                ?: $this->runtimeEnvironment('TELEGRAM_APP_URL')
-                ?: $this->runtimeEnvironment('APP_URL')
-                ?: (string) config('app.url'),
-            '/'
-        );
-
-        return $baseUrl.route('telegram.login', ['token' => $plainToken], false);
+        // The public address (App\Support\SiteUrl), not TELEGRAM_APP_URL: on the host
+        // that still named the old platform subdomain, where WinHouse refuses to
+        // be framed, so the mini app opened without its sportsbook.
+        return \App\Support\SiteUrl::route('telegram.login', ['token' => $plainToken]);
     }
 
     private function registerMember(TelegramSubscriber $subscriber, string $phone): User

@@ -19,19 +19,33 @@ class PaymentGateway extends Model
         return $this->hasMany(AgentBankAccount::class);
     }
 
+    /**
+     * Artwork that cannot be found by name (ported from kulubet). The file is
+     * named for the brand and the gateway for the institution, and the two
+     * rarely match: M-PESA ships as MPSA.png, Bank of Abyssinia as BOA.png.
+     *
+     * ORDER MATTERS: the first hit wins. "cbebirr" contains "ebirr", so `cbe`
+     * is tested before `ebirr`, or every CBE gateway would show the Ebirr mark.
+     */
+    private const LOGO_FILES = [
+        'cbe' => 'cbebirr.png',
+        'tele' => 'Telebirr.jpg',
+        'ebirr' => 'Ebirr.png',
+        'abyssinia' => 'BOA.png',
+        'boa' => 'BOA.png',
+        'mpesa' => 'MPSA.png',
+        'mpsa' => 'MPSA.png',
+    ];
+
     public function getLogoUrlAttribute(): ?string
     {
         $key = strtolower(trim($this->code ?: $this->name));
         $cleanKey = preg_replace('/[^a-z0-9]/', '', $key);
 
-        if (str_contains($cleanKey, 'cbe')) {
-            return asset('images/cbebirr.png');
-        }
-        if (str_contains($cleanKey, 'tele')) {
-            return asset('images/Telebirr.jpg');
-        }
-        if (str_contains($cleanKey, 'ebirr')) {
-            return asset('images/Ebirr.png');
+        foreach (self::LOGO_FILES as $needle => $file) {
+            if (str_contains($cleanKey, $needle)) {
+                return asset('images/'.$file);
+            }
         }
 
         foreach (['png', 'jpg', 'jpeg', 'webp', 'svg'] as $ext) {

@@ -26,13 +26,19 @@ class PlayerDepositController
             'agent_bank_account_id' => ['required', 'integer', Rule::exists('agent_bank_accounts', 'id')],
             'reference' => ['required', 'string', 'min:3', 'max:100'],
             'idempotency_key' => ['nullable', 'uuid'],
+            // The payment screenshot the agent checks the transfer against. Optional:
+            // the bank reference is still what identifies the payment.
+            'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+        ], [
+            'proof.mimes' => __('Upload the screenshot as a JPG, PNG or WEBP picture.'),
+            'proof.max' => __('That picture is larger than 10 MB. Take a screenshot instead of a photo.'),
         ]);
         $validated['idempotency_key'] ??= (string) Str::uuid();
 
-        DB::transaction(function () use ($request, $validated, $rules): void {
+        $order = DB::transaction(function () use ($request, $validated, $rules): ?AgentOrder {
             $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
             if (AgentOrder::query()->where('user_id', $user->id)->where('type', 'deposit')->where('idempotency_key', $validated['idempotency_key'])->exists()) {
-                return;
+                return null;
             }
             if (AgentOrder::query()->where('reference', trim($validated['reference']))->exists()) {
                 throw ValidationException::withMessages(['reference' => 'That bank reference has already been submitted.']);
@@ -69,10 +75,32 @@ class PlayerDepositController
                 'notes' => 'Player submitted a bank reference through the web wallet; awaiting agent approval.',
             ]);
             AgentOrderEvent::record($order, 'submitted', $user, null, 'pending', $order->notes);
+
+            return $order;
         });
+
+        // After the commit: a screenshot that cannot be read does not undo a
+        // deposit the player has already paid; they are told and can add it again.
+        $proofProblem = null;
+        $hasProof = false;
+        if ($order && $request->hasFile('proof')) {
+            try {
+                app(\App\Services\DepositProofStore::class)->store($order, $request->file('proof'));
+                $hasProof = true;
+            } catch (\InvalidArgumentException $exception) {
+                $proofProblem = $exception->getMessage();
+            } catch (\Throwable $exception) {
+                report($exception);
+                $proofProblem = __('The deposit was submitted, but the screenshot could not be saved. Add it again from your wallet.');
+            }
+        }
+        if ($order) {
+            app(\App\Services\AgentNotifier::class)->depositSubmitted($order->load(['agent', 'user', 'gateway']), $hasProof);
+        }
 
         return redirect()->route('player.wallet', ['tab' => 'deposit'])
             ->with('deposit_submitted', true)
+            ->with('error', $proofProblem)
             ->with('status', __('Deposit submitted. Your agent will confirm the transfer, usually within :minutes minutes, and your wallet is credited then.', ['minutes' => $rules->depositReviewMinutes()]));
     }
 

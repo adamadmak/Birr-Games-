@@ -205,6 +205,22 @@ class TelegramBotService
         return false;
     }
 
+    /**
+     * A notice sent inside somebody else's request (a player submitting a
+     * deposit): one attempt, five seconds at most, so a slow Telegram can
+     * never hold the page. Callers catch and log; the portal is the record.
+     */
+    public function notify(int|string $chatId, string $text, array $buttons = []): void
+    {
+        $this->post('sendMessage', array_filter([
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+            'reply_markup' => $this->keyboard($buttons),
+        ], fn ($value) => $value !== null), retry: false, timeout: 5);
+    }
+
     public function sendText(int|string $chatId, string $text, array $buttons = [], ?array $replyMarkup = null): array
     {
         return $this->post('sendMessage', array_filter([
@@ -417,10 +433,10 @@ class TelegramBotService
         }
     }
 
-    private function post(string $method, array $payload = [], bool $retry = true): Response
+    private function post(string $method, array $payload = [], bool $retry = true, ?int $timeout = null): Response
     {
         try {
-            $request = $this->http()->asJson()->timeout((int) config('services.telegram.timeout', 20));
+            $request = $this->http()->asJson()->timeout($timeout ?? (int) config('services.telegram.timeout', 20));
             if ($retry) {
                 $request = $request->retry(2, 300, throw: false);
             }

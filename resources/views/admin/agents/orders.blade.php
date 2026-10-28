@@ -27,7 +27,7 @@
             <td>{{ $order->gateway?->name ?: '-' }}</td>
             <td><strong>{{ \App\Support\Money::format($order->amount) }}</strong>@if($order->commission)<span class="cell-subtitle">Fee {{ \App\Support\Money::format($order->commission) }}</span>@endif</td>
             <td>@if($order->account_number)<strong>{{ $order->account_name }}</strong><span class="cell-subtitle">{{ $order->account_number }}</span>@else - @endif</td>
-            <td>@if($order->reference)<code class="admin-ref" title="{{ $order->reference }}">{{ $order->reference }}</code>@else - @endif</td>
+            <td>@if($order->reference)<code class="admin-ref" title="{{ $order->reference }}">{{ $order->reference }}</code>@else - @endif @if(isset($proofOrderIds[$order->id]))<a class="cell-subtitle" href="{{ route('admin.agents.orders.deposit-proof', $order) }}" target="_blank" rel="noopener">Payment screenshot</a>@endif</td>
             <td><span class="status-badge order-{{ $order->status }} {{ $order->status==='success'?'won':'' }}">{{ str($order->status)->replace('_',' ')->title() }}</span>@if($order->payout_reference)<span class="cell-subtitle">Payout: {{ $order->payout_reference }}</span>@endif</td>
             <td>{{ $order->created_at->format('M j, Y H:i') }}</td>
             <td>{{ $order->processedBy?->name ?: ($order->agent && $order->processed_at ? 'Agent: '.$order->agent->nickname : '-') }}@if($order->processed_at)<span class="cell-subtitle">{{ $order->processed_at->format('M j, H:i') }}</span>@endif</td>

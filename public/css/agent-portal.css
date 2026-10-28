@@ -505,3 +505,17 @@ body { font-family: "Source Sans 3", "Source Sans Pro", Inter, system-ui, sans-s
 [data-agent-theme="light"] .agent-badge.success { color: #fff; background: #28a745; }
 [data-agent-theme="light"] .agent-badge.rejected,
 [data-agent-theme="light"] .agent-badge.cancelled { color: #fff; background: #dc3545; }
+
+
+/* ============================================================================
+   BET TICKETS — resources/views/agent/tickets.blade.php (October 2026)
+   The search row holds a date box, which the toolbar's 260px minimum made
+   needlessly wide; the Print button sits in a table cell and stays small;
+   the pager is a plain previous / page / next row.
+   ========================================================================== */
+.agent-ticket-search input[type="date"] { min-width: 0; }
+.agent-ticket-table td small { color: var(--agent-muted); }
+.agent-ticket-table .agent-ticket-print { padding: 7px 11px; font-size: 12px; white-space: nowrap; }
+.agent-ticket-pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.agent-ticket-pager > span:not(.agent-button) { color: var(--agent-muted); font-size: 13px; }
+.agent-ticket-pager .agent-button[aria-disabled="true"] { opacity: .45; pointer-events: none; }

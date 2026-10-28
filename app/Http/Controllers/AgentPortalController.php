@@ -136,6 +136,8 @@ class AgentPortalController
             'pendingDeposits' => (clone $orders)->where('type', 'deposit')->where('status', 'pending')->count(),
             'pendingWithdrawals' => $this->availableWithdrawals($agent)->where('status', 'pending')->count(),
             'deltas' => $this->dashboardDeltas($agent, $from, $to, $current),
+            'floatMinimum' => app(FinancialRuleService::class)->agentMinimumFloat(),
+            'floatWarning' => app(FinancialRuleService::class)->agentLowFloatWarning(),
         ]));
     }
 
@@ -480,8 +482,10 @@ class AgentPortalController
         $counterpartIds = $receivedTransfers->getCollection()->pluck('source_id')->filter()->unique();
         $counterpartAgents = Agent::query()->whereIn('id', $counterpartIds)->get()->keyBy('id');
 
+        $proofOrderIds = \App\Models\DepositProof::idsFor(collect($orders->items())->push($searchedOrder)->filter());
+
         return view('agent.deposit-orders', compact(
-            'agent', 'orders', 'status', 'reference', 'searchedOrder', 'receivedTransfers', 'counterpartAgents'
+            'agent', 'orders', 'status', 'reference', 'searchedOrder', 'receivedTransfers', 'counterpartAgents', 'proofOrderIds'
         ));
     }
 
@@ -521,9 +525,10 @@ class AgentPortalController
                 ? $rules->agentCommissionFor($lockedAgent, $amount)
                 : 0.0;
 
+            $floatBefore = (float) $lockedAgent->balance;
             if ($validated['status'] === 'success') {
-                if ((float) $lockedAgent->balance < $amount) {
-                    throw ValidationException::withMessages(['status' => 'Your agent credit balance is too low to approve this deposit.']);
+                if ($refusal = $rules->agentFloatRefusal($lockedAgent, $amount)) {
+                    throw ValidationException::withMessages(['status' => $refusal]);
                 }
                 if (WalletTransaction::query()->where('ledger_key', 'player-deposit-order-'.$lockedOrder->id)->exists()) {
                     throw ValidationException::withMessages(['status' => 'This deposit already has a ledger settlement.']);
@@ -587,8 +592,13 @@ class AgentPortalController
             return [
                 'order' => $lockedOrder->fresh(),
                 'user' => $user->fresh(),
+                'ranLow' => $rules->agentFloatJustRanLow($floatBefore, (float) $lockedAgent->fresh()->balance),
             ];
         });
+
+        if ($result['ranLow']) {
+            app(\App\Services\AgentNotifier::class)->lowFloat($agent->fresh(), $rules->agentMinimumFloat());
+        }
 
         try {
             $subscriber = TelegramSubscriber::query()
@@ -764,7 +774,8 @@ class AgentPortalController
         ]);
         $validated['reference'] = trim($validated['reference']);
 
-        DB::transaction(function () use ($agent, $validated, $rules, $agentLedger): void {
+        $ranLow = false;
+        DB::transaction(function () use ($agent, $validated, $rules, $agentLedger, &$ranLow): void {
             $lockedAgent = Agent::query()->lockForUpdate()->findOrFail($agent->id);
             if (AgentOrder::query()
                 ->where('agent_id', $lockedAgent->id)
@@ -789,9 +800,10 @@ class AgentPortalController
                 ]);
             }
 
-            if ($lockedAgent->balance < $validated['amount']) {
-                throw ValidationException::withMessages(['amount' => 'Your agent credit balance is too low for this deposit.']);
+            if ($refusal = $rules->agentFloatRefusal($lockedAgent, (float) $validated['amount'])) {
+                throw ValidationException::withMessages(['amount' => $refusal]);
             }
+            $ranLow = $rules->agentFloatJustRanLow((float) $lockedAgent->balance, (float) $lockedAgent->balance - (float) $validated['amount']);
             $user = User::query()->where('phone', $validated['phone'])->where('role', User::ROLE_PLAYER)->lockForUpdate()->firstOrFail();
             $rules->assertAgentDirectDepositAllowed($user, (float) $validated['amount']);
             $lockedAgent->decrement('balance', $validated['amount']);
@@ -842,6 +854,10 @@ class AgentPortalController
             ]);
         });
 
+        if ($ranLow) {
+            app(\App\Services\AgentNotifier::class)->lowFloat($this->agent($request)->fresh(), $rules->agentMinimumFloat());
+        }
+
         return back()->with('agent_status', 'Deposit completed against reference '.$validated['reference'].' and recorded in the Birr ledger.');
     }
 
@@ -870,7 +886,8 @@ class AgentPortalController
             'idempotency_key' => ['required', 'uuid'],
         ]);
 
-        DB::transaction(function () use ($agent, $validated, $rules): void {
+        $ranLow = false;
+        DB::transaction(function () use ($agent, $validated, $rules, &$ranLow): void {
             $receiverId = Agent::query()
                 ->where('phone', $validated['phone'])
                 ->where('active', true)
@@ -897,9 +914,10 @@ class AgentPortalController
             if (WalletTransaction::query()->where('ledger_key', $ledgerPrefix.'-debit')->exists()) {
                 return;
             }
-            if ($sender->balance < $validated['amount']) {
-                throw ValidationException::withMessages(['amount' => 'Your agent credit balance is too low.']);
+            if ($refusal = $rules->agentFloatRefusal($sender, (float) $validated['amount'])) {
+                throw ValidationException::withMessages(['amount' => $refusal]);
             }
+            $ranLow = $rules->agentFloatJustRanLow((float) $sender->balance, (float) $sender->balance - (float) $validated['amount']);
             $rules->assertAgentTransferAllowed($sender, (float) $validated['amount']);
             $sender->decrement('balance', $validated['amount']);
             $receiver->increment('balance', $validated['amount']);
@@ -932,6 +950,10 @@ class AgentPortalController
                 'metadata' => ['transfer_id' => $transferId, 'sender_agent_id' => $sender->id, 'note' => $validated['note'] ?? null],
             ]);
         });
+
+        if ($ranLow) {
+            app(\App\Services\AgentNotifier::class)->lowFloat($this->agent($request)->fresh(), $rules->agentMinimumFloat());
+        }
 
         return back()->with('agent_status', 'Agent credit transferred successfully.');
     }

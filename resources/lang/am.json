@@ -484,5 +484,21 @@
     "Discard": "አስወግድ",
     "Your agent confirms the transfer, usually within :minutes minutes, and your wallet is credited then. These details stay on your wallet page until it is confirmed.": "ወኪልዎ ዝውውሩን ያረጋግጣል፣ አብዛኛውን ጊዜ በ:minutes ደቂቃ ውስጥ፣ ከዚያ ቦርሳዎ ይሞላል። እነዚህ ዝርዝሮች እስኪረጋገጥ ድረስ በቦርሳ ገጽዎ ላይ ይቆያሉ።",
     "Deposit submitted. Your agent will confirm the transfer, usually within :minutes minutes, and your wallet is credited then.": "ተቀማጩ ቀርቧል። ወኪልዎ ዝውውሩን ያረጋግጣል፣ አብዛኛውን ጊዜ በ:minutes ደቂቃ ውስጥ፣ ከዚያ ቦርሳዎ ይሞላል።",
-    "Withdrawal requested. An agent will pay it to your account, usually within :hours hours.": "የማውጣት ጥያቄ ቀርቧል። ወኪል ወደ ሂሳብዎ ይከፍላል፣ አብዛኛውን ጊዜ በ:hours ሰዓት ውስጥ።"
+    "Withdrawal requested. An agent will pay it to your account, usually within :hours hours.": "የማውጣት ጥያቄ ቀርቧል። ወኪል ወደ ሂሳብዎ ይከፍላል፣ አብዛኛውን ጊዜ በ:hours ሰዓት ውስጥ።",
+    "The agent you choose pays the money to your account and is notified straight away.": "የሚመርጡት ወኪል ገንዘቡን ወደ ሂሳብዎ ይከፍላል፣ ወዲያውኑም ይነገረዋል።",
+    "No agent pays out with this method right now. Choose another method.": "አሁን በዚህ ዘዴ የሚከፍል ወኪል የለም። ሌላ ዘዴ ይምረጡ።",
+    "Your payment screenshot": "የክፍያዎ ቅጽበታዊ ገጽ እይታ",
+    "Screenshot attached": "ቅጽበታዊ ገጽ እይታ ተያይዟል",
+    "Your agent checks it against the transfer.": "ወኪልዎ ከዝውውሩ ጋር ያመሳክረዋል።",
+    "Replace screenshot": "ቅጽበታዊ ገጽ እይታውን ቀይር",
+    "Add payment screenshot": "የክፍያ ቅጽበታዊ ገጽ እይታ ያያይዙ",
+    "Upload": "ስቀል",
+    "Payment screenshot": "የክፍያ ቅጽበታዊ ገጽ እይታ",
+    "Optional. A screenshot of the transfer helps your agent confirm faster.": "አማራጭ። የዝውውሩ ቅጽበታዊ ገጽ እይታ ወኪልዎ በፍጥነት እንዲያረጋግጥ ይረዳል።",
+    "Screenshot attached. Your agent can now check it against the transfer.": "ቅጽበታዊ ገጽ እይታው ተያይዟል። ወኪልዎ አሁን ከዝውውሩ ጋር ማመሳከር ይችላል።",
+    "That agent cannot pay out with this method. Choose another agent.": "ያ ወኪል በዚህ ዘዴ መክፈል አይችልም። ሌላ ወኪል ይምረጡ።",
+    "That picture is larger than 10 MB. Take a screenshot instead of a photo.": "ያ ምስል ከ10 ሜባ በላይ ነው። ፎቶ ሳይሆን ቅጽበታዊ ገጽ እይታ ይውሰዱ።",
+    "The deposit was submitted, but the screenshot could not be saved. Add it again from your wallet.": "ተቀማጩ ቀርቧል፣ ነገር ግን ቅጽበታዊ ገጽ እይታው ሊቀመጥ አልቻለም። ከቦርሳዎ እንደገና ያያይዙት።",
+    "This deposit has already been handled, so it no longer takes a screenshot.": "ይህ ተቀማጭ አስቀድሞ ተስተናግዷል፣ ስለዚህ ቅጽበታዊ ገጽ እይታ ከእንግዲህ አይቀበልም።",
+    "Upload the screenshot as a JPG, PNG or WEBP picture.": "ቅጽበታዊ ገጽ እይታውን በJPG፣ PNG ወይም WEBP ምስል ይስቀሉ።"
 }
