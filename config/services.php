@@ -23,7 +23,9 @@ return [
 
     'bigbang' => [
         'base_url' => env('BIGBANG_API_BASE_URL', 'https://api.bigbangcasino.bet/api/v1'),
-        'api_key' => env('BIGBANG_API_KEY', 'ek_96a92ecfbdd6d7f2877554c83841e0af8f33f36acadb3425'),
+        // No literal default: App\Support\BigBang reads platform_settings when
+        // the env is absent (it is, on AletCloud). Set under Configuration → System.
+        'api_key' => env('BIGBANG_API_KEY'),
         'mode' => env('BIGBANG_MODE', 'live'),
         'currency' => env('BIGBANG_CURRENCY', 'ETB'),
         'provider' => env('BIGBANG_PROVIDER'),
@@ -33,10 +35,9 @@ return [
         'ca_bundle' => env('BIGBANG_CA_BUNDLE'),
         'sync_page_size' => (int) env('BIGBANG_SYNC_PAGE_SIZE', 200),
         // Guards the HTTP catalog-refresh endpoint an external timer calls, because
-        // Laravel's scheduler does not run on this host. Carries a literal default for
-        // the same reason `callback_token` needs one: the build caches config without
-        // the runtime env, so an env-only secret never arrives. Rotate here, not in env.
-        'sync_token' => env('BIGBANG_SYNC_TOKEN', 'a4c40206893828818071ba567c3e2d06bafdd552bd79800e52b88cee8cb1acf3'),
+        // Laravel's scheduler does not run on this host. Like the keys above it
+        // resolves through App\Support\BigBang, so the value lives in settings.
+        'sync_token' => env('BIGBANG_SYNC_TOKEN'),
         // Runaway guard, not a size limit: the sync bounds itself by the row count
         // the feed reports. At 30 it capped the read at 3,600 of 5,106 games, and a
         // read that never completes is a read that can never retire anything.

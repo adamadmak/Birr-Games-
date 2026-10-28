@@ -287,22 +287,9 @@ class BigBangWalletController
 
     private function callbackTokenIsValid(Request $request): bool
     {
-        $expected = trim((string) config('services.bigbang.callback_token'));
-
-        // Fallback: on this platform the build's `php artisan config:cache` runs without the
-        // runtime env, freezing callback_token to null, AND php-fpm does not expose the
-        // dashboard env vars to getenv()/env() at runtime — so both config() and the process
-        // env come back empty and every callback would 401. Fall back through both, then to the
-        // shared token literal as a last resort so seamless wallet callbacks authenticate.
-        // TODO: once the deploy caches config WITH env present (or php-fpm clear_env=no), drop
-        // the literal and keep this env-only.
-        if (strlen($expected) < 32) {
-            $expected = trim((string) (getenv('BIGBANG_CALLBACK_TOKEN') ?: env('BIGBANG_CALLBACK_TOKEN')));
-        }
-        if (strlen($expected) < 32) {
-            $expected = 'f2ac413642a81a6d425ce96407aa2d3143ac81dc868bdcbd35dc0e63b48c58a8';
-        }
-
+        // Settings first on this host (App\Support\BigBang). An unset token fails
+        // closed: it must never read as "allow everyone", and it is never a literal.
+        $expected = \App\Support\BigBang::callbackToken();
         $provided = trim((string) $request->query('token'));
 
         return strlen($expected) >= 32 && strlen($provided) === strlen($expected)

@@ -42,9 +42,9 @@ class CheckProductionReadiness extends Command
             ['Trusted proxy source is explicit', filled(env('TRUSTED_PROXIES')) && env('TRUSTED_PROXIES') !== '*'],
             ['BigBang API uses the /api/v1 contract', Str::endsWith(rtrim((string) config('services.bigbang.base_url'), '/'), '/api/v1')],
             ['BigBang is in live mode', config('services.bigbang.mode') === 'live'],
-            ['BigBang live API key is configured', filled(config('services.bigbang.api_key')) && !Str::startsWith((string) config('services.bigbang.api_key'), 'ek_test_')],
+            ['BigBang live API key is configured', \App\Support\BigBang::apiKey() !== '' && !Str::startsWith(\App\Support\BigBang::apiKey(), 'ek_test_')],
             ['BigBang account currency is ETB', strtoupper((string) config('services.bigbang.currency')) === 'ETB'],
-            ['BigBang callback token is configured', strlen((string) config('services.bigbang.callback_token')) >= 32],
+            ['BigBang callback token is configured', strlen(\App\Support\BigBang::callbackToken()) >= 32],
             ['BigBang webhook secret is configured', strlen((string) config('services.bigbang.webhook_secret')) >= 32],
             ['Telegram webhook secret is configured', strlen((string) config('services.telegram.webhook_secret')) >= 32],
         ];

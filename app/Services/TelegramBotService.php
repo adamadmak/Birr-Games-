@@ -409,6 +409,12 @@ class TelegramBotService
         return hash('sha256', 'lucy-telegram-webhook|'.$token);
     }
 
+    /** The token the web-app sign-in verifies Telegram's signature with. Resolved like every other call's. */
+    public function signingToken(): string
+    {
+        return $this->botToken();
+    }
+
     private function botToken(): string
     {
         return trim((string) config('services.telegram.bot_token'))

@@ -22,7 +22,7 @@ class TelegramWebAppAuthController
             return response()->json(['ok' => false, 'error' => 'No init_data provided']);
         }
 
-        $tgUser = $this->verifyInitData($initData);
+        $tgUser = $this->verifyInitData($initData, $telegram->signingToken());
         if (! $tgUser || ! isset($tgUser['id'])) {
             return response()->json(['ok' => false, 'error' => 'Invalid Telegram user payload']);
         }
@@ -70,30 +70,55 @@ class TelegramWebAppAuthController
         return response()->json(['ok' => true, 'redirect' => false]);
     }
 
-    private function verifyInitData(string $initData): ?array
+    /**
+     * Telegram's own check for a mini-app payload, and nothing less.
+     *
+     * The user object inside init_data is only trustworthy when the hash over
+     * the rest of the payload matches an HMAC keyed with the bot token, and
+     * the payload is recent. Until 28 Oct 2026 this method handed the user
+     * back even when the hash did not match (and skipped the check entirely
+     * when no token resolved), which let anyone sign in as any linked player
+     * by posting a made-up hash and a victim's Telegram id. Every failure
+     * path now answers null, and no token means no sign-in.
+     *
+     * @see https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
+     */
+    private const MAX_AGE_SECONDS = 86400;
+
+    private function verifyInitData(string $initData, string $botToken): ?array
     {
-        parse_str($initData, $data);
-        if (! isset($data['hash'])) {
+        if ($botToken === '') {
+            report(new \RuntimeException('Telegram web-app sign-in refused: no bot token is configured to verify the payload.'));
+
             return null;
         }
 
-        $hash = $data['hash'];
+        parse_str($initData, $data);
+        if (! isset($data['hash']) || ! is_string($data['hash']) || $data['hash'] === '') {
+            return null;
+        }
+
+        $hash = strtolower($data['hash']);
         unset($data['hash']);
+
+        $authDate = (int) ($data['auth_date'] ?? 0);
+        if ($authDate <= 0 || abs(time() - $authDate) > self::MAX_AGE_SECONDS) {
+            return null;
+        }
 
         ksort($data);
         $checkString = collect($data)
             ->map(fn ($val, $key) => "{$key}={$val}")
             ->implode("\n");
 
-        $botToken = (string) (config('services.telegram.bot_token') ?: getenv('TELEGRAM_BOT_TOKEN'));
-        if ($botToken !== '') {
-            $secretKey = hash_hmac('sha256', $botToken, 'WebAppData', true);
-            $calculatedHash = hash_hmac('sha256', $checkString, $secretKey);
-            if (hash_equals($calculatedHash, $hash)) {
-                return isset($data['user']) ? json_decode($data['user'], true) : null;
-            }
+        $secretKey = hash_hmac('sha256', $botToken, 'WebAppData', true);
+        $calculatedHash = hash_hmac('sha256', $checkString, $secretKey);
+        if (! hash_equals($calculatedHash, $hash)) {
+            return null;
         }
 
-        return isset($data['user']) ? json_decode($data['user'], true) : null;
+        $user = isset($data['user']) ? json_decode((string) $data['user'], true) : null;
+
+        return is_array($user) ? $user : null;
     }
 }

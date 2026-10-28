@@ -78,15 +78,8 @@ class BigBangCatalogSyncController
 
     private function tokenIsValid(Request $request): bool
     {
-        // Read the same way BigBangWalletController has to: this platform runs
-        // `config:cache` at build time without the runtime env, and php-fpm does not
-        // expose the dashboard variables to getenv()/env() either, so an env-only
-        // secret arrives empty and every call would 401. config() therefore falls
-        // through to the literal default in config/services.php.
-        $expected = trim((string) config('services.bigbang.sync_token'));
-        if (strlen($expected) < 32) {
-            $expected = trim((string) (getenv('BIGBANG_SYNC_TOKEN') ?: env('BIGBANG_SYNC_TOKEN')));
-        }
+        // Settings first on this host (App\Support\BigBang); never a literal.
+        $expected = \App\Support\BigBang::syncToken();
 
         $provided = trim((string) ($request->query('token') ?? $request->input('token')));
 

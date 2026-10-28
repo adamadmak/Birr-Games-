@@ -39,7 +39,7 @@ class ProviderGameController
                 $game,
                 $request->user(),
                 route('integrations.bigbang.user-data', [
-                    'token' => (string) config('services.bigbang.callback_token'),
+                    'token' => \App\Support\BigBang::callbackToken(),
                 ]),
                 route('home')
             );

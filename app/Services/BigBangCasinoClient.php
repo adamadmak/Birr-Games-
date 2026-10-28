@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Env;
 use RuntimeException;
 
 class BigBangCasinoClient
@@ -228,23 +227,10 @@ class BigBangCasinoClient
         return (bool) preg_match('/Connection timed out|Failed to connect|Could not resolve host|Connection refused|Connection reset by peer|SSL connect error|Empty reply from server/i', $message);
     }
 
-    /**
-     * Read the provider secret from the running process when it was injected
-     * after Laravel's configuration cache was built (as on some cloud hosts).
-     */
+    /** See App\Support\BigBang: settings first on this host, never a literal. */
     private function apiKey(): string
     {
-        $runtimeKey = getenv('BIGBANG_API_KEY');
-        if ($runtimeKey === false || trim($runtimeKey) === '') {
-            $runtimeKey = $_SERVER['BIGBANG_API_KEY'] ?? $_ENV['BIGBANG_API_KEY'] ?? '';
-        }
-        if (trim((string) $runtimeKey) === '') {
-            $runtimeKey = Env::get('BIGBANG_API_KEY', '');
-        }
-
-        return trim((string) ($runtimeKey !== ''
-            ? $runtimeKey
-            : config('services.bigbang.api_key')));
+        return \App\Support\BigBang::apiKey();
     }
 
     private function json(Response $response, string $operation): array

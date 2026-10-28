@@ -16,7 +16,7 @@ class SettingController
     private const TABS = ['promotion', 'company', 'contact', 'system', 'frontend', 'agent', 'bonus', 'security'];
 
     /** Write-only fields: a blank box means "keep what is stored", never "erase". */
-    private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password', 'winhouse_api_key', 'winhouse_callback_token'];
+    private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password', 'winhouse_api_key', 'winhouse_callback_token', 'bigbang_api_key', 'bigbang_callback_token', 'bigbang_sync_token'];
 
     public function index(Request $request): View
     {
@@ -38,6 +38,11 @@ class SettingController
             'goLiveReset' => $tab === 'system' ? $this->goLiveResetPreview() : null,
             'qtechIntegrationMode' => \App\Support\Qtech::integrationMode(),
             'winhouse' => $tab === 'system' ? $this->winhouseState($request) : null,
+            'bigbang' => $tab === 'system' ? [
+                'api_key_set' => \App\Support\BigBang::apiKey() !== '',
+                'callback_set' => \App\Support\BigBang::callbackToken() !== '',
+                'sync_set' => \App\Support\BigBang::syncToken() !== '',
+            ] : null,
             'hero' => $tab === 'frontend' ? $this->heroState() : null,
             'security' => $tab === 'security' ? $this->securityState() : null,
             'bonus' => $tab === 'bonus' ? $this->bonusState() : null,
@@ -497,6 +502,10 @@ class SettingController
                 'winhouse_api_key' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
                 'winhouse_callback_token' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
                 'winhouse_mode' => ['nullable', Rule::in(['sandbox', 'live'])],
+                // BigBang (App\Support\BigBang). Write-only like the others.
+                'bigbang_api_key' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
+                'bigbang_callback_token' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
+                'bigbang_sync_token' => ['nullable', 'string', 'max:190', 'regex:/^[A-Za-z0-9_\-]*$/'],
                 'bigbang_live' => ['nullable', 'boolean'],
                 'max_payout' => ['required', 'numeric', 'min:0'],
                 'min_deposit_amount' => ['required', 'numeric', 'min:0'],

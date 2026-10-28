@@ -148,7 +148,7 @@ final class Qtech
     {
         $token = self::value('sync_token');
 
-        return $token !== '' ? $token : trim((string) config('services.bigbang.sync_token'));
+        return $token !== '' ? $token : BigBang::syncToken();
     }
 
     /** ISO 3166-1 alpha-2 of the players — QTech require it on every launch. */

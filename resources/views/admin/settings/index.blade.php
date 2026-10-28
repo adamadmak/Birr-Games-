@@ -293,6 +293,24 @@
                         </small>
                     </label>
                 </div>
+                <div class="configuration-form-section">
+                    <h3>BigBang keys</h3>
+                    <p>From Portal → API Keys. Write-only: a saved key is never shown again, and a blank box keeps the one already stored. Nothing is built into the code any more, so BigBang stays off until these are set.</p>
+                </div>
+                <div class="configuration-form-grid three">
+                    <label>API key
+                        <input type="password" name="bigbang_api_key" autocomplete="new-password" placeholder="{{ $bigbang['api_key_set'] ? 'Saved — type a new one to replace it' : 'Not set' }}">
+                        <small>Authenticates our calls and signs every balance-change callback. {{ $bigbang['api_key_set'] ? 'Saved. Leave blank to keep it.' : 'Required before a game can launch or settle.' }}</small>
+                    </label>
+                    <label>Callback token
+                        <input type="password" name="bigbang_callback_token" autocomplete="new-password" placeholder="{{ $bigbang['callback_set'] ? 'Saved — type a new one to replace it' : 'Not set' }}">
+                        <small>The <code>?token=</code> value in the two wallet URLs under Portal → API Keys → Wallet RGS. Choose it, type it here, then put the same value in those URLs. {{ $bigbang['callback_set'] ? 'Saved.' : 'Required.' }}</small>
+                    </label>
+                    <label>Sync token
+                        <input type="password" name="bigbang_sync_token" autocomplete="new-password" placeholder="{{ $bigbang['sync_set'] ? 'Saved — type a new one to replace it' : 'Not set' }}">
+                        <small>Presented by the external timer that refreshes the catalogue. Any long random value; give the same one to the timer. {{ $bigbang['sync_set'] ? 'Saved.' : 'Not set — the timer is refused.' }}</small>
+                    </label>
+                </div>
                 @if ($errors->has('bigbang'))
                     <div class="configuration-form-feedback"><div class="form-errors">{{ $errors->first('bigbang') }}</div></div>
                 @endif
