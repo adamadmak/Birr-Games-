@@ -61,10 +61,11 @@ final class PlayerWallet
      *
      * @param  string  $source  the BonusPlay source: 'winhouse', 'bigbang', 'qtech'
      * @param  string  $roundRef  the round the stake belongs to, for its payout to be measured against; '' when unknown
+     * @param  bool  $wagers  whether the stake counts toward a bonus rollover; a campaign entry fee does not
      *
      * @throws InsufficientFunds when the wallet does not cover it; nothing has moved
      */
-    public function stake(User $user, float $amount, string $source, string $roundRef, LedgerEntry $ledger): Movement
+    public function stake(User $user, float $amount, string $source, string $roundRef, LedgerEntry $ledger, bool $wagers = true): Movement
     {
         $this->requireTransaction();
         $amount = self::cents($amount);
@@ -87,8 +88,10 @@ final class PlayerWallet
         $user->save();
 
         BonusPlay::stake($user, $source, $roundRef, $amount, $withdrawableDebit);
-        $row = $this->ledger($user, 'bet', -$amount, $ledger);
-        $this->wagering->recordStake($user, $amount);
+        $row = $this->ledger($user, $ledger->type ?? 'bet', -$amount, $ledger);
+        if ($wagers) {
+            $this->wagering->recordStake($user, $amount);
+        }
 
         return $this->movement($user, $amount, $withdrawableDebit, 0.0, $row);
     }
@@ -158,7 +161,7 @@ final class PlayerWallet
         $user->withdrawable_balance = self::cents((float) $user->withdrawable_balance + $amount);
         $user->save();
 
-        $row = $this->ledger($user, 'payout', $amount, $ledger);
+        $row = $this->ledger($user, $ledger->type ?? 'payout', $amount, $ledger);
 
         return $this->movement($user, $amount, 0.0, 0.0, $row);
     }

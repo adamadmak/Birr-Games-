@@ -280,9 +280,14 @@ class BigBangWalletController
 
     private function user(string $token): ?User
     {
-        $id = (int) preg_replace('/^player_/', '', trim($token));
+        // Exactly `player_<digits>`: the signed fields are concatenated with no
+        // separator, so anything looser lets a signed payload be re-cut into a
+        // different one (player_7- / 25 / betT100) that still verifies.
+        if (! preg_match('/^player_([1-9]\d{0,18})$/', trim($token), $matches)) {
+            return null;
+        }
 
-        return $id > 0 ? User::query()->find($id) : null;
+        return User::query()->find((int) $matches[1]);
     }
 
     private function game(string $name, string $provider): ?Game

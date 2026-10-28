@@ -22,7 +22,24 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
-    <script src="https://telegram.org/js/telegram-web-app.js?v=8.0"></script>
+    {{-- Only inside Telegram. Loaded synchronously there because the init code
+         below needs it at once; everywhere else the page no longer waits on
+         telegram.org, which some carriers slow or block. A mini app is
+         recognised by its launch hash or the native bridge, and remembered for
+         the session because the hash is gone after the first navigation. --}}
+    <script>
+        (function () {
+            var inside = false;
+            try { inside = sessionStorage.getItem('tg-webapp') === '1'; } catch (e) {}
+            if (!inside && (/tgWebApp/.test(location.hash) || /tgWebApp/.test(location.search) || window.TelegramWebviewProxy || window.TelegramWebviewProxyProto || (window.parent !== window && /telegram/i.test(document.referrer)))) {
+                inside = true;
+                try { sessionStorage.setItem('tg-webapp', '1'); } catch (e) {}
+            }
+            if (inside) {
+                document.write('<script src="https://telegram.org/js/telegram-web-app.js?v=8.0"><\/script>');
+            }
+        })();
+    </script>
     <script>
         (function() {
             var tg = window.Telegram && window.Telegram.WebApp;

@@ -80,7 +80,11 @@ class AuditAdminMutation
     {
         $key = strtolower($key);
 
-        return collect(['password', 'token', 'secret', 'api_key', 'private_key', 'credential'])
+        if (in_array($key, array_map('strtolower', \App\Http\Controllers\Admin\SettingController::SECRETS), true)) {
+            return true;
+        }
+
+        return collect(['password', 'token', 'secret', 'api_key', 'private_key', 'credential', 'pass_key', '_key', 'passkey'])
             ->contains(fn (string $needle) => str_contains($key, $needle));
     }
 }

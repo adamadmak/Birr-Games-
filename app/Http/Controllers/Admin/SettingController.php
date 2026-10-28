@@ -16,7 +16,7 @@ class SettingController
     private const TABS = ['promotion', 'company', 'contact', 'system', 'frontend', 'agent', 'bonus', 'security'];
 
     /** Write-only fields: a blank box means "keep what is stored", never "erase". */
-    private const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password', 'winhouse_api_key', 'winhouse_callback_token', 'bigbang_api_key', 'bigbang_callback_token', 'bigbang_sync_token'];
+    public const SECRETS = ['qtech_pass_key', 'qtech_pass_key_staging', 'qtech_api_password', 'turnstile_secret_key', 'mail_password', 'winhouse_api_key', 'winhouse_callback_token', 'bigbang_api_key', 'bigbang_callback_token', 'bigbang_sync_token'];
 
     public function index(Request $request): View
     {

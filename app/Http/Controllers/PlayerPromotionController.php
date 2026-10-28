@@ -7,7 +7,9 @@ use App\Models\PlatformSetting;
 use App\Models\ShamoCampaign;
 use App\Models\ShamoParticipation;
 use App\Models\User;
-use App\Models\WalletTransaction;
+use App\Services\Wallet\InsufficientFunds;
+use App\Services\Wallet\LedgerEntry;
+use App\Services\Wallet\PlayerWallet;
 use App\Support\Money;
 use App\Services\WageringService;
 use Illuminate\Http\RedirectResponse;
@@ -97,12 +99,11 @@ class PlayerPromotionController
         ]);
     }
 
-    public function joinShamo(Request $request, ShamoCampaign $campaign): RedirectResponse
+    public function joinShamo(Request $request, ShamoCampaign $campaign, PlayerWallet $wallet): RedirectResponse
     {
-        $result = DB::transaction(function () use ($request, $campaign) {
+        $result = DB::transaction(function () use ($request, $campaign, $wallet) {
             $lockedCampaign = ShamoCampaign::query()->lockForUpdate()->findOrFail($campaign->id);
-            /** @var User $user */
-            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+            $user = $wallet->lock($request->user());
 
             if (!$lockedCampaign->isOpen()) {
                 return 'closed';
@@ -112,22 +113,18 @@ class PlayerPromotionController
                 return 'joined';
             }
 
-            if ($user->credits < $lockedCampaign->entry_cost) {
+            // The entry fee is a stake: bonus credit first, cents, a ledger row.
+            // It is not play, so it does not count toward a bonus rollover.
+            try {
+                $wallet->stake($user, (float) $lockedCampaign->entry_cost, 'shamo', '', new LedgerEntry(
+                    method: 'shamo',
+                    reason: $lockedCampaign->name.' entry',
+                    sourceType: 'shamo_campaign',
+                    sourceId: $lockedCampaign->id,
+                    type: 'campaign_entry',
+                ), wagers: false);
+            } catch (InsufficientFunds) {
                 return 'balance';
-            }
-
-            if ($lockedCampaign->entry_cost > 0) {
-                $lockedCredits = max(0, $user->credits - $user->withdrawable_balance);
-                $withdrawableCost = max(0, $lockedCampaign->entry_cost - $lockedCredits);
-                $user->update([
-                    'credits' => $user->credits - $lockedCampaign->entry_cost,
-                    'withdrawable_balance' => max(0, $user->withdrawable_balance - $withdrawableCost),
-                ]);
-                WalletTransaction::create([
-                    'user_id' => $user->id, 'type' => 'campaign_entry', 'amount' => -$lockedCampaign->entry_cost,
-                    'status' => 'success', 'method' => 'shamo', 'reason' => $lockedCampaign->name.' entry',
-                    'currency' => 'ETB', 'source_type' => 'shamo_campaign', 'source_id' => $lockedCampaign->id,
-                ]);
             }
 
             ShamoParticipation::create([
@@ -150,27 +147,27 @@ class PlayerPromotionController
         return back()->with($result === 'success' ? 'status' : 'error', $message);
     }
 
-    public function claimShamo(Request $request, ShamoParticipation $participation): RedirectResponse
+    public function claimShamo(Request $request, ShamoParticipation $participation, PlayerWallet $wallet): RedirectResponse
     {
         abort_unless($participation->user_id === $request->user()->id, 403);
 
-        $claimed = DB::transaction(function () use ($request, $participation) {
+        $claimed = DB::transaction(function () use ($request, $participation, $wallet) {
             $locked = ShamoParticipation::query()->lockForUpdate()->findOrFail($participation->id);
-            /** @var User $user */
-            $user = User::query()->lockForUpdate()->findOrFail($request->user()->id);
+            $user = $wallet->lock($request->user());
 
             if ($locked->status !== ShamoParticipation::STATUS_AWARDED || $locked->prize_amount < 1) {
                 return false;
             }
 
-            $user->increment('credits', $locked->prize_amount);
-            $user->increment('withdrawable_balance', $locked->prize_amount);
+            // A prize is real money, all of it (PlayerWallet::reward).
+            $wallet->reward($user, (float) $locked->prize_amount, new LedgerEntry(
+                method: 'shamo',
+                reason: 'Shamo campaign prize',
+                sourceType: 'shamo_participation',
+                sourceId: $locked->id,
+                type: 'campaign_prize',
+            ));
             $locked->update(['status' => ShamoParticipation::STATUS_CLAIMED, 'claimed_at' => now()]);
-            WalletTransaction::create([
-                'user_id' => $user->id, 'type' => 'campaign_prize', 'amount' => $locked->prize_amount,
-                'status' => 'success', 'method' => 'shamo', 'reason' => 'Shamo campaign prize',
-                'currency' => 'ETB', 'source_type' => 'shamo_participation', 'source_id' => $locked->id,
-            ]);
 
             return true;
         });

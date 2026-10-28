@@ -293,19 +293,33 @@ class WinhouseWalletController
 
     private function user(string $token): ?User
     {
-        $id = (int) preg_replace('/^player_/', '', trim($token));
+        // Exactly `player_<digits>`: the signed fields are concatenated with no
+        // separator, so anything looser lets a signed payload be re-cut into a
+        // different one (player_7- / 25 / betT100) that still verifies.
+        if (! preg_match('/^player_([1-9]\d{0,18})$/', trim($token), $matches)) {
+            return null;
+        }
 
-        return $id > 0 ? User::query()->find($id) : null;
+        return User::query()->find((int) $matches[1]);
     }
 
+    /**
+     * The action is part of the signed material and decides the direction of
+     * the money, so it has to be declared and agree with the amount's sign: a
+     * bet takes, a win or a void gives. Anything else is refused rather than
+     * guessed at.
+     */
     private function action(array $payload, float $delta): string
     {
         $declared = strtolower(trim((string) ($payload['action'] ?? '')));
-        if (in_array($declared, ['bet', 'win', 'void'], true)) {
-            return $declared;
+        if (! in_array($declared, ['bet', 'win', 'void'], true)) {
+            throw new \InvalidArgumentException('action must be bet, win or void.');
+        }
+        if (($declared === 'bet') !== ($delta < 0)) {
+            throw new \InvalidArgumentException('The amount sign does not match the action.');
         }
 
-        return $delta < 0 ? 'bet' : 'win';
+        return $declared;
     }
 
     private function validSession(User $user, string $externalId): ?WinhouseSession
@@ -322,8 +336,13 @@ class WinhouseWalletController
     /** Round to cents once, here, so no other path can introduce drift. */
     private function decimalDelta(mixed $value): float
     {
-        if (!is_numeric($value)) {
+        // A plain decimal with at most two places, as it is signed on the wire.
+        // Exponents, spaces and extra precision are not amounts a book sends.
+        if (! is_int($value) && ! is_float($value) && ! is_string($value)) {
             throw new \InvalidArgumentException('A numeric amount is required.');
+        }
+        if (! preg_match('/^-?\d{1,13}(?:\.\d{1,2})?$/', $this->wireString($value))) {
+            throw new \InvalidArgumentException('A numeric amount with at most two decimals is required.');
         }
 
         return round((float) $value, 2);

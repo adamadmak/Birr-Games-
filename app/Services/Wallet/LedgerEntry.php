@@ -15,6 +15,7 @@ final readonly class LedgerEntry
      * @param  string|null  $sourceType  the provider table the movement settles, e.g. 'winhouse_session'
      * @param  int|null  $sourceId  that row's id; QTech fills it in after its own row exists
      * @param  array<string, mixed>  $metadata
+     * @param  string|null  $type  a ledger type other than the movement's default ('bet', 'payout', 'refund'); the reports group by it
      */
     public function __construct(
         public string $method,
@@ -23,6 +24,7 @@ final readonly class LedgerEntry
         public ?string $sourceType = null,
         public ?int $sourceId = null,
         public array $metadata = [],
+        public ?string $type = null,
     ) {
     }
 }

@@ -9,11 +9,11 @@ use App\Http\Controllers\WinhouseWalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/integrations/bigbang/user-data', [BigBangWalletController::class, 'userData'])
-    ->middleware('throttle:1200,1,integrations-bigbang-user-data')
+    ->middleware('throttle:6000,1,integrations-bigbang-user-data')
     ->name('integrations.bigbang.user-data');
 
 Route::post('/integrations/bigbang/balance-change', [BigBangWalletController::class, 'balanceChange'])
-    ->middleware('throttle:1200,1,integrations-bigbang-balance-change')
+    ->middleware('throttle:20000,1,integrations-bigbang-balance-change')
     ->name('integrations.bigbang.balance-change');
 
 // Catalog refresh for an external timer. The hourly schedule in routes/console.php
@@ -30,6 +30,12 @@ Route::post('/integrations/qtech/sync-catalog', QtechCatalogSyncController::clas
 
 // The scheduler's clock. The same timer calls this once a minute with the same
 // token; it runs schedule:run, which includes the queue worker (SystemTickController).
+// What an uptime monitor asks once a minute: database, scheduler freshness,
+// schema. No secret, nothing player-specific (SystemHealthController).
+Route::get('/system/health', \App\Http\Controllers\SystemHealthController::class)
+    ->middleware('throttle:60,1,system-health')
+    ->name('system.health');
+
 Route::match(['get', 'post'], '/system/tick', \App\Http\Controllers\SystemTickController::class)
     ->middleware('throttle:6,1,system-tick')
     ->name('system.tick');
@@ -38,15 +44,15 @@ Route::match(['get', 'post'], '/system/tick', \App\Http\Controllers\SystemTickCo
 // sweeper resolve a stake whose call timed out instead of blind-retrying it,
 // which would charge a player twice for one bet.
 Route::get('/integrations/winhouse/user-data', [WinhouseWalletController::class, 'userData'])
-    ->middleware('throttle:1200,1,integrations-winhouse-user-data')
+    ->middleware('throttle:6000,1,integrations-winhouse-user-data')
     ->name('integrations.winhouse.user-data');
 
 Route::post('/integrations/winhouse/balance-change', [WinhouseWalletController::class, 'balanceChange'])
-    ->middleware('throttle:1200,1,integrations-winhouse-balance-change')
+    ->middleware('throttle:20000,1,integrations-winhouse-balance-change')
     ->name('integrations.winhouse.balance-change');
 
 Route::get('/integrations/winhouse/transaction', [WinhouseWalletController::class, 'transaction'])
-    ->middleware('throttle:1200,1,integrations-winhouse-transaction')
+    ->middleware('throttle:20000,1,integrations-winhouse-transaction')
     ->name('integrations.winhouse.transaction');
 
 // QTech (QT) Common Wallet. QTech host the games and call these back for every
@@ -60,21 +66,21 @@ Route::get('/integrations/winhouse/transaction', [WinhouseWalletController::clas
 // enough to bite would turn a traffic spike into refused bets and stuck rounds.
 Route::prefix('/integrations/qtech')->name('integrations.qtech.')->group(function () {
     Route::get('/accounts/{playerId}/session', [QtechWalletController::class, 'verifySession'])
-        ->middleware('throttle:1200,1,verify-session')
+        ->middleware('throttle:6000,1,verify-session')
         ->name('verify-session');
 
     Route::get('/accounts/{playerId}/balance', [QtechWalletController::class, 'getBalance'])
-        ->middleware('throttle:1200,1,get-balance')
+        ->middleware('throttle:6000,1,get-balance')
         ->name('get-balance');
 
     // Withdrawal (txnType=DEBIT) and deposit (txnType=CREDIT) share this URL —
     // that is QT's contract, not a shortcut.
     Route::post('/transactions', [QtechWalletController::class, 'transaction'])
-        ->middleware('throttle:1200,1,transaction')
+        ->middleware('throttle:20000,1,transaction')
         ->name('transaction');
 
     Route::post('/transactions/rollback', [QtechWalletController::class, 'rollback'])
-        ->middleware('throttle:1200,1,rollback')
+        ->middleware('throttle:20000,1,rollback')
         ->name('rollback');
 
     Route::post('/bonus/rewards', [QtechWalletController::class, 'reward'])
@@ -99,21 +105,21 @@ Route::prefix('/integrations/qtech')->name('integrations.qtech.')->group(functio
 // Point them at a dedicated test account, never a live one.
 Route::prefix('/integrations/qtech-staging')->name('integrations.qtech-staging.')->group(function () {
     Route::get('/accounts/{playerId}/session', [QtechWalletController::class, 'verifySession'])
-        ->middleware('throttle:1200,1,qts-verify-session')
+        ->middleware('throttle:6000,1,qts-verify-session')
         ->name('verify-session');
 
     Route::get('/accounts/{playerId}/balance', [QtechWalletController::class, 'getBalance'])
-        ->middleware('throttle:1200,1,qts-get-balance')
+        ->middleware('throttle:6000,1,qts-get-balance')
         ->name('get-balance');
 
     // Withdrawal (txnType=DEBIT) and deposit (txnType=CREDIT) share this URL —
     // that is QT's contract, not a shortcut.
     Route::post('/transactions', [QtechWalletController::class, 'transaction'])
-        ->middleware('throttle:1200,1,qts-transaction')
+        ->middleware('throttle:20000,1,qts-transaction')
         ->name('transaction');
 
     Route::post('/transactions/rollback', [QtechWalletController::class, 'rollback'])
-        ->middleware('throttle:1200,1,qts-rollback')
+        ->middleware('throttle:20000,1,qts-rollback')
         ->name('rollback');
 
     Route::post('/bonus/rewards', [QtechWalletController::class, 'reward'])

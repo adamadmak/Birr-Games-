@@ -1,0 +1,32 @@
+name: Tests
+
+# Every push and pull request runs the suite against an in-memory SQLite
+# database (phpunit.xml), so a money-path change cannot reach `main` with a
+# red suite unnoticed. The host builds `main` on push regardless; this is
+# the check beside it, not a gate in front of it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, pdo_sqlite, sqlite3, gd, intl
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Lint
+        run: find app routes database tests -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Run the suite
+        run: php vendor/bin/pest --ci

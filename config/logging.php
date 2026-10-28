@@ -18,7 +18,9 @@ return [
 
     
 
-    'default' => env('LOG_CHANNEL', 'single'),
+    // stack = file + stderr: the file for a local tail, stderr for the host's
+    // log viewer, which is the only place production logs can be read.
+    'default' => env('LOG_CHANNEL', 'stack'),
 
 
     
@@ -34,7 +36,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            'channels' => explode(',', env('LOG_STACK', 'single,stderr')),
             'ignore_exceptions' => false,
         ],
 

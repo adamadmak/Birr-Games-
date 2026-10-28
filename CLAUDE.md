@@ -62,11 +62,13 @@ environment. A cached config makes Laravel skip loading `.env` entirely, so
 `config()`, `env()`, `$_ENV` and `getenv()` are all empty at runtime — a value
 set in the platform dashboard never reaches the application.
 
-`BigBang` and `WinHouse` work around it with literal defaults committed in
-`config/services.php`. Do not copy that for anything that authorises money: a
-clone of the repo would authenticate as us. Read through a support class that
-falls back to `platform_settings` (see `App\Support\Qtech`) and give operators
-an admin field to set it.
+No provider key is a literal in the repository any more (they were, until
+28 Oct 2026, and a clone of the repo authenticated as us). `App\Support\Qtech`,
+`BigBang` and `Winhouse` each read through `RuntimeEnv` and the admin fields on
+Configuration → System; keep it that way for anything that authorises money.
+Rotating a key is: set the new value at the provider, paste it in the admin
+field, save. No restart. The QTech staging prefix shares the production
+database, so its handlers refuse every player except the `qtech_test` fixture.
 
 For anything new, resolve the value with `App\Support\RuntimeEnv::get()` —
 config → `platform_settings` → process env → the `.env` file on disk — as

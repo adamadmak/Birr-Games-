@@ -38,6 +38,23 @@ final class GoLiveReset
     public const CONFIRMATION = 'ERASE';
 
     /**
+     * Set the first time the reset runs. From then on it refuses, because a
+     * site that has cleared its test data is live, and a stolen super-admin
+     * session must not be able to erase the ledger. Unlocking means deleting
+     * this row from platform_settings by hand, on purpose, at the database.
+     */
+    public const LOCK_KEY = 'go_live_reset_locked_at';
+
+    public static function locked(): bool
+    {
+        try {
+            return filled(\App\Models\PlatformSetting::valueFor(self::LOCK_KEY));
+        } catch (\Throwable) {
+            return true;   // a settings table that cannot be read is no reason to allow a wipe
+        }
+    }
+
+    /**
      * @var array<string, array{label: string, note: string, tables: list<string>}>
      */
     private const GROUPS = [
@@ -75,16 +92,6 @@ final class GoLiveReset
             'label' => 'Telegram history',
             'note' => 'Broadcasts sent and their deliveries. Templates and subscribers stay.',
             'tables' => ['telegram_broadcast_deliveries', 'telegram_broadcasts', 'telegram_updates', 'telegram_login_tokens'],
-        ],
-        'audit' => [
-            'label' => 'Admin activity log',
-            'note' => 'The record of what administrators did while testing.',
-            'tables' => ['admin_activity_logs'],
-        ],
-        'security' => [
-            'label' => 'Security log',
-            'note' => 'Registration and sign-in attempts recorded while testing. The protection settings stay.',
-            'tables' => ['security_events'],
         ],
         'players' => [
             'label' => 'Player accounts',
@@ -151,6 +158,10 @@ final class GoLiveReset
      */
     public function apply(array $groups, string $confirmation): array
     {
+        if (self::locked()) {
+            throw new RuntimeException('The reset is locked: it ran once already and the site is live. Nothing was cleared.');
+        }
+
         if (trim($confirmation) !== self::CONFIRMATION) {
             throw new RuntimeException('Type '.self::CONFIRMATION.' to confirm. Nothing was cleared.');
         }
@@ -186,6 +197,9 @@ final class GoLiveReset
 
                 $removed[$key] = $count;
             }
+
+            \App\Models\PlatformSetting::query()->updateOrCreate(['key' => self::LOCK_KEY], ['value' => now()->toIso8601String()]);
+            \App\Models\PlatformSetting::flushValueCache();
         });
 
         return $removed;

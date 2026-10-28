@@ -269,8 +269,12 @@ class MemberController
         $validated = $request->validate([
             'password' => ['required', 'confirmed', Password::min(10)->letters()->numbers()],
         ]);
-        $user->update(['password' => $validated['password']]);
-        return back()->with('admin_status', "{$user->name}'s password was reset.");
+        // Same as the bot's reissue and the recovery link: a password someone
+        // else knows is reason to sign every browser out.
+        $user->forceFill(['password' => $validated['password'], 'remember_token' => \Illuminate\Support\Str::random(60)])->save();
+        \App\Support\PlayerSessions::endAll($user);
+
+        return back()->with('admin_status', "{$user->name}'s password was reset and their other sessions were signed out.");
     }
 
     /**

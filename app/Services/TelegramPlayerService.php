@@ -367,6 +367,18 @@ class TelegramPlayerService
 
         if (! $user->contact_confirmed) {
             $updates['contact_confirmed'] = true;
+
+            // Web sign-up never proved the number. This contact card does, and
+            // it may belong to someone other than whoever typed the number
+            // first. The person holding the phone gets a fresh password (the
+            // webhook shows it once, then deletes the message) and every
+            // browser signed in with the old one is signed out.
+            $this->issuedPassword = $this->generatePassword();
+            $updates['password'] = $this->issuedPassword;
+            $updates['remember_token'] = Str::random(60);
+            \App\Support\PlayerSessions::endAll($user);
+
+            \App\Models\SecurityEvent::record('telegram', \App\Models\SecurityEvent::OUTCOME_ALLOWED, 'contact_confirmed_password_rotated', null, null, (string) $user->id, $user->id);
         }
 
         if (blank($user->username)) {

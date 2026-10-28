@@ -387,7 +387,9 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
                 <h3>Clear test data for go-live</h3>
                 <p>Everything here was built and rehearsed against this database. This empties the records of what happened during testing so the platform opens with clean books. It cannot be undone, and it never touches configuration — settings, payment gateways, the game catalogue, promotions, bonus rules, administrators and agents all stay.</p>
             </div>
-            @if ($goLiveReset === null)
+            @if (\App\Services\GoLiveReset::locked())
+                <p class="admin-empty">Locked. The reset ran once and the site is live; the admin activity and security logs were never part of it. Unlocking is a deliberate database change (delete the <code>go_live_reset_locked_at</code> row in platform_settings), not a button.</p>
+            @elseif ($goLiveReset === null)
                 <p class="admin-empty">The record counts could not be read on this connection.</p>
             @elseif (collect($goLiveReset)->sum('count') === 0)
                 <p class="admin-empty">Nothing to clear — the books are already empty.</p>

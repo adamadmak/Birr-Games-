@@ -61,7 +61,10 @@ return [
 
     
 
-    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
+    // Secure by default: the host's config cache is built without a runtime
+    // environment, so an APP_ENV test here always read as "not production".
+    // Local development over plain http sets SESSION_SECURE_COOKIE=false in .env.
+    'secure' => env('SESSION_SECURE_COOKIE', true),
 
     
 

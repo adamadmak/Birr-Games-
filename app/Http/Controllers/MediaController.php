@@ -20,8 +20,10 @@ class MediaController
     {
         abort_unless(in_array($slot, \App\Support\HeroBanner::SLOTS, true), 404);
 
+        // Without the blob: a 304 (most hits, the asset is immutable) must not
+        // read the whole image out of the database to decide it is unchanged.
         $row = SiteMedia::available()
-            ? SiteMedia::query()->where('slot', 'hero-'.$slot)->first()
+            ? SiteMedia::query()->where('slot', 'hero-'.$slot)->first(['id', 'slot', 'mime', 'bytes', 'updated_at'])
             : null;
 
         abort_if($row === null || ! in_array($row->mime, SiteMedia::ALLOWED_MIMES, true), 404);
@@ -40,7 +42,7 @@ class MediaController
             return response('', 304, $headers);
         }
 
-        $binary = base64_decode((string) $row->data, true);
+        $binary = base64_decode((string) SiteMedia::query()->whereKey($row->id)->value('data'), true);
 
         abort_if($binary === false || $binary === '', 404);
 

@@ -14,6 +14,12 @@ class DeduplicateTelegramUpdate
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // The secret first: an anonymous caller must not be able to write a
+        // row, or claim an update_id so that the real update is dropped.
+        if (! app(\App\Services\TelegramBotService::class)->validWebhookSecret((string) $request->header('X-Telegram-Bot-Api-Secret-Token'))) {
+            return new JsonResponse(['ok' => false], 403);
+        }
+
         $updateId = filter_var($request->input('update_id'), FILTER_VALIDATE_INT);
         if ($updateId === false || $updateId < 0) {
             return new JsonResponse(['ok' => false, 'error' => 'A valid Telegram update_id is required.'], 422);

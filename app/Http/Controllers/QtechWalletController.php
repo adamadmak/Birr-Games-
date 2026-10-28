@@ -59,7 +59,7 @@ class QtechWalletController
             return $this->fail('LOGIN_FAILED', 'The given pass key is missing or invalid.', 401);
         }
 
-        $user = $this->player($playerId);
+        $user = $this->player($request, $playerId);
         if (! $user) {
             return $this->fail('INVALID_TOKEN', 'Unknown player.', 400);
         }
@@ -96,7 +96,7 @@ class QtechWalletController
             return $this->fail('LOGIN_FAILED', 'The given pass key is missing or invalid.', 401);
         }
 
-        $user = $this->player($playerId);
+        $user = $this->player($request, $playerId);
         if (! $user) {
             return $this->fail('INVALID_TOKEN', 'Unknown player.', 400);
         }
@@ -144,7 +144,7 @@ class QtechWalletController
             return $this->fail('REQUEST_DECLINED', 'txnId is required.', 400);
         }
 
-        $user = $this->player((string) ($payload['playerId'] ?? ''));
+        $user = $this->player($request, (string) ($payload['playerId'] ?? ''));
         if (! $user) {
             return $this->fail('REQUEST_DECLINED', 'Unknown player.', 400);
         }
@@ -214,7 +214,7 @@ class QtechWalletController
             return $this->fail('REQUEST_DECLINED', 'txnId is required.', 400);
         }
 
-        $user = $this->player((string) ($payload['playerId'] ?? ''));
+        $user = $this->player($request, (string) ($payload['playerId'] ?? ''));
         if (! $user) {
             return $this->fail('REQUEST_DECLINED', 'Unknown player.', 400);
         }
@@ -274,7 +274,7 @@ class QtechWalletController
             return $this->fail('REQUEST_DECLINED', 'txnId is required.', 400);
         }
 
-        $user = $this->player((string) ($payload['playerId'] ?? ''));
+        $user = $this->player($request, (string) ($payload['playerId'] ?? ''));
         if (! $user) {
             return $this->fail('REQUEST_DECLINED', 'Unknown player.', 400);
         }
@@ -299,6 +299,15 @@ class QtechWalletController
                 // a successful no-op.
                 if (! $bet || $bet->rolled_back) {
                     return response()->json(['balance' => $this->money($locked->credits)]);
+                }
+
+                // The refund goes to whoever placed the bet. A rollback naming a
+                // different player is not a no-op, it is a request to pay one
+                // player another player's stake.
+                if ($bet->user_id !== $locked->id) {
+                    Log::warning('QTech rollback named a player who did not place the bet.', ['bet_id' => $bet->txn_id, 'bet_user_id' => $bet->user_id, 'requested_user_id' => $locked->id]);
+
+                    return $this->fail('REQUEST_DECLINED', 'The bet does not belong to this player.', 400);
                 }
 
                 $amount = (float) $bet->amount;
@@ -348,7 +357,7 @@ class QtechWalletController
             return $this->fail('REQUEST_DECLINED', 'rewardType and txnId are required.', 400);
         }
 
-        $user = $this->player((string) ($payload['playerId'] ?? ''));
+        $user = $this->player($request, (string) ($payload['playerId'] ?? ''));
         if (! $user) {
             return $this->fail('REQUEST_DECLINED', 'Unknown player.', 400);
         }
@@ -675,22 +684,30 @@ class QtechWalletController
      * the `player_<id>` form the other integrations use, a bare id, or a
      * username, so the launcher is free to pick whichever reads best.
      */
-    private function player(string $playerId): ?User
+    private function player(Request $request, string $playerId): ?User
     {
         $playerId = trim($playerId);
         if ($playerId === '') {
             return null;
         }
 
-        if (preg_match('/^player_(\d+)$/i', $playerId, $matches)) {
-            return User::query()->find((int) $matches[1]);
+        $user = match (true) {
+            (bool) preg_match('/^player_(\d+)$/i', $playerId, $matches) => User::query()->find((int) $matches[1]),
+            ctype_digit($playerId) => User::query()->find((int) $playerId),
+            default => User::query()->where('username', $playerId)->first(),
+        };
+
+        // The staging prefix reaches the same database as production, so the
+        // staging pass key — which lives in QTech's test environment — must
+        // never be able to move a real player's money. It knows one player:
+        // the fixture minted for verification.
+        if ($user && $this->environment($request) === Qtech::STAGING && ! Qtech::isFixturePlayer($user)) {
+            Log::warning('A QTech staging callback named a live player and was refused.', ['user_id' => $user->id]);
+
+            return null;
         }
 
-        if (ctype_digit($playerId)) {
-            return User::query()->find((int) $playerId);
-        }
-
-        return User::query()->where('username', $playerId)->first();
+        return $user;
     }
 
     private function isBlocked(User $user): bool
