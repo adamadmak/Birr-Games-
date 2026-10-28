@@ -208,6 +208,10 @@ reference for the player site. What it means here:
 - Haptics only inside Telegram, only for results (success, error, a snap).
 - The two phone bars stay solid blue: that is the owner's choice and
   overrides the skill's translucent-chrome advice.
+- Casino tiles are portrait (3:4, the providers' art is 2:3) with the title
+  on the art, and every lobby section is one swipeable row, phones included.
+  The last block of `lucy-play.css` ("CASINO TILES") settles the older tile
+  rules above it; change tiles there, and keep the empty layers out of the markup.
 
 ## Agents: float floor, alerts, screenshots
 

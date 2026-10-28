@@ -70,9 +70,9 @@
                 @foreach ($trendingGames as $game)
                     <a class="member-game-card game-card" href="{{ route('games.show', $game) }}" data-game-card data-title="{{ strtolower($game->title) }}" data-provider="{{ $game->provider->name }}" data-modal-title="{{ $game->display_title }}" data-modal-image="{{ $game->image_source }}" data-modal-slug="{{ $game->slug }}" data-modal-launch="{{ $game->launchesViaProvider() ? route('games.provider.launch',$game) : route('games.show',$game) }}" data-modal-launch-method="{{ $game->launchesViaProvider() ? 'post' : 'get' }}">
                         <div class="game-art art-{{ $game->art }} {{ $game->image_source ? 'has-image' : '' }}">
-                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" loading="lazy" decoding="async">@endif
-                            <span class="game-tag">{{ $game->tag }}</span>
-                            <span class="game-symbol">{{ $game->symbol }}</span><span class="art-glow"></span><span class="card-overlay"></span><span class="play-button">&#9654;</span>
+                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" width="400" height="600" loading="{{ $loop->index < 6 ? 'eager' : 'lazy' }}" decoding="async">@endif
+                            @if($game->tag)<span class="game-tag">{{ $game->tag }}</span>@endif
+                            <span class="game-symbol">{{ $game->symbol }}</span><span class="play-button">&#9654;</span>
                         </div>
                         <div class="game-info"><strong>{{ $game->display_title }}</strong></div>
                     </a>
@@ -92,9 +92,9 @@
                 @foreach ($providerGames as $game)
                     <a class="member-game-card game-card" href="{{ route('games.show', $game) }}" data-game-card data-title="{{ strtolower($game->title) }}" data-provider="{{ $game->provider->name }}" data-modal-title="{{ $game->display_title }}" data-modal-image="{{ $game->image_source }}" data-modal-slug="{{ $game->slug }}" data-modal-launch="{{ $game->launchesViaProvider() ? route('games.provider.launch',$game) : route('games.show',$game) }}" data-modal-launch-method="{{ $game->launchesViaProvider() ? 'post' : 'get' }}">
                         <div class="game-art art-{{ $game->art }} {{ $game->image_source ? 'has-image' : '' }}">
-                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" loading="lazy" decoding="async">@endif
-                            <span class="game-tag">{{ $game->tag }}</span>
-                            <span class="game-symbol">{{ $game->symbol }}</span><span class="art-glow"></span><span class="card-overlay"></span><span class="play-button">&#9654;</span>
+                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" width="400" height="600" loading="lazy" decoding="async">@endif
+                            @if($game->tag)<span class="game-tag">{{ $game->tag }}</span>@endif
+                            <span class="game-symbol">{{ $game->symbol }}</span><span class="play-button">&#9654;</span>
                         </div>
                         <div class="game-info"><strong>{{ $game->display_title }}</strong></div>
                     </a>
@@ -188,11 +188,9 @@
                         <a class="game-card" href="{{ route('games.show', $game) }}"
                            data-game-card data-title="{{ strtolower($game->title) }}" data-provider="{{ $game->provider->name }}" data-modal-title="{{ $game->display_title }}" data-modal-image="{{ $game->image_source }}" data-modal-slug="{{ $game->slug }}" data-modal-launch="{{ route('login') }}">
                             <div class="game-art art-{{ $game->art }} {{ $game->image_source ? 'has-image' : '' }}">
-                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" loading="lazy" decoding="async">@endif
-                                <span class="game-tag">{{ $game->tag }}</span>
+                            @if($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" width="400" height="600" loading="{{ $loop->parent->first && $loop->index < 6 ? 'eager' : 'lazy' }}" decoding="async">@endif
+                                @if($game->tag)<span class="game-tag">{{ $game->tag }}</span>@endif
                                 <span class="game-symbol">{{ $game->symbol }}</span>
-                                <span class="art-glow"></span>
-                                <span class="card-overlay"></span>
                                 <span class="play-button">▶</span>
                             </div>
                             <div class="game-info">

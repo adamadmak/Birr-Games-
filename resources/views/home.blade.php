@@ -73,9 +73,9 @@
                 @foreach ($casinoPicks as $game)
                     <a class="game-card home-casino-card" href="{{ route('games.show', $game) }}">
                         <div class="game-art art-{{ $game->art }} {{ $game->image_source ? 'has-image' : '' }}">
-                            @if ($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" loading="lazy" decoding="async">@endif
-                            <span class="game-tag">{{ $game->tag }}</span>
-                            <span class="game-symbol">{{ $game->symbol }}</span><span class="art-glow"></span><span class="card-overlay"></span><span class="play-button">&#9654;</span>
+                            @if ($game->image_source)<img class="game-cover" src="{{ $game->image_source }}" alt="{{ $game->display_title }}" width="400" height="600" loading="lazy" decoding="async">@endif
+                            @if($game->tag)<span class="game-tag">{{ $game->tag }}</span>@endif
+                            <span class="game-symbol">{{ $game->symbol }}</span><span class="play-button">&#9654;</span>
                         </div>
                         <div class="game-info"><strong>{{ $game->display_title }}</strong><small>{{ $game->provider->name }}</small></div>
                     </a>
