@@ -319,7 +319,7 @@ class AgentPortalController
                 }
 
                 $lockedAgent = Agent::query()->lockForUpdate()->findOrFail($agent->id);
-                $commission = $rules->agentCommissionFor($lockedAgent, (float) $lockedOrder->amount);
+                $commission = $rules->agentCommissionFor($lockedAgent, (float) $lockedOrder->amount, 'withdrawal');
                 if (WalletTransaction::query()->where('ledger_key', 'agent-withdrawal-settlement-'.$lockedOrder->id)->exists()) {
                     throw ValidationException::withMessages(['status' => 'This withdrawal has already been settled.']);
                 }

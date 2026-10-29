@@ -576,7 +576,9 @@ class SettingController
             'agent' => [
                 'agent_commission_amount' => ['required', 'numeric', 'min:0', 'max:1000000'],
             'agent_commission_threshold' => ['required', 'numeric', 'min:0', 'max:100000000'],
-            'agent_commission_mode' => ['required', Rule::in(['per_order', 'per_block'])],
+            'agent_commission_mode' => ['required', Rule::in(['per_order', 'per_block', 'percent'])],
+            'agent_commission_deposit_percent' => ['nullable', 'required_if:agent_commission_mode,percent', 'numeric', 'min:0', 'max:100'],
+            'agent_commission_withdrawal_percent' => ['nullable', 'required_if:agent_commission_mode,percent', 'numeric', 'min:0', 'max:100'],
                 'min_agent_order' => ['required', 'numeric', 'min:0'],
                 'max_agent_order' => ['required', 'numeric', 'gte:min_agent_order'],
                 'agent_settlement_days' => ['required', 'integer', 'min:0', 'max:90'],

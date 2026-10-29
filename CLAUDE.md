@@ -223,6 +223,13 @@ reference for the player site. What it means here:
 - Agents hear about work on Telegram through `App\Services\AgentNotifier`,
   sent after the commit with `TelegramBotService::notify()` (one attempt, five
   seconds). Never send Telegram inside a money transaction.
+- Commission comes only from `FinancialRuleService::agentCommissionFor($agent, $amount, $kind)`,
+  with `$kind` deposit or withdrawal. `agent_commission_mode` is per_order or
+  per_block (the flat amount on orders that reach the threshold) or percent
+  (`agent_commission_deposit_percent` / `agent_commission_withdrawal_percent`
+  of every order). The agent must also have commission enabled.
+- A deposit needs a bank reference or a payment screenshot, either one
+  (`AgentOrder::hasPaymentEvidence()`); approve on that, never on the reference alone.
 - Payment screenshots live in `deposit_proofs` (database, not disk: the
   container is replaced on deploy), re-encoded by `DepositProofStore`, and are
   served only to the player, the assigned agent and an admin.
@@ -246,3 +253,12 @@ Booking codes (WinHouse docs/agent.md 4.8) are read with
 and must run before a code reaches a URL. The Counter page looks a code up and
 opens it in the book as the counter (`/?booking=CODE`), where WinHouse lets the
 agent change the stake and picks before placing. Our site never edits a slip.
+
+## My Bets: per-pick results are worked out, not reported
+
+`/player/bets` (`PlayerBetsController`) lists the player's WinHouse tickets.
+WinHouse settles a ticket as a whole and sends no result per pick, so
+`App\Support\BetPick` marks each pick from the final score (match result,
+double chance, draw no bet, over/under goals, both teams to score) and from
+what the ticket result proves. Anything else stays unknown, never guessed.
+The printed receipt uses the same marks.

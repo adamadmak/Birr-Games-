@@ -95,21 +95,46 @@ final class FinancialRuleService
     /** True when an order pays once per whole block of the threshold instead of once in total. */
     public function agentCommissionPaysPerBlock(): bool
     {
-        return (string) PlatformSetting::valueFor('agent_commission_mode', 'per_order') === 'per_block';
+        return $this->agentCommissionMode() === 'per_block';
+    }
+
+    /** per_order and per_block pay the flat amount; percent pays a share of every order. */
+    public function agentCommissionMode(): string
+    {
+        $mode = (string) PlatformSetting::valueFor('agent_commission_mode', 'per_order');
+
+        return in_array($mode, ['per_order', 'per_block', 'percent'], true) ? $mode : 'per_order';
+    }
+
+    /** The administrator's percentage for this kind of order ('deposit' or 'withdrawal'), 0 to 100. */
+    public function agentCommissionPercent(string $kind): float
+    {
+        $key = $kind === 'withdrawal' ? 'agent_commission_withdrawal_percent' : 'agent_commission_deposit_percent';
+
+        return min(100, max(0, $this->number($key, 0)));
     }
 
     /**
-     * The only commission this platform pays: a flat 200 ETB on an order that reaches
-     * 10,000 ETB, on both deposits and withdrawals. The old percentage-of-every-transaction
-     * commission is gone.
+     * What an agent earns for completing an order, paid on top of the float.
      *
-     * 9,999 pays nothing. 10,000 pays 200. 25,000 pays 200, or 400 when the mode is set to
-     * `per_block` (one payment for each whole 10,000).
+     * Flat (per_order, the default): 200 ETB on an order that reaches 10,000 ETB.
+     * 9,999 pays nothing, 10,000 pays 200, 25,000 pays 200 — or 400 in per_block,
+     * one payment for each whole 10,000.
+     *
+     * Percent: the administrator's share of every order, set separately for
+     * deposits and withdrawals; the threshold does not apply. 1.5% of a
+     * 4,000 ETB deposit pays 60.
+     *
+     * @param  string  $kind  'deposit' or 'withdrawal'
      */
-    public function agentCommissionFor(Agent $agent, float $amount): float
+    public function agentCommissionFor(Agent $agent, float $amount, string $kind = 'deposit'): float
     {
-        if (! $agent->commission_enabled) {
+        if (! $agent->commission_enabled || $amount <= 0) {
             return 0.0;
+        }
+
+        if ($this->agentCommissionMode() === 'percent') {
+            return round($amount * $this->agentCommissionPercent($kind) / 100, 2);
         }
 
         $threshold = $this->agentCommissionThreshold();
@@ -127,6 +152,16 @@ final class FinancialRuleService
     /** One-line description of the live rule, for the admin and agent screens. */
     public function agentCommissionSummary(): string
     {
+        if ($this->agentCommissionMode() === 'percent') {
+            $deposit = $this->agentCommissionPercent('deposit');
+            $withdrawal = $this->agentCommissionPercent('withdrawal');
+
+            return $deposit <= 0 && $withdrawal <= 0
+                ? 'No commission is paid.'
+                : rtrim(rtrim(number_format($deposit, 2), '0'), '.').'% of each deposit and '
+                    .rtrim(rtrim(number_format($withdrawal, 2), '0'), '.').'% of each withdrawal';
+        }
+
         $threshold = $this->agentCommissionThreshold();
         $reward = $this->agentCommissionAmount();
 

@@ -178,6 +178,8 @@ Route::middleware('auth')->prefix('player')->name('player.')->group(function () 
         ->middleware('throttle:120,1,balance')
         ->name('balance');
     Route::get('/wallet', [PlayerController::class, 'wallet'])->name('wallet');
+    // My Bets: the player's sportsbook tickets, each pick marked (PlayerBetsController).
+    Route::get('/bets', [\App\Http\Controllers\PlayerBetsController::class, 'index'])->middleware('throttle:60,1,player-bets')->name('bets');
     Route::get('/tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
     Route::post('/wallet/deposits', [PlayerDepositController::class, 'store'])->middleware('throttle:10,1,deposit')->name('deposits.store');
     Route::patch('/wallet/deposits/{order}/cancel', [PlayerDepositController::class, 'cancel'])->name('deposits.cancel');

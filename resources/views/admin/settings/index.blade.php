@@ -519,14 +519,17 @@ password: {{ $qtechTestCredentials['player_password'] }}</pre>
             </form>
         @elseif ($activeTab === 'agent')
             <form method="POST" action="{{ route('admin.settings.update') }}">@csrf @method('PUT')<input type="hidden" name="section" value="agent">
-                <div class="configuration-panel-title"><div><h2>Agent Payment Config</h2><p>The commission rule and Birr order limits for the whole agent network. Commission is a flat amount on qualifying orders — never a percentage of every transaction.</p></div><span>Currency: ETB</span></div>
+                <div class="configuration-panel-title"><div><h2>Agent Payment Config</h2><p>The commission rule and Birr order limits for the whole agent network.</p></div><span>Currency: ETB</span></div>
                 <div class="configuration-form-grid two">
                     <label>Commission Paid Per Order<input type="number" step="0.01" min="0" name="agent_commission_amount" value="{{ $value('agent_commission_amount', 200) }}" required><small>ETB, on deposits and withdrawals</small></label>
                     <label>Commission Threshold<input type="number" step="0.01" min="0" name="agent_commission_threshold" value="{{ $value('agent_commission_threshold', 10000) }}" required><small>ETB an order must reach to earn it</small></label>
                     <label>Commission Counting<select name="agent_commission_mode" required>
-                        <option value="per_order" @selected($value('agent_commission_mode', 'per_order') !== 'per_block')>Once per qualifying order (25,000 pays 200)</option>
-                        <option value="per_block" @selected($value('agent_commission_mode', 'per_order') === 'per_block')>Once per whole threshold (25,000 pays 400)</option>
-                    </select><small>How large orders are counted</small></label>
+                        <option value="per_order" @selected(! in_array($value('agent_commission_mode', 'per_order'), ['per_block', 'percent'], true))>Flat, once per qualifying order (25,000 pays 200)</option>
+                        <option value="per_block" @selected($value('agent_commission_mode', 'per_order') === 'per_block')>Flat, once per whole threshold (25,000 pays 400)</option>
+                        <option value="percent" @selected($value('agent_commission_mode', 'per_order') === 'percent')>Percentage of every order (the two rates below)</option>
+                    </select><small>Flat pays the amount above on orders that reach the threshold. Percentage pays the rates below on every order and ignores the amount and threshold.</small></label>
+                    <label>Deposit Commission<input type="number" step="0.01" min="0" max="100" name="agent_commission_deposit_percent" value="{{ $value('agent_commission_deposit_percent', 0) }}"><small class="unit">%</small></label>
+                    <label>Withdrawal Commission<input type="number" step="0.01" min="0" max="100" name="agent_commission_withdrawal_percent" value="{{ $value('agent_commission_withdrawal_percent', 0) }}"><small class="unit">%</small></label>
                     <label>Settlement Period<input type="number" min="0" max="90" name="agent_settlement_days" value="{{ $value('agent_settlement_days', 7) }}" required><small class="unit">Days</small></label>
                     <label>Minimum Agent Order<input type="number" step="0.01" min="0" name="min_agent_order" value="{{ $value('min_agent_order', 100) }}" required><small class="unit">ETB</small></label>
                     <label>Maximum Agent Order<input type="number" step="0.01" min="0" name="max_agent_order" value="{{ $value('max_agent_order', 100000) }}" required><small class="unit">ETB</small></label>

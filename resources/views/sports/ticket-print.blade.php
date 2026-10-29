@@ -19,6 +19,8 @@
     $currency = $data['currency'] ?? $local->currency ?? \App\Support\Winhouse::currency();
     $placedAt = $data['placed_at'] ?? $local?->placed_at;
     $selections = $data['selections'] ?? [];
+    // Won or lost per pick, from each match's final score (App\Support\BetPick).
+    $pickResults = $data ? \App\Support\BetPick::results($data) : [];
     $money = fn ($v) => number_format((float) $v, 2).' '.$currency;
     $phone = $player?->phone ? \App\Support\PhoneNumber::format($player->phone) : null;
     $maskedPhone = $phone ? preg_replace('/\d(?=(?:\D*\d){4})/', '•', $phone) : null;
@@ -57,6 +59,7 @@
         .picks .event { display: block; font-weight: 700; }
         .picks .live { display: inline-block; margin-left: 4px; padding: 0 5px; border: 1px solid #000; border-radius: 3px; font-size: 9px; font-weight: 800; letter-spacing: .1em; vertical-align: 1px; }
         .picks .line { display: flex; justify-content: space-between; gap: 8px; }
+        .picks .mark { font-weight: 800; margin-left: 6px; }
         .picks .line em { font-style: normal; font-weight: 800; font-family: "Consolas", "Courier New", monospace; white-space: nowrap; }
         .picks .meta { display: flex; justify-content: space-between; font-size: 10.5px; color: #555; }
         .totals { font-size: 13px; }
@@ -111,7 +114,7 @@
                         <span class="event">{{ $pick['event'] ?: 'Selection '.$loop->iteration }}@if($pick['live'])<span class="live">LIVE</span>@endif</span>
                         <div class="line">
                             <span>{{ $pick['market'] }}{{ $pick['market'] !== '' && $pick['pick_label'] !== '' ? ': ' : '' }}{{ $pick['pick_label'] }}</span>
-                            @if($pick['odds'] > 0)<em>{{ number_format($pick['odds'], 2) }}</em>@endif
+                            <em>@if($pick['odds'] > 0){{ number_format($pick['odds'], 2) }}@endif @switch($pickResults[$loop->index] ?? null)@case('won')<b class="mark" title="Won">&#10003;</b>@break @case('lost')<b class="mark" title="Lost">&#10007;</b>@break @case('void')<b class="mark" title="Void">&ndash;</b>@break @endswitch</em>
                         </div>
                         @if($pick['starts_at'] || $pick['status'] !== '' || $pick['score'] !== '')
                             <div class="meta">
